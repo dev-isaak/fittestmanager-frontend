@@ -1,0 +1,54 @@
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import LayersIcon from "@mui/icons-material/Layers";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { usePathname } from "next/navigation";
+
+export const MainListItems = () => {
+	const pathName = usePathname();
+
+	const menuItems = [
+		{
+			text: "Dashboard",
+			icon: <DashboardIcon />,
+			path: "/dashboard",
+		},
+		{
+			text: "Calendar",
+			icon: <CalendarMonthIcon />,
+			path: "/dashboard/calendar",
+		},
+		{
+			text: "Customers",
+			icon: <PeopleIcon />,
+			path: "/dashboard/customers",
+		},
+		{
+			text: "Reports",
+			icon: <BarChartIcon />,
+			path: "/reports",
+		},
+		{
+			text: "Integrations",
+			icon: <LayersIcon />,
+			path: "/integrations",
+		},
+	];
+	return (
+		<>
+			{menuItems.map((item, index) => (
+				<ListItemButton
+					key={index}
+					sx={{ bgcolor: pathName === item.path && "rgba(20,30,70,.3)" }}
+					href={item.path}>
+					<ListItemIcon>{item.icon}</ListItemIcon>
+					<ListItemText primary={item.text} />
+				</ListItemButton>
+			))}
+		</>
+	);
+};

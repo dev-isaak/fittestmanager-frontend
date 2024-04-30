@@ -191,6 +191,7 @@ export default function Pricing() {
 							</CardContent>
 							<CardActions>
 								<Button
+									color='secondary'
 									fullWidth
 									variant={tier.buttonVariant as "outlined" | "contained"}
 									component='a'

@@ -35,7 +35,7 @@ export default function Footer() {
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
-				backgroundImage: "linear-gradient(360deg, #CEE5FD, #FFF)",
+				backgroundImage: "linear-gradient(360deg, #9fb0c1, #FFF)",
 				gap: { xs: 4, sm: 8 },
 				mt: 2,
 				py: { xs: 8, sm: 10 },

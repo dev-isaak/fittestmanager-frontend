@@ -15,7 +15,7 @@ export default function Hero() {
 			id='hero'
 			sx={(theme) => ({
 				width: "100%",
-				backgroundImage: "linear-gradient(180deg, #CEE5FD, #FFF)",
+				backgroundImage: "linear-gradient(180deg, #9fb0c1, #FFF)",
 				backgroundSize: "100% 20%",
 				backgroundRepeat: "no-repeat",
 			})}>
@@ -43,10 +43,7 @@ export default function Hero() {
 							variant='h1'
 							sx={{
 								fontSize: "clamp(3rem, 10vw, 4rem)",
-								color: (theme) =>
-									theme.palette.mode === "light"
-										? "primary.main"
-										: "primary.light",
+								color: "secondary",
 							}}>
 							products
 						</Typography>
