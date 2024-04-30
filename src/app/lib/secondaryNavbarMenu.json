@@ -1,0 +1,22 @@
+[
+	{
+		"title": "Home",
+		"href": "/"
+	},
+	{
+		"title": "Features",
+		"href": "features"
+	},
+	{
+		"title": "Highlihgts",
+		"href": "highlights"
+	},
+	{
+		"title": "Pricing",
+		"href": "pricing"
+	},
+	{
+		"title": "FAQ",
+		"href": "faq"
+	}
+]
