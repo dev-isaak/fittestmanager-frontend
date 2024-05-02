@@ -30,7 +30,8 @@ function Copyright() {
 
 export default function Footer() {
 	return (
-		<Container
+		<Box
+			component='footer'
 			sx={{
 				display: "flex",
 				flexDirection: "column",
@@ -40,13 +41,11 @@ export default function Footer() {
 				mt: 2,
 				py: { xs: 8, sm: 10 },
 				textAlign: { sm: "center", md: "left" },
-				width: "100%",
 			}}>
 			<Box
 				sx={{
 					display: "flex",
 					flexDirection: { xs: "column", sm: "row" },
-					width: "100%",
 					justifyContent: "space-between",
 				}}>
 				<Box
@@ -211,6 +210,6 @@ export default function Footer() {
 					</IconButton>
 				</Stack>
 			</Box>
-		</Container>
+		</Box>
 	);
 }

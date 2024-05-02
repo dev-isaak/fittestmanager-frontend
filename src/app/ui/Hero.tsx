@@ -13,12 +13,12 @@ export default function Hero() {
 	return (
 		<Box
 			id='hero'
-			sx={(theme) => ({
+			sx={{
 				width: "100%",
 				backgroundImage: "linear-gradient(180deg, #9fb0c1, #FFF)",
 				backgroundSize: "100% 20%",
 				backgroundRepeat: "no-repeat",
-			})}>
+			}}>
 			<Container
 				sx={{
 					display: "flex",

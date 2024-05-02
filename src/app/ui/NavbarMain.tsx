@@ -14,11 +14,13 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import mainNavbarMenu from "../lib/mainNavbarMenu.json";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { removeSession, scrollToSection } from "../lib/data";
 import { AuthContext } from "./layout/Navbar";
+import DashBoardButton from "./DashBoardButton";
+import AuthButtons from "./AuthButtons";
 
 const logoStyle = {
 	width: "140px",
@@ -116,35 +118,7 @@ export default function NavbarMain() {
 								gap: 0.5,
 								alignItems: "center",
 							}}>
-							{!isSignedIn ? (
-								<>
-									<Button
-										color='primary'
-										variant='text'
-										size='small'
-										component='a'
-										href='/sign-in'>
-										Sign in
-									</Button>
-									<Button
-										color='primary'
-										variant='contained'
-										size='small'
-										component='a'
-										href='/sign-up'>
-										Sign up
-									</Button>
-								</>
-							) : (
-								<Button
-									onClick={handleLogout}
-									color='primary'
-									variant='contained'
-									size='small'
-									component='a'>
-									Logout
-								</Button>
-							)}
+							{!isSignedIn ? <AuthButtons /> : <DashBoardButton />}
 						</Box>
 						<Box sx={{ display: { sm: "", md: "none" } }}>
 							<Button
@@ -180,41 +154,7 @@ export default function NavbarMain() {
 										);
 									})}
 									<Divider />
-									{!isSignedIn ? (
-										<>
-											<MenuItem>
-												<Button
-													color='primary'
-													variant='contained'
-													component='a'
-													href='/sign-up'
-													sx={{ width: "100%" }}>
-													Sign up
-												</Button>
-											</MenuItem>
-											<MenuItem>
-												<Button
-													color='primary'
-													variant='outlined'
-													component='a'
-													href='/sign-in'
-													sx={{ width: "100%" }}>
-													Sign in
-												</Button>
-											</MenuItem>
-										</>
-									) : (
-										<MenuItem>
-											<Button
-												color='primary'
-												variant='contained'
-												size='small'
-												component='a'
-												onClick={handleLogout}>
-												Logout
-											</Button>
-										</MenuItem>
-									)}
+									{!isSignedIn ? <AuthButtons /> : <DashBoardButton />}
 								</Box>
 							</Drawer>
 						</Box>
