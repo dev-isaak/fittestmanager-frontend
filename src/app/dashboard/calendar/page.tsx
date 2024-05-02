@@ -1,5 +1,4 @@
 "use client";
-import isAuth from "@/app/ui/isAuth";
 import { Box } from "@mui/material";
 
 function Calendar() {
@@ -10,4 +9,4 @@ function Calendar() {
 	);
 }
 
-export default isAuth(Calendar);
+export default Calendar;

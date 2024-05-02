@@ -2,18 +2,33 @@
 import { usePathname } from "next/navigation";
 import NavbarMain from "../NavbarMain";
 import NavbarSecondary from "../NavbarSecondary";
+import { createContext } from "react";
 
-function NavBar() {
+export const AuthContext = createContext(false);
+
+type NavBarType = {
+	isLoggedIn: boolean;
+};
+
+function NavBar({ isLoggedIn }: NavBarType) {
 	const pathName = usePathname();
 
 	if (pathName === "/") {
-		return <NavbarMain />;
+		return (
+			<AuthContext.Provider value={isLoggedIn}>
+				<NavbarMain />
+			</AuthContext.Provider>
+		);
 	} else if (
 		pathName !== "/" &&
 		!/^\/dashboard\/.*/.test(pathName) &&
 		pathName !== "/dashboard"
 	) {
-		return <NavbarSecondary />;
+		return (
+			<AuthContext.Provider value={isLoggedIn}>
+				<NavbarSecondary />
+			</AuthContext.Provider>
+		);
 	}
 }
 

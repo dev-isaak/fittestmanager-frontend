@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,30 +11,37 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { useRouter } from "next/navigation";
 import Footer from "../ui/layout/Footer";
-import login from "./lib/data";
 import { ThemeProvider } from "@emotion/react";
 import theme from "../theme";
+import { toast } from "react-toastify";
+import AlertMessage from "../ui/AlertMessage";
+import { createClient } from "../utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
 	const router = useRouter();
+	const supabase = createClient();
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		const loggedIn = await login({
-			email: data.get("email"),
-			password: data.get("password"),
-		});
-		if (loggedIn) {
-			router.push("/dashboard");
+		const userCredentials = {
+			email: data.get("email") as string,
+			password: data.get("password") as string,
+		};
+		const { error } = await supabase.auth.signInWithPassword(userCredentials);
+		if (error) {
+			toast.error(error.message);
+			throw new Error(error.message);
 		}
+		router.push("/dashboard");
 	};
 
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component='main'>
+				<AlertMessage />
 				<CssBaseline />
 				<Box
 					sx={{

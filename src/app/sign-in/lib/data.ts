@@ -5,7 +5,6 @@ type loginDataType = {
 
 export default async function login({ email, password }: loginDataType) {
 	const url = "http://localhost:3000/api/auth/login";
-
 	try {
 		const loginData = {
 			email: email,
@@ -19,11 +18,13 @@ export default async function login({ email, password }: loginDataType) {
 			body: JSON.stringify(loginData),
 		});
 		const res = await req.json();
+		if(res.error) throw new Error(res.message)
 
-		if (!res.token) throw new Error(res.message);
+		document.cookie = `token=${res.token}; path=/`
 
-		return true;
-	} catch (error) {
-		console.log(error);
+		return res;
+	} catch (error: any) {
+		console.error(error);
+		return (error)
 	}
 }

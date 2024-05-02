@@ -43,7 +43,10 @@ export const MainListItems = () => {
 			{menuItems.map((item, index) => (
 				<ListItemButton
 					key={index}
-					sx={{ bgcolor: pathName === item.path && "rgba(20,30,70,.3)" }}
+					sx={{
+						background:
+							pathName === item.path ? "rgba(20,30,70,.3)" : "inherit",
+					}}
 					href={item.path}>
 					<ListItemIcon>{item.icon}</ListItemIcon>
 					<ListItemText primary={item.text} />

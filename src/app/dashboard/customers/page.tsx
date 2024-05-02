@@ -1,5 +1,4 @@
 "use client";
-import isAuth from "@/app/ui/isAuth";
 import { Box } from "@mui/material";
 
 function Customers() {
@@ -10,4 +9,4 @@ function Customers() {
 	);
 }
 
-export default isAuth(Customers);
+export default Customers;

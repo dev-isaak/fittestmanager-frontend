@@ -1,3 +1,4 @@
+"use client";
 import { ThemeProvider } from "@emotion/react";
 import theme from "../theme";
 import {
@@ -13,9 +14,11 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import mainNavbarMenu from "../lib/mainNavbarMenu.json";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { removeSession, scrollToSection } from "../lib/data";
+import { AuthContext } from "./layout/Navbar";
 
 const logoStyle = {
 	width: "140px",
@@ -25,26 +28,29 @@ const logoStyle = {
 
 export default function NavbarMain() {
 	const [open, setOpen] = useState(false);
+	const isLoggedIn = useContext(AuthContext);
+	const [isSignedIn, setIsSignedIn] = useState(isLoggedIn);
 	const pathName = usePathname();
 	const router = useRouter();
+
+	const handleLogout = async () => {
+		const isLoggedOut = await removeSession();
+		if (isLoggedOut) {
+			setIsSignedIn(false);
+		}
+	};
 
 	const toggleDrawer = (newOpen: boolean) => () => {
 		setOpen(newOpen);
 	};
 
-	const scrollToSection = (sectionId: string) => {
-		if (pathName !== "/") router.push("/");
+	const handleScroll = (sectionId: string) => {
+		const isHomePage = scrollToSection(sectionId, pathName);
 
-		const sectionElement = document.getElementById(sectionId);
-		const offset = 128;
-		if (sectionElement) {
-			const targetScroll = sectionElement.offsetTop - offset;
-			sectionElement.scrollIntoView({ behavior: "smooth" });
-			window.scrollTo({
-				top: targetScroll,
-				behavior: "smooth",
-			});
+		if (isHomePage) {
 			setOpen(false);
+		} else {
+			router.push("/");
 		}
 	};
 
@@ -94,7 +100,7 @@ export default function NavbarMain() {
 									return (
 										<MenuItem
 											key={index}
-											onClick={() => scrollToSection(item.href)}
+											onClick={() => handleScroll(item.href)}
 											sx={{ py: "6px", px: "12px" }}>
 											<Typography variant='body2' color='text.primary'>
 												{item.title}
@@ -110,22 +116,35 @@ export default function NavbarMain() {
 								gap: 0.5,
 								alignItems: "center",
 							}}>
-							<Button
-								color='primary'
-								variant='text'
-								size='small'
-								component='a'
-								href='/sign-in'>
-								Sign in
-							</Button>
-							<Button
-								color='primary'
-								variant='contained'
-								size='small'
-								component='a'
-								href='/sign-up'>
-								Sign up
-							</Button>
+							{!isSignedIn ? (
+								<>
+									<Button
+										color='primary'
+										variant='text'
+										size='small'
+										component='a'
+										href='/sign-in'>
+										Sign in
+									</Button>
+									<Button
+										color='primary'
+										variant='contained'
+										size='small'
+										component='a'
+										href='/sign-up'>
+										Sign up
+									</Button>
+								</>
+							) : (
+								<Button
+									onClick={handleLogout}
+									color='primary'
+									variant='contained'
+									size='small'
+									component='a'>
+									Logout
+								</Button>
+							)}
 						</Box>
 						<Box sx={{ display: { sm: "", md: "none" } }}>
 							<Button
@@ -155,32 +174,47 @@ export default function NavbarMain() {
 										return (
 											<MenuItem
 												key={index}
-												onClick={() => scrollToSection(item.href)}>
+												onClick={() => handleScroll(item.href)}>
 												{item.title}
 											</MenuItem>
 										);
 									})}
 									<Divider />
-									<MenuItem>
-										<Button
-											color='primary'
-											variant='contained'
-											component='a'
-											href='/sign-up'
-											sx={{ width: "100%" }}>
-											Sign up
-										</Button>
-									</MenuItem>
-									<MenuItem>
-										<Button
-											color='primary'
-											variant='outlined'
-											component='a'
-											href='/sign-in'
-											sx={{ width: "100%" }}>
-											Sign in
-										</Button>
-									</MenuItem>
+									{!isSignedIn ? (
+										<>
+											<MenuItem>
+												<Button
+													color='primary'
+													variant='contained'
+													component='a'
+													href='/sign-up'
+													sx={{ width: "100%" }}>
+													Sign up
+												</Button>
+											</MenuItem>
+											<MenuItem>
+												<Button
+													color='primary'
+													variant='outlined'
+													component='a'
+													href='/sign-in'
+													sx={{ width: "100%" }}>
+													Sign in
+												</Button>
+											</MenuItem>
+										</>
+									) : (
+										<MenuItem>
+											<Button
+												color='primary'
+												variant='contained'
+												size='small'
+												component='a'
+												onClick={handleLogout}>
+												Logout
+											</Button>
+										</MenuItem>
+									)}
 								</Box>
 							</Drawer>
 						</Box>
