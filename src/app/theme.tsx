@@ -31,9 +31,6 @@ const theme: ThemeOptions = createTheme({
 					borderRadius: 3,
 					color: "white",
 				},
-				// textPrimary: {
-				// 	color: "#333",
-				// },
 				containedSecondary: {
 					color: "#333",
 					fontWeight: "700",
@@ -52,6 +49,25 @@ const theme: ThemeOptions = createTheme({
 					background: "#f5f5f5",
 					padding: 0,
 					border: "none",
+				},
+			},
+		},
+		MuiTableCell: {
+			styleOverrides: {
+				root: {},
+				head: {
+					background: "#434343",
+					color: "white",
+					fontWeight: 600,
+				},
+			},
+		},
+		MuiTableRow: {
+			styleOverrides: {
+				root: {
+					"&:nth-of-type(odd)": {
+						background: "#f5f5f5",
+					},
 				},
 			},
 		},

@@ -6,6 +6,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { usePathname } from "next/navigation";
 
 export const MainListItems = () => {
@@ -23,9 +24,14 @@ export const MainListItems = () => {
 			path: "/dashboard/calendar",
 		},
 		{
-			text: "Customers",
+			text: "Fitness Centers",
+			icon: <FitnessCenterIcon />,
+			path: "/dashboard/fitness-centers",
+		},
+		{
+			text: "Members",
 			icon: <PeopleIcon />,
-			path: "/dashboard/customers",
+			path: "/dashboard/members",
 		},
 		{
 			text: "Reports",
