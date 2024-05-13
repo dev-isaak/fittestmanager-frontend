@@ -1,8 +1,6 @@
 export interface IFitnessCenter {
+	avatar: string | null;
+	center_name: string | null;
 	id: number;
-	center_name: string;
-	profiles: {
-		first_name: string;
-		email: string;
-	};
+	manager_id: string;
 }

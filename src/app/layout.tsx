@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Box } from "@mui/material";
 import NavBar from "./ui/layout/Navbar";
 import { createClient } from "./utils/supabase/server";
+import StoreProvider from "@/redux/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,8 +24,10 @@ export default async function RootLayout({
 	return (
 		<html lang='es'>
 			<body className={inter.className}>
-				<NavBar isLoggedIn={isLoggedIn} />
-				<Box>{children}</Box>
+				<StoreProvider>
+					<NavBar isLoggedIn={isLoggedIn} />
+					<Box>{children}</Box>
+				</StoreProvider>
 			</body>
 		</html>
 	);

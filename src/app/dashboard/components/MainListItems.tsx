@@ -8,30 +8,31 @@ import LayersIcon from "@mui/icons-material/Layers";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { ListItem } from "@mui/material";
 
 export const MainListItems = () => {
 	const pathName = usePathname();
-
 	const menuItems = [
 		{
 			text: "Dashboard",
 			icon: <DashboardIcon />,
-			path: "/dashboard",
+			path: `/dashboard`,
 		},
 		{
 			text: "Calendar",
 			icon: <CalendarMonthIcon />,
-			path: "/dashboard/calendar",
+			path: `/dashboard/calendar`,
 		},
 		{
 			text: "Fitness Centers",
 			icon: <FitnessCenterIcon />,
-			path: "/dashboard/fitness-centers",
+			path: `/dashboard/fitness-centers`,
 		},
 		{
 			text: "Members",
 			icon: <PeopleIcon />,
-			path: "/dashboard/members",
+			path: `/dashboard/members`,
 		},
 		{
 			text: "Reports",
@@ -48,14 +49,17 @@ export const MainListItems = () => {
 		<>
 			{menuItems.map((item, index) => (
 				<ListItemButton
+					component={Link}
+					href={{
+						pathname: item.path,
+					}}
 					key={index}
 					sx={{
 						background:
 							pathName === item.path ? "rgba(20,30,70,.3)" : "inherit",
-					}}
-					href={item.path}>
+					}}>
 					<ListItemIcon>{item.icon}</ListItemIcon>
-					<ListItemText primary={item.text} />
+					<ListItemText>{item.text}</ListItemText>
 				</ListItemButton>
 			))}
 		</>

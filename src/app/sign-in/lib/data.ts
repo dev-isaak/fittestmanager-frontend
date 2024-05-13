@@ -1,3 +1,5 @@
+import { createClient } from "@/app/utils/supabase/client";
+
 type loginDataType = {
 	email: any;
 	password: any;
@@ -17,7 +19,9 @@ export default async function login({ email, password }: loginDataType) {
 			},
 			body: JSON.stringify(loginData),
 		});
+		console.log(req)
 		const res = await req.json();
+
 		if(res.error) throw new Error(res.message)
 
 		document.cookie = `token=${res.token}; path=/`
@@ -27,4 +31,11 @@ export default async function login({ email, password }: loginDataType) {
 		console.error(error);
 		return (error)
 	}
+}
+
+export const getMyUser = async() => {
+  const supabase = createClient()
+
+	const { data: { user } } = await supabase.auth.getUser()
+	return user
 }

@@ -12,7 +12,7 @@ export default function CreateCenter() {
 		console.log(data.get("centerName"), data.get("manager"));
 	};
 
-	const handleUploadFile = (newFile) => {
+	const handleUploadFile = (newFile: any) => {
 		setFile(newFile);
 	};
 

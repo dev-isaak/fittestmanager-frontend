@@ -14,10 +14,16 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import theme from "../theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MainListItems } from "./components/MainListItems";
 import { SecondaryListItems } from "./components/SecondaryListItems";
 import { UserZoneListItems } from "./components/UserZoneListItems";
+import SelectFitnessCenter from "./components/SelectFitnessCenter";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+	fetchOwnFitnessCenters,
+	selectFitnessCenter,
+} from "@/redux/features/fitnessCentersSlice";
 
 const drawerWidth: number = 240;
 
@@ -78,6 +84,23 @@ export default function DashboardLayout({
 	const toggleDrawer = () => {
 		setOpen(!open);
 	};
+	const dispatch = useAppDispatch();
+	const currentFitnessCenter = useAppSelector(
+		(data) => data.fitnessCentersReducer.currentFitnessCenter
+	);
+	const fitnessCenters: any = useAppSelector(
+		(data) => data.fitnessCentersReducer.centers
+	);
+
+	useEffect(() => {
+		dispatch(fetchOwnFitnessCenters());
+	}, []);
+
+	useEffect(() => {
+		if (fitnessCenters.length > 0) {
+			dispatch(selectFitnessCenter(fitnessCenters[0]));
+		}
+	}, [fitnessCenters]);
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -105,7 +128,7 @@ export default function DashboardLayout({
 							color='inherit'
 							noWrap
 							sx={{ flexGrow: 1 }}>
-							Dashboard
+							{currentFitnessCenter.center_name}
 						</Typography>
 						<IconButton color='inherit'>
 							<Badge badgeContent={4} color='secondary'>
@@ -128,7 +151,8 @@ export default function DashboardLayout({
 					</Toolbar>
 					<Divider />
 					<List component='nav'>
-						<MainListItems />
+						<SelectFitnessCenter />
+						<MainListItems fitnessCenterId={currentFitnessCenter.id} />
 						<Divider sx={{ my: 1 }} />
 						<SecondaryListItems />
 						<Divider sx={{ mt: 10 }} />

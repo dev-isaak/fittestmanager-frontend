@@ -8,9 +8,6 @@ import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
 import Footer from "../ui/layout/Footer";
 import { ThemeProvider } from "@emotion/react";
 import theme from "../theme";
@@ -18,7 +15,6 @@ import { toast } from "react-toastify";
 import AlertMessage from "../ui/AlertMessage";
 import { useRouter } from "next/navigation";
 import { createClient } from "../utils/supabase/client";
-import { useEffect, useState } from "react";
 import { Stack } from "@mui/material";
 
 export default function SignIn() {

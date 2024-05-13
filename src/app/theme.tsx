@@ -71,6 +71,26 @@ const theme: ThemeOptions = createTheme({
 				},
 			},
 		},
+		MuiTabs: {
+			styleOverrides: {
+				indicator: {
+					backgroundColor: "#f5f5f5",
+				},
+			},
+		},
+		MuiTab: {
+			styleOverrides: {
+				root: {
+					"&.Mui-selected": {
+						background: "#f5f5f5",
+						borderRadius: "10px 10px 0px 0px",
+					},
+					"&.MuiTabs-indicator": {
+						backgroundColor: "red",
+					},
+				},
+			},
+		},
 	},
 	shape: {
 		borderRadius: 4,
