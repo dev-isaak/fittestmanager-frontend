@@ -15,6 +15,7 @@ export default function MembersBoard() {
 	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
+			// Añadir condicional para que solo haga dispatch cuando se cambia de fitnessCenter, pero no esten los datos anteriores guardados en redux
 			dispatch(fetchMembersByFitnessCenter(centerId));
 		}
 	}, [currentFitnessCenter, dispatch]);
@@ -23,7 +24,13 @@ export default function MembersBoard() {
 		<>
 			<Typography component='h2'>Miembros</Typography>
 			<SearchInput type='MEMBERS' />
-			<DataTable data={members} />
+			<DataTable
+				onClickOpenDialog
+				data={members}
+				type='MEMBERS'
+				titleCol={["Avatar", "Name", "Email", "Phone Number", "Plan", "Status"]}
+				dataCol={["photo", "first_name", "email", "phone_number", "plan", ""]}
+			/>
 		</>
 	);
 }

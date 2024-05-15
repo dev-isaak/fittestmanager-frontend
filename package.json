@@ -23,6 +23,8 @@
 		"@supabase/supabase-js": "^2.43.0",
 		"@types/react-redux": "^7.1.33",
 		"cookies-next": "^4.1.1",
+		"country-region-data": "^3.0.0",
+		"dayjs": "^1.11.11",
 		"install": "^0.13.0",
 		"mui-file-input": "^4.0.4",
 		"next": "^14.2.3",

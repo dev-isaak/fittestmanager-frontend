@@ -11,7 +11,6 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import { IFitnessCenter } from "../interfaces/interfaces";
 
 export default function FitnessCentersBoard() {
 	const [fitnessCenters, setFitnessCenters] = useState([]);
