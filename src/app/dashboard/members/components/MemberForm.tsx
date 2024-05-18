@@ -1,14 +1,17 @@
-import { updateMemberInfo } from "@/redux/features/membersSlice";
-import { useAppDispatch } from "@/redux/hooks";
+import {
+	createNewMember,
+	memberCreated,
+	updateMemberInfo,
+} from "@/redux/features/membersSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
 	Avatar,
 	Box,
 	Button,
+	CircularProgress,
 	Divider,
 	Grid,
-	InputLabel,
 	MenuItem,
-	Select,
 	Stack,
 	TextField,
 	Typography,
@@ -19,9 +22,12 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { allCountries } from "country-region-data";
+import { toast } from "react-toastify";
 
-type UpdateMemberFormType = {
-	memberData: any;
+type MemberFormType = {
+	memberData?: any;
+	formType: "CREATE" | "UPDATE";
+	onCloseDialog?: any;
 };
 
 const VisuallyHiddenInput = styled("input")({
@@ -36,30 +42,53 @@ const VisuallyHiddenInput = styled("input")({
 	width: 1,
 });
 
-export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
+export default function MemberForm({
+	memberData,
+	formType,
+	onCloseDialog,
+}: MemberFormType) {
 	const [gender, setGender] = useState();
 	const [imgURL, setImgURL] = useState("");
 	const [selectedState, setSelectedState] = useState([]);
+	const created = useAppSelector((data) => data.membersReducer.created);
+	const isLoading = useAppSelector((data) => data.membersReducer.loading);
+	const currentCenter = useAppSelector(
+		(data) => data.fitnessCentersReducer.currentFitnessCenter
+	);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		const country = allCountries.filter(
-			(country) => country[1] === memberData.country
-		);
+		if (formType === "UPDATE") {
+			const country = allCountries.filter(
+				(country) => country[1] === memberData.country
+			);
 
-		if (country.length > 0) {
-			setSelectedState(country[0][2]);
+			if (country.length > 0) {
+				setSelectedState(country[0][2]);
+			}
 		}
 	}, []);
+
+	useEffect(() => {
+		if (created) {
+			toast.success("Usuario creado.");
+			dispatch(memberCreated(""));
+		}
+	}, [created]);
 
 	const handleSubmit = (event: any) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		dispatch(updateMemberInfo(data));
+		if (formType === "UPDATE") dispatch(updateMemberInfo(data));
+		if (formType === "CREATE")
+			dispatch(createNewMember({ member: data, centerId: currentCenter.id }));
 	};
-	const memberSinceDate = `${new Date(memberData.created_at).getDate()}-${
-		new Date(memberData.created_at).getMonth() + 1
-	}-${new Date(memberData.created_at).getFullYear()}`;
+
+	const memberSinceDate =
+		memberData &&
+		`${new Date(memberData.created_at).getDate()}-${
+			new Date(memberData.created_at).getMonth() + 1
+		}-${new Date(memberData.created_at).getFullYear()}`;
 
 	const handleGender = (event) => {
 		setGender(event.target.value);
@@ -82,6 +111,10 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 		setSelectedState(country[0][2]);
 	};
 
+	const handleCloseButton = () => {
+		onCloseDialog(false);
+	};
+
 	return (
 		<Stack
 			component='form'
@@ -92,11 +125,15 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 			<TextField
 				sx={{ display: "none" }}
 				name='userId'
-				value={memberData.user_id}
+				value={formType === "UPDATE" && memberData.user_id}
 			/>
-			<Box marginBottom={2}>
+			<Box
+				display='flex'
+				flexDirection='column'
+				alignItems='center'
+				marginBottom={2}>
 				<Avatar
-					src={imgURL || memberData.photo}
+					src={imgURL || (formType === "UPDATE" && memberData.photo)}
 					sx={{
 						width: 150,
 						height: 150,
@@ -118,18 +155,14 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 					/>
 				</Button>
 			</Box>
-			<Divider
-				sx={{ width: "100%", marginY: 2, fontSize: "0.8rem" }}
-				textAlign='left'>
-				Datos de contacto
-			</Divider>
+			<Divider>Datos de contacto</Divider>
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
 					<TextField
 						fullWidth
 						label='Nombre'
 						name='firstName'
-						defaultValue={memberData.first_name}
+						defaultValue={formType === "UPDATE" ? memberData.first_name : ""}
 					/>
 				</Grid>
 				<Grid item xs={12} md={6}>
@@ -137,7 +170,7 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='Apellidos'
 						name='lastName'
-						defaultValue={memberData.last_name}
+						defaultValue={formType === "UPDATE" ? memberData.last_name : ""}
 					/>
 				</Grid>
 			</Grid>
@@ -147,14 +180,19 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='DNI'
 						name='dni'
-						defaultValue={memberData.dni}
+						defaultValue={formType === "UPDATE" ? memberData.dni : ""}
 					/>
 				</Grid>
 				<Grid item xs={12} md={6}>
 					<DatePicker
+						sx={{ width: "100%" }}
 						label='Fecha de nacimiento'
 						name='birthDate'
-						defaultValue={dayjs(memberData.birth_date)}
+						defaultValue={
+							formType === "UPDATE"
+								? dayjs(memberData.birth_date ? memberData.birth_date : "")
+								: undefined
+						}
 						format='MM-DD-YYYY'
 					/>
 				</Grid>
@@ -165,7 +203,7 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='Teléfono'
 						name='phone'
-						defaultValue={memberData.phone_number}
+						defaultValue={formType === "UPDATE" ? memberData.phone_number : ""}
 					/>
 				</Grid>
 				<Grid item xs={12} md={6}>
@@ -173,7 +211,9 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='Teléfono de emergéncia'
 						name='emergencyPhone'
-						defaultValue={memberData.emergency_phone}
+						defaultValue={
+							formType === "UPDATE" ? memberData.emergency_phone : ""
+						}
 					/>
 				</Grid>
 			</Grid>
@@ -181,41 +221,39 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 				fullWidth
 				label='Email'
 				name='email'
-				value={memberData.email}
-				disabled
+				defaultValue={formType === "UPDATE" ? memberData.email : ""}
+				disabled={formType === "UPDATE" ? true : false}
 			/>
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
-					<Select
+					<TextField
+						select
 						label='Género'
 						value={gender}
 						name='gender'
-						defaultValue={memberData.gender}
+						defaultValue={formType === "UPDATE" ? memberData.gender : ""}
 						onChange={handleGender}
 						fullWidth>
 						<MenuItem value={"male"}>Hombre</MenuItem>
 						<MenuItem value={"female"}>Mujer</MenuItem>
-					</Select>
+					</TextField>
 				</Grid>
 				<Grid item xs={12} md={6}></Grid>
 			</Grid>
-			<Divider
-				sx={{ width: "100%", marginY: 2, fontSize: "0.8rem" }}
-				textAlign='left'>
-				Localización
-			</Divider>
+			<Divider>Localización</Divider>
 			<TextField
 				fullWidth
 				label='Dirección'
 				name='address'
-				defaultValue={memberData.address}
+				defaultValue={formType === "UPDATE" ? memberData.address : ""}
 			/>
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
-					<Select
+					<TextField
+						select
 						label='País'
 						name='country'
-						defaultValue={memberData.country || ""}
+						defaultValue={formType === "UPDATE" ? memberData.country : ""}
 						fullWidth
 						onChange={handleCountryChange}>
 						{allCountries.map((country, index) => (
@@ -223,20 +261,21 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 								{country[0]}
 							</MenuItem>
 						))}
-					</Select>
+					</TextField>
 				</Grid>
 				<Grid item xs={12} md={6}>
-					<Select
+					<TextField
+						select
 						label='Localidad'
 						name='town'
-						defaultValue={memberData.town || ""}
+						defaultValue={formType === "UPDATE" ? memberData.town : ""}
 						fullWidth>
 						{selectedState.map((state, index) => (
 							<MenuItem key={index} value={state[0]}>
 								{state[0]}
 							</MenuItem>
 						))}
-					</Select>
+					</TextField>
 				</Grid>
 			</Grid>
 			<Grid container spacing={2}>
@@ -245,24 +284,19 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='Código Postal'
 						name='postalCode'
-						defaultValue={memberData.postal_code}
+						defaultValue={formType === "UPDATE" ? memberData.postal_code : ""}
 					/>
 				</Grid>
 				<Grid item xs={12} md={6}></Grid>
 			</Grid>
-			<Divider
-				sx={{ width: "100%", marginY: 2, fontSize: "0.8rem" }}
-				textAlign='left'>
-				Cuota
-			</Divider>
-
+			<Divider>Cuota</Divider>
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
 					<TextField
 						fullWidth
 						label='Plan'
 						name='plan'
-						defaultValue={memberData.plan}
+						defaultValue={formType === "UPDATE" ? memberData.plan : ""}
 					/>
 				</Grid>
 				<Grid item xs={12} md={6}>
@@ -270,14 +304,34 @@ export default function UpdateMemberForm({ memberData }: UpdateMemberFormType) {
 						fullWidth
 						label='Status'
 						name='status'
-						defaultValue={memberData.status}
+						defaultValue={formType === "UPDATE" ? memberData.status : ""}
 					/>
 				</Grid>
 			</Grid>
-			<Typography variant='body2'>Miembro desde: {memberSinceDate}</Typography>
-			<Button type='submit' variant='contained'>
-				Actualizar
-			</Button>
+			{formType === "UPDATE" && (
+				<Typography variant='body2'>
+					Miembro desde: {memberSinceDate}
+				</Typography>
+			)}
+			<Stack flexDirection='row' gap={2} marginTop={4}>
+				{isLoading ? (
+					<CircularProgress />
+				) : (
+					<>
+						<Button type='submit' variant='contained'>
+							{formType === "CREATE" ? "Crear nuevo miembro" : "Actualizar"}
+						</Button>
+						{formType === "UPDATE" && (
+							<Button
+								onClick={handleCloseButton}
+								variant='outlined'
+								color='error'>
+								Cancelar
+							</Button>
+						)}
+					</>
+				)}
+			</Stack>
 		</Stack>
 	);
 }
