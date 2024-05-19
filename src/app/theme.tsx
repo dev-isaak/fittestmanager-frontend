@@ -3,14 +3,14 @@ import { ThemeOptions, createTheme } from "@mui/material/styles";
 const theme: ThemeOptions = createTheme({
 	palette: {
 		primary: {
-			main: "#141E46",
+			main: "rgb(28 36 52)",
 		},
 		secondary: {
-			main: "#8DECB4",
+			main: "#E86746",
 		},
 		background: {
-			default: "#ffffff",
-			paper: "#ececec",
+			// default: "blue",
+			paper: "white",
 		},
 		error: {
 			main: "#d32f2f",
@@ -21,7 +21,37 @@ const theme: ThemeOptions = createTheme({
 		success: {
 			main: "#2e7d32",
 		},
-		divider: "rgba(76,76,76,0.12)",
+	},
+	typography: {
+		body1: {
+			fontSize: "1rem",
+		},
+		body2: {
+			fontSize: ".9rem",
+		},
+		h1: {
+			fontSize: "3.5rem",
+			marginTop: "1rem",
+			marginBottom: "1rem",
+			fontWeight: "900",
+		},
+		h2: {
+			fontSize: "3rem",
+			marginTop: "1rem",
+			marginBottom: "1rem",
+			fontWeight: "900",
+		},
+		h3: {
+			fontSize: "2.5rem",
+			marginTop: "1rem",
+			marginBottom: "1rem",
+		},
+		h4: {
+			fontSize: "2rem",
+		},
+		h5: {
+			fontSize: "1.5rem",
+		},
 	},
 	components: {
 		MuiButton: {
@@ -30,6 +60,14 @@ const theme: ThemeOptions = createTheme({
 					border: 0,
 					borderRadius: 3,
 					color: "white",
+				},
+				outlinedPrimary: {
+					color: "#333",
+					border: "1px solid rgb(28 36 52)",
+				},
+				outlinedError: {
+					color: "#d32f2f",
+					border: "1px solid #d32f2f",
 				},
 				containedSecondary: {
 					color: "#333",
@@ -46,7 +84,7 @@ const theme: ThemeOptions = createTheme({
 		MuiTextField: {
 			styleOverrides: {
 				root: {
-					background: "#f5f5f5",
+					background: "white",
 					padding: 0,
 					border: "none",
 				},
@@ -56,17 +94,20 @@ const theme: ThemeOptions = createTheme({
 			styleOverrides: {
 				root: {},
 				head: {
-					background: "#434343",
-					color: "white",
+					color: "rgba(65,76,99,.7)",
+					background: "rgba(65,76,99,.1)",
 					fontWeight: 600,
+					textTransform: "uppercase",
 				},
 			},
 		},
 		MuiTableRow: {
 			styleOverrides: {
 				root: {
-					"&:nth-of-type(odd)": {
-						background: "#f5f5f5",
+					transition: "300ms all",
+					"&:hover": {
+						cursor: "pointer",
+						background: "rgba(65,76,99,.1)",
 					},
 				},
 			},
@@ -82,12 +123,50 @@ const theme: ThemeOptions = createTheme({
 			styleOverrides: {
 				root: {
 					"&.Mui-selected": {
-						background: "#f5f5f5",
+						background: "rgb(241, 245, 249)",
 						borderRadius: "10px 10px 0px 0px",
+						boxShadow: "4px 4px 10px lightgray",
 					},
 					"&.MuiTabs-indicator": {
 						backgroundColor: "red",
 					},
+				},
+			},
+		},
+		MuiAvatar: {
+			styleOverrides: {
+				root: {
+					border: "1px solid lightgray",
+				},
+			},
+		},
+		MuiDivider: {
+			styleOverrides: {
+				root: {
+					width: "100%",
+					marginTop: 4,
+					marginBottom: 6,
+					fontSize: "0.9rem",
+				},
+			},
+		},
+		MuiPaper: {
+			styleOverrides: {
+				root: {
+					borderRadius: "0",
+				},
+			},
+		},
+		MuiChip: {
+			styleOverrides: {
+				colorError: {
+					backgroundColor: "#ff000021",
+				},
+				colorSuccess: {
+					backgroundColor: "#00800030",
+				},
+				colorInfo: {
+					backgroundColor: "#0000ff1c",
 				},
 			},
 		},

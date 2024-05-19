@@ -114,11 +114,12 @@ export default function DashboardLayout({
 					<AppBar position='absolute' open={open}>
 						<Toolbar
 							sx={{
-								pr: "24px", // keep right padding when drawer closed
+								pr: "24px",
+								backgroundColor: "#ececec",
 							}}>
 							<IconButton
 								edge='start'
-								color='inherit'
+								color='primary'
 								aria-label='open drawer'
 								onClick={toggleDrawer}
 								sx={{
@@ -142,25 +143,35 @@ export default function DashboardLayout({
 							</IconButton>
 						</Toolbar>
 					</AppBar>
-					<Drawer variant='permanent' open={open}>
+					<Drawer
+						variant='permanent'
+						open={open}
+						sx={{ backgroundColor: "red" }}>
 						<Toolbar
 							sx={{
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "flex-end",
 								px: [1],
+								backgroundColor: "rgb(28 36 52)",
 							}}>
 							<IconButton onClick={toggleDrawer}>
-								<ChevronLeftIcon />
+								<ChevronLeftIcon sx={{ color: "#ececec" }} />
 							</IconButton>
 						</Toolbar>
-						<Divider />
-						<List component='nav'>
+						<List
+							component='nav'
+							sx={{
+								background: "rgb(28 36 52)",
+								height: "100%",
+								color: "#d0d0d0",
+							}}>
 							<SelectFitnessCenter />
+							<Divider sx={{ my: 1, backgroundColor: "#e8e8e8" }} />
 							<MainListItems fitnessCenterId={currentFitnessCenter.id} />
-							<Divider sx={{ my: 1 }} />
+							<Divider sx={{ my: 1, backgroundColor: "#e8e8e8" }} />
 							<SecondaryListItems />
-							<Divider sx={{ mt: 10 }} />
+							<Divider sx={{ mt: 10, backgroundColor: "#e8e8e8" }} />
 							<UserZoneListItems />
 						</List>
 					</Drawer>
@@ -173,7 +184,11 @@ export default function DashboardLayout({
 							overflow: "auto",
 						}}>
 						<Toolbar />
-						<Box>{children}</Box>
+						<Box
+							component='main'
+							sx={{ backgroundColor: "rgb(241, 245, 249)", height: "100%" }}>
+							{children}
+						</Box>
 					</Box>
 				</Box>
 			</LocalizationProvider>

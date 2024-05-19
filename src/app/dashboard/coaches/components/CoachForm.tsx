@@ -1,8 +1,3 @@
-import {
-	createNewMember,
-	memberCreated,
-	updateMemberInfo,
-} from "@/redux/features/membersSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
 	Avatar,
@@ -23,11 +18,16 @@ import { useEffect, useState } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { allCountries } from "country-region-data";
 import { toast } from "react-toastify";
+import {
+	coachesCreated,
+	createNewCoach,
+	updateCoachInfo,
+} from "@/redux/features/coachesSlice";
 import { Formik } from "formik";
-import { memberFormValidation } from "@/app/dashboard/members/validation/memberFormValidation";
+import { coachFormValidation } from "../validation/coachFormValidation";
 
-type MemberFormType = {
-	memberData?: any;
+type CoachFormType = {
+	coachData?: any;
 	formType: "CREATE" | "UPDATE";
 	onCloseDialog?: any;
 };
@@ -44,15 +44,15 @@ const VisuallyHiddenInput = styled("input")({
 	width: 1,
 });
 
-export default function MemberForm({
-	memberData,
+export default function CoachForm({
+	coachData,
 	formType,
 	onCloseDialog,
-}: MemberFormType) {
+}: CoachFormType) {
 	const [imgURL, setImgURL] = useState("");
 	const [selectedState, setSelectedState] = useState([]);
-	const created = useAppSelector((data) => data.membersReducer.created);
-	const isLoading = useAppSelector((data) => data.membersReducer.loading);
+	const created = useAppSelector((data) => data.coachesReducer.created);
+	const isLoading = useAppSelector((data) => data.coachesReducer.loading);
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
@@ -61,7 +61,7 @@ export default function MemberForm({
 	useEffect(() => {
 		if (formType === "UPDATE") {
 			const country = allCountries.filter(
-				(country) => country[1] === memberData.country
+				(country) => country[1] === coachData.country
 			);
 
 			if (country.length > 0) {
@@ -73,15 +73,15 @@ export default function MemberForm({
 	useEffect(() => {
 		if (created) {
 			toast.success("Usuario creado.");
-			dispatch(memberCreated(""));
+			dispatch(coachesCreated(""));
 		}
-	}, [created]);
+	}, [created, dispatch]);
 
 	const memberSinceDate =
-		memberData &&
-		`${new Date(memberData.created_at).getDate()}-${
-			new Date(memberData.created_at).getMonth() + 1
-		}-${new Date(memberData.created_at).getFullYear()}`;
+		coachData &&
+		`${new Date(coachData.created_at).getDate()}-${
+			new Date(coachData.created_at).getMonth() + 1
+		}-${new Date(coachData.created_at).getFullYear()}`;
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);
@@ -90,34 +90,33 @@ export default function MemberForm({
 	return (
 		<Formik
 			initialValues={{
-				userId: formType === "UPDATE" && memberData.user_id,
-				avatar: formType === "UPDATE" ? memberData.avatar : "",
-				firstName: formType === "UPDATE" ? memberData.first_name : "",
-				lastName: formType === "UPDATE" ? memberData.last_name : "",
-				dni: formType === "UPDATE" ? memberData.dni : "",
+				userId: formType === "UPDATE" && coachData.user_id,
+				avatar: formType === "UPDATE" ? coachData.avatar : "",
+				firstName: formType === "UPDATE" ? coachData.first_name : "",
+				lastName: formType === "UPDATE" ? coachData.last_name : "",
+				dni: formType === "UPDATE" ? coachData.dni : "",
 				birthDate:
 					formType === "UPDATE"
-						? dayjs(memberData.birth_date ? memberData.birth_date : "")
+						? dayjs(coachData.birth_date ? coachData.birth_date : "")
 						: undefined,
-				phone: formType === "UPDATE" ? memberData.phone_number : "",
-				emergencyPhone: formType === "UPDATE" ? memberData.emergency_phone : "",
-				email: formType === "UPDATE" ? memberData.email : "",
-				gender: formType === "UPDATE" ? memberData.gender : "",
-				address: formType === "UPDATE" ? memberData.address : "",
-				country: formType === "UPDATE" ? memberData.country : "",
-				town: formType === "UPDATE" ? memberData.town : "",
-				postalCode: formType === "UPDATE" ? memberData.postal_code : "",
-				status: formType === "UPDATE" ? memberData.status : "",
-				plan: formType === "UPDATE" ? memberData.plan : "",
+				phone: formType === "UPDATE" ? coachData.phone_number : "",
+				email: formType === "UPDATE" ? coachData.email : "",
+				gender: formType === "UPDATE" ? coachData.gender : "",
+				address: formType === "UPDATE" ? coachData.address : "",
+				country: formType === "UPDATE" ? coachData.country : "",
+				town: formType === "UPDATE" ? coachData.town : "",
+				postalCode: formType === "UPDATE" ? coachData.postal_code : "",
+				status: formType === "UPDATE" ? coachData.status : "",
 			}}
-			onSubmit={(formData, actions) => {
-				if (formType === "UPDATE") dispatch(updateMemberInfo(formData));
+			onSubmit={(formData, { resetForm }) => {
+				if (formType === "UPDATE") dispatch(updateCoachInfo(formData));
 				if (formType === "CREATE")
 					dispatch(
-						createNewMember({ member: formData, centerId: currentCenter.id })
+						createNewCoach({ coach: formData, centerId: currentCenter.id })
 					);
+				resetForm();
 			}}
-			validate={memberFormValidation}>
+			validate={coachFormValidation}>
 			{({
 				values,
 				errors,
@@ -135,7 +134,7 @@ export default function MemberForm({
 					<TextField
 						sx={{ display: "none" }}
 						name='userId'
-						value={formType === "UPDATE" && memberData.user_id}
+						value={formType === "UPDATE" && coachData.user_id}
 					/>
 					<Box
 						display='flex'
@@ -143,12 +142,11 @@ export default function MemberForm({
 						alignItems='center'
 						marginBottom={2}>
 						<Avatar
-							src={imgURL || (formType === "UPDATE" && memberData.photo)}
+							src={imgURL || (formType === "UPDATE" && coachData.photo)}
 							sx={{
 								width: 150,
 								height: 150,
 								marginBottom: 2,
-								border: "1px solid lightgray",
 							}}
 						/>
 						<Button
@@ -213,7 +211,7 @@ export default function MemberForm({
 								name='dni'
 								onChange={handleChange}
 								defaultValue={values.dni}
-								error={Boolean(errors.dni && touched.dni && errors.dni)}
+								error={errors.dni && touched.dni && errors.dni}
 								helperText={errors.dni && touched.dni && errors.dni}
 							/>
 						</Grid>
@@ -239,15 +237,7 @@ export default function MemberForm({
 								defaultValue={values.phone}
 							/>
 						</Grid>
-						<Grid item xs={12} md={6}>
-							<TextField
-								fullWidth
-								label='Teléfono de emergéncia'
-								name='emergencyPhone'
-								onChange={handleChange}
-								defaultValue={values.emergencyPhone}
-							/>
-						</Grid>
+						<Grid item xs={12} md={6}></Grid>
 					</Grid>
 					<TextField
 						fullWidth
@@ -255,7 +245,7 @@ export default function MemberForm({
 						name='email'
 						defaultValue={values.email}
 						onChange={handleChange}
-						error={Boolean(errors.email && touched.email && errors.email)}
+						error={errors.email && touched.email && errors.email}
 						helperText={errors.email && touched.email && errors.email}
 						disabled={formType === "UPDATE" ? true : false}
 					/>
@@ -339,15 +329,6 @@ export default function MemberForm({
 						<Grid item xs={12} md={6}>
 							<TextField
 								fullWidth
-								label='Plan'
-								name='plan'
-								onChange={handleChange}
-								defaultValue={values.plan}
-							/>
-						</Grid>
-						<Grid item xs={12} md={6}>
-							<TextField
-								fullWidth
 								label='Status'
 								name='status'
 								onChange={handleChange}
@@ -355,6 +336,7 @@ export default function MemberForm({
 							/>
 						</Grid>
 					</Grid>
+					<Grid item xs={12} md={6}></Grid>
 					{formType === "UPDATE" && (
 						<Typography variant='body2'>
 							Miembro desde: {memberSinceDate}
@@ -366,7 +348,7 @@ export default function MemberForm({
 						) : (
 							<>
 								<Button type='submit' variant='contained'>
-									{formType === "CREATE" ? "Crear nuevo miembro" : "Actualizar"}
+									{formType === "CREATE" ? "Crear nuevo coach" : "Actualizar"}
 								</Button>
 								{formType === "UPDATE" && (
 									<Button

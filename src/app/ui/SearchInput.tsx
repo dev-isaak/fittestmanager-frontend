@@ -1,9 +1,11 @@
+import { searchCoaches } from "@/redux/features/coachesSlice";
 import { searchMembers } from "@/redux/features/membersSlice";
 import { useAppDispatch } from "@/redux/hooks";
-import { Button, Stack, TextField } from "@mui/material";
+import { IconButton, Stack, TextField } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 type SearchInputType = {
-	type: "MEMBERS";
+	type: "MEMBERS" | "COACHES";
 };
 
 export default function SearchInput({ type }: SearchInputType) {
@@ -15,6 +17,8 @@ export default function SearchInput({ type }: SearchInputType) {
 		switch (type) {
 			case "MEMBERS":
 				dispatch(searchMembers(data.get("inputSearch")));
+			case "COACHES":
+				dispatch(searchCoaches(data.get("inputSearch")));
 		}
 	};
 
@@ -25,10 +29,10 @@ export default function SearchInput({ type }: SearchInputType) {
 			flexDirection='row'
 			gap={2}
 			my={4}>
+			<IconButton type='submit'>
+				<SearchIcon />
+			</IconButton>
 			<TextField label='Search' name='inputSearch' fullWidth />
-			<Button type='submit' variant='contained'>
-				Buscar
-			</Button>
 		</Stack>
 	);
 }

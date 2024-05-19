@@ -1,12 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit'
 import fitnessCentersReducer from './features/fitnessCentersSlice'
 import membersReducer from './features/membersSlice'
+import coachesReducer from './features/coachesSlice'
+import roomsReducer from './features/roomsSlice'
+import classesReducer from './features/classesSlice'
 
 export const store = () => {
   return configureStore({
     reducer: {
       fitnessCentersReducer,
-      membersReducer
+      membersReducer,
+      coachesReducer,
+      roomsReducer,
+      classesReducer
     },
   })
 }

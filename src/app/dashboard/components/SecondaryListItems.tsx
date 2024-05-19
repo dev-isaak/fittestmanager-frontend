@@ -6,21 +6,22 @@ import { usePathname } from "next/navigation";
 
 export const SecondaryListItems = () => {
 	const pathName = usePathname();
+	const iconColor = "#d0d0d0";
 
 	const menuItems = [
 		{
 			text: "Current month",
-			icon: <AssignmentIcon />,
+			icon: <AssignmentIcon sx={{ color: iconColor }} />,
 			path: "/dashboard/reports/current-month",
 		},
 		{
 			text: "Last quarter",
-			icon: <AssignmentIcon />,
+			icon: <AssignmentIcon sx={{ color: iconColor }} />,
 			path: "/dashboard/reports/last-quarter",
 		},
 		{
 			text: "Year-end sale",
-			icon: <AssignmentIcon />,
+			icon: <AssignmentIcon sx={{ color: iconColor }} />,
 			path: "/dashboard/reports/year-end-sale",
 		},
 	];
@@ -30,8 +31,7 @@ export const SecondaryListItems = () => {
 				<ListItemButton
 					key={index}
 					sx={{
-						background:
-							pathName === item.path ? "rgba(20,30,70,.3)" : "inherit",
+						background: pathName === item.path ? "rgba(65,76,99,1)" : "inherit",
 					}}
 					href={item.path}>
 					<ListItemIcon>{item.icon}</ListItemIcon>

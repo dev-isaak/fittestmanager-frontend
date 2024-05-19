@@ -1,43 +1,36 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchMembersByFitnessCenter } from "@/redux/features/membersSlice";
 import SearchInput from "@/app/ui/SearchInput";
 import DataTable from "@/app/ui/DataTable";
+import { fetchCoachesByFitnessCenter } from "@/redux/features/coachesSlice";
 import PaperBoard from "../../components/PaperBoard";
 
-export default function MembersBoard() {
+export default function CoachesBoard() {
 	const dispatch = useAppDispatch();
 	const currentFitnessCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
-	const members = useAppSelector((data) => data.membersReducer.searchMembers);
+	const coaches = useAppSelector((data) => data.coachesReducer.searchCoaches);
 
 	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
 			// Añadir condicional para que solo haga dispatch cuando se cambia de fitnessCenter, pero no esten los datos anteriores guardados en redux
-			dispatch(fetchMembersByFitnessCenter(centerId));
+			dispatch(fetchCoachesByFitnessCenter(centerId));
 		}
 	}, [currentFitnessCenter, dispatch]);
 
 	return (
 		<PaperBoard>
-			<Typography component='h2'>Miembros</Typography>
-			<SearchInput type='MEMBERS' />
+			<Typography component='h2'>Coaches</Typography>
+			<SearchInput type='COACHES' />
 			<DataTable
 				onClickOpenDialog
-				data={members}
-				type='MEMBERS'
-				titleCol={["Avatar", "Name", "Email", "Phone Number", "Plan", "Status"]}
-				dataCol={[
-					"photo",
-					"first_name",
-					"email",
-					"phone_number",
-					"plan",
-					"status",
-				]}
+				data={coaches}
+				type='COACHES'
+				titleCol={["Avatar", "Name", "Email", "Phone Number", "Status"]}
+				dataCol={["photo", "first_name", "email", "phone_number", ""]}
 			/>
 		</PaperBoard>
 	);

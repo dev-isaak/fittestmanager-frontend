@@ -1,6 +1,12 @@
 "use client";
 
-import { Divider, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import {
+	Box,
+	Divider,
+	MenuItem,
+	Select,
+	SelectChangeEvent,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectFitnessCenter } from "@/redux/features/fitnessCentersSlice";
@@ -36,19 +42,24 @@ export default function SelectFitnessCenter() {
 
 	return (
 		<>
-			<Select
-				sx={{ width: "100%", paddingX: 2 }}
-				labelId='demo-simple-select-label'
-				id='demo-simple-select'
-				value={currentCenterId ? currentCenterId : ""}
-				onChange={handleFitnessCenterChange}>
-				{fitnessCenters.map((center: IFitnessCenter) => (
-					<MenuItem key={center.id} value={center.id}>
-						{center.center_name}
-					</MenuItem>
-				))}
-			</Select>
-			<Divider sx={{ my: 1 }} />
+			<Box margin={2}>
+				<Select
+					sx={{
+						width: "100%",
+						paddingX: 2,
+						color: "#d0d0d0",
+						background: "rgba(65,76,99,1)",
+						border: "none",
+					}}
+					value={currentCenterId ? currentCenterId : ""}
+					onChange={handleFitnessCenterChange}>
+					{fitnessCenters.map((center: IFitnessCenter) => (
+						<MenuItem key={center.id} value={center.id}>
+							{center.center_name}
+						</MenuItem>
+					))}
+				</Select>
+			</Box>
 		</>
 	);
 }

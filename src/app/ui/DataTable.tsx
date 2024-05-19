@@ -1,8 +1,11 @@
 import {
 	Avatar,
 	Box,
+	Chip,
+	CircularProgress,
 	Pagination,
 	Paper,
+	Skeleton,
 	Stack,
 	Table,
 	TableBody,
@@ -17,10 +20,12 @@ import DialogForm from "./DialogForm";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { toast } from "react-toastify";
 import { membersUpdated } from "@/redux/features/membersSlice";
+import { coachesUpdated } from "@/redux/features/coachesSlice";
+import { classesUpdated } from "@/redux/features/classesSlice";
 
 type DataTableType = {
 	data: unknown[];
-	type: "MEMBERS";
+	type: "MEMBERS" | "COACHES" | "CLASSES";
 	titleCol: string[];
 	dataCol: string[];
 	onClickOpenDialog?: boolean;
@@ -36,19 +41,33 @@ export default function DataTable({
 	const [page, setPage] = useState(0);
 	const [openDialog, setOpenDialog] = useState(false);
 	const [formData, setFormData] = useState({});
-	const PER_PAGE = 3;
+	const PER_PAGE = 5;
 	const count = Math.ceil(data.length / PER_PAGE);
 	const _DATA = usePagination(data, PER_PAGE);
-	const updated = useAppSelector((data) => data.membersReducer.updated);
+	const memberUpdated = useAppSelector((data) => data.membersReducer.updated);
+	const coachUpdated = useAppSelector((data) => data.coachesReducer.updated);
+	const classUpdated = useAppSelector((data) => data.classesReducer.updated);
+	const isLoading = useAppSelector((data) => data.coachesReducer.loading);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (updated) {
+		if (memberUpdated) {
 			setOpenDialog(false);
-			toast.success("Usuario actualizado.");
+			toast.success("Miembro actualizado.");
 			dispatch(membersUpdated(""));
+		} else if (coachUpdated) {
+			setOpenDialog(false);
+			toast.success("Coach actualizado.");
+			dispatch(coachesUpdated(""));
 		}
-	}, [updated]);
+	}, [memberUpdated, coachUpdated]);
+
+	useEffect(() => {
+		if (classUpdated) {
+			setOpenDialog(false);
+			dispatch(classesUpdated(""));
+		}
+	}, [classUpdated]);
 
 	const handleUserClick = (data: unknown[]) => {
 		setOpenDialog(true);
@@ -62,7 +81,7 @@ export default function DataTable({
 
 	return (
 		<Box>
-			<TableContainer component={Paper}>
+			<TableContainer>
 				<Table>
 					<TableHead>
 						<TableRow>
@@ -71,37 +90,69 @@ export default function DataTable({
 							))}
 						</TableRow>
 					</TableHead>
-					<TableBody>
-						{_DATA.currentData().map((data: any) => (
-							<TableRow
-								key={data.user_id}
-								onClick={() => handleUserClick(data)}>
-								{dataCol.map((col) => (
-									<React.Fragment key={`${col}-${data.user_id}`}>
-										{col === "photo" ? (
-											<TableCell>
-												<Avatar
-													sx={{ width: 56, height: 56 }}
-													src={data[col]}
-												/>
-											</TableCell>
-										) : (
-											<TableCell>{data[col]}</TableCell>
-										)}
-									</React.Fragment>
-								))}
+					{isLoading ? (
+						<TableBody>
+							<TableRow>
+								<TableCell>
+									<CircularProgress />
+								</TableCell>
 							</TableRow>
-						))}
-					</TableBody>
+						</TableBody>
+					) : (
+						<TableBody>
+							{_DATA.currentData().map((data: any, index) => (
+								<TableRow key={index} onClick={() => handleUserClick(data)}>
+									{dataCol.map((col) => (
+										<React.Fragment key={`${col}-${data.user_id}`}>
+											{col === "photo" ? (
+												<TableCell>
+													<Avatar
+														sx={{ width: 56, height: 56 }}
+														src={data[col]}
+													/>
+												</TableCell>
+											) : col === "status" ? (
+												<TableCell>
+													<Chip
+														label={data[col]}
+														variant='outlined'
+														color={
+															data[col] === "active"
+																? "success"
+																: data[col] === "canceled"
+																? "error"
+																: data[col] === "paused"
+																? "info"
+																: "primary"
+														}
+													/>
+												</TableCell>
+											) : col === "color" ? (
+												<TableCell>
+													<Box
+														sx={{
+															background: data[col],
+															width: 25,
+															height: 25,
+														}}></Box>
+												</TableCell>
+											) : (
+												<TableCell>{data[col]}</TableCell>
+											)}
+										</React.Fragment>
+									))}
+								</TableRow>
+							))}
+						</TableBody>
+					)}
 				</Table>
 			</TableContainer>
-			<Stack width='100%' alignItems='center' paddingY={2}>
+			<Stack width='100%' alignItems='center' paddingTop={4}>
 				<Pagination
 					count={count}
 					page={page}
 					onChange={handlePageChange}
-					color='primary'
-					variant='outlined'
+					variant='text'
 				/>
 			</Stack>
 			{onClickOpenDialog && (
