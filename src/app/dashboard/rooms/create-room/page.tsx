@@ -1,7 +1,7 @@
 "use client";
 import { Typography } from "@mui/material";
-import RoomsForm from "./RoomsForm";
 import PaperBoard from "../../components/PaperBoard";
+import RoomsForm from "../components/RoomsForm";
 
 export default function CreateRoom() {
 	return (

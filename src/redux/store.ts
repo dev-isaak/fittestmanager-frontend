@@ -12,7 +12,7 @@ export const store = () => {
       membersReducer,
       coachesReducer,
       roomsReducer,
-      classesReducer
+      classesReducer,
     },
   })
 }

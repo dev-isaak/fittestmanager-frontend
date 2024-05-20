@@ -1,7 +1,7 @@
 "use client";
 import { Typography } from "@mui/material";
-import CoachForm from "./CoachForm";
 import PaperBoard from "../../components/PaperBoard";
+import CoachForm from "../components/CoachForm";
 
 export default function CreateCoach() {
 	return (

@@ -5,6 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchClassesByFitnessCenter } from "@/redux/features/classesSlice";
+import Link from "next/link";
 
 export default function ClassesTable() {
 	const dispatch = useAppDispatch();
@@ -16,7 +17,9 @@ export default function ClassesTable() {
 	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
-			dispatch(fetchClassesByFitnessCenter(centerId));
+			if (!classes.length) {
+				dispatch(fetchClassesByFitnessCenter(centerId));
+			}
 		}
 	}, [currentFitnessCenter, dispatch]);
 	return (
@@ -25,8 +28,12 @@ export default function ClassesTable() {
 				Clases
 			</Typography>
 			<Box m={2}>
-				<Button color='primary' variant='contained'>
-					<AddIcon /> Añadir clase
+				<Button
+					color='primary'
+					variant='contained'
+					component={Link}
+					href='/dashboard/classes/create-class'>
+					<AddIcon /> Crear clase
 				</Button>
 			</Box>
 			<DataTable

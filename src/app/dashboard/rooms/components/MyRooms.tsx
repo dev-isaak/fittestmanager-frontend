@@ -19,6 +19,8 @@ import {
 import DialogForm from "@/app/ui/DialogForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
 
 export default function MyRooms() {
 	const [openDialog, setOpenDialog] = useState(false);
@@ -47,7 +49,9 @@ export default function MyRooms() {
 	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
-			dispatch(fetchRoomsByFitnessCenter(centerId));
+			if (!rooms.length) {
+				dispatch(fetchRoomsByFitnessCenter(centerId));
+			}
 		}
 	}, [currentFitnessCenter, dispatch]);
 
@@ -60,6 +64,15 @@ export default function MyRooms() {
 			<Typography component='h1' variant='h3'>
 				Mis salas
 			</Typography>
+			<Box m={2}>
+				<Button
+					color='primary'
+					variant='contained'
+					component={Link}
+					href='/dashboard/rooms/create-room'>
+					<AddIcon /> Crear sala
+				</Button>
+			</Box>
 			<Stack
 				flexDirection='row'
 				flexWrap='wrap'

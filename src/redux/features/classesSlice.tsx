@@ -2,12 +2,7 @@ import {
 	createClass,
 	getAllClasses,
 	updateClass,
-} from "@/app/dashboard/rooms/classes/lib/data";
-import {
-	createRoom,
-	getAllRooms,
-	updateRoom,
-} from "@/app/dashboard/rooms/lib/data";
+} from "@/app/dashboard/classes/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 

@@ -17,7 +17,7 @@ export const getAllClasses = async(currentCenterId: number) => {
 
 export const createClass = async(classData: any, centerId: number) => {
   const supabase = createClient()
-  const formData = {name: classData.className, description: classData.classDescription, color: classData.color, fitness_center_id: centerId}
+  const formData = {name: classData.className, description: classData.classDescription, color: classData.color, fitness_center_id: centerId, booking_limit_per_day: classData.bookingLimitPerDay, minimum_persons_per_class: classData.minimumPersonsPerClass, limit_time_for_booking: classData.limitTimeForBooking, waiting_list_type: classData.waitingListType, calendar_order: classData.calendarOrder, limit_cancellation_time: classData.limitCancellationTime, room_id: classData.roomId }
   try {
 
     const { data, error } = await supabase
@@ -41,7 +41,7 @@ export const createClass = async(classData: any, centerId: number) => {
 
 export const updateClass = async(classData: any) => {
   const supabase = createClient()
-  const formData = {name: classData.className, description: classData.classDescription, color: classData.color}
+  const formData = {name: classData.className, description: classData.classDescription, color: classData.color,booking_limit_per_day: classData.bookingLimitPerDay, minimum_persons_per_class: classData.minimumPersonsPerClass, limit_time_for_booking: classData.limitTimeForBooking, waiting_list_type: classData.waitingListType, calendar_order: classData.calendarOrder, limit_cancellation_time: classData.limitCancellationTime, room_id: classData.roomId}
   try {
 
     const { data, error } = await supabase

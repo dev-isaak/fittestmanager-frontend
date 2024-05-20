@@ -110,7 +110,12 @@ export default function DashboardLayout({
 			<LocalizationProvider dateAdapter={AdapterDayjs}>
 				<CssBaseline />
 				<AlertMessage />
-				<Box sx={{ display: "flex" }}>
+				<Box
+					sx={{
+						display: "flex",
+						backgroundColor: "rgb(241, 245, 249)",
+						minHeight: "100vh",
+					}}>
 					<AppBar position='absolute' open={open}>
 						<Toolbar
 							sx={{
@@ -143,10 +148,7 @@ export default function DashboardLayout({
 							</IconButton>
 						</Toolbar>
 					</AppBar>
-					<Drawer
-						variant='permanent'
-						open={open}
-						sx={{ backgroundColor: "red" }}>
+					<Drawer variant='permanent' open={open}>
 						<Toolbar
 							sx={{
 								display: "flex",
@@ -178,15 +180,17 @@ export default function DashboardLayout({
 					<Box
 						component='main'
 						sx={{
-							backgroundColor: "#f5f5f5",
 							flexGrow: 1,
-							height: "100vh",
+							height: "100%",
 							overflow: "auto",
 						}}>
 						<Toolbar />
 						<Box
 							component='main'
-							sx={{ backgroundColor: "rgb(241, 245, 249)", height: "100%" }}>
+							sx={{
+								height: "100%",
+								padding: 2,
+							}}>
 							{children}
 						</Box>
 					</Box>

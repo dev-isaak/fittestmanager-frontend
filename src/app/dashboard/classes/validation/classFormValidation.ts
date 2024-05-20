@@ -3,6 +3,13 @@ interface IClassFormValidation {
   classDescription?: string
   classId?: string
   color?: string
+  bookingLimitPerDay?: string
+  minimumPersonsPerClass?: string
+  limitTimeForBooking?: string
+  waitingListType?: string
+  calendarOrder?: string
+  limitCancellationTime?: string
+  roomId?: string
 }
 
 export const classFormValidation = (formValues: IClassFormValidation) => {

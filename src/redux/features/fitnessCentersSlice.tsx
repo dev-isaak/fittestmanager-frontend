@@ -5,6 +5,7 @@ import { IFitnessCenter } from "@/app/dashboard/fitness-centers/interfaces/inter
 interface IFitnessCenterSlice {
 	centers: IFitnessCenter[];
 	currentFitnessCenter: IFitnessCenter;
+	changed: boolean;
 }
 
 const initialState: IFitnessCenterSlice = {
@@ -15,6 +16,7 @@ const initialState: IFitnessCenterSlice = {
 		center_name: "",
 		manager_id: "",
 	},
+	changed: false,
 };
 
 export const fetchOwnFitnessCenters = createAsyncThunk(
@@ -32,6 +34,9 @@ export const fitnessCentersSlice = createSlice({
 		selectFitnessCenter: (state, action) => {
 			state.currentFitnessCenter = action.payload;
 		},
+		changeFitnessCenter: (state, action) => {
+			state.changed = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchOwnFitnessCenters.fulfilled, (state, action) => {
@@ -41,6 +46,7 @@ export const fitnessCentersSlice = createSlice({
 	},
 });
 
-export const { selectFitnessCenter } = fitnessCentersSlice.actions;
+export const { selectFitnessCenter, changeFitnessCenter } =
+	fitnessCentersSlice.actions;
 
 export default fitnessCentersSlice.reducer;

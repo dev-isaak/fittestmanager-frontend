@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
 import MemberForm from "../dashboard/members/components/MemberForm";
 import CoachForm from "../dashboard/coaches/components/CoachForm";
 import RoomsForm from "../dashboard/rooms/components/RoomsForm";
-import ClassForm from "../dashboard/rooms/classes/components/ClassForm";
+import ClassForm from "../dashboard/classes/components/ClassForm";
 
 type DialogFormType = {
 	openDialog: boolean;
