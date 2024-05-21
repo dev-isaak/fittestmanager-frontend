@@ -9,23 +9,26 @@ import {
 	TextField,
 } from "@mui/material";
 import { Formik } from "formik";
-import { classFormValidation } from "../validation/classFormValidation";
 import { MuiColorInput } from "mui-color-input";
-import { createNewClass, updateClassInfo } from "@/redux/features/classesSlice";
-import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
+import { seminarFormValidation } from "../validation/seminarFormValidation";
+import {
+	createNewSeminar,
+	updateSeminarInfo,
+} from "@/redux/features/seminarsSlice";
 import { useEffect } from "react";
+import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
 
-type RoomFormType = {
-	classData?: any;
+type SeminarFormType = {
+	seminarData?: any;
 	formType: "CREATE" | "UPDATE";
 	onCloseDialog?: any;
 };
 
-export default function ClassForm({
-	classData,
+export default function SeminarForm({
+	seminarData,
 	formType,
 	onCloseDialog,
-}: RoomFormType) {
+}: SeminarFormType) {
 	const dispatch = useAppDispatch();
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
@@ -46,34 +49,38 @@ export default function ClassForm({
 	return (
 		<Formik
 			initialValues={{
-				classId: formType === "UPDATE" ? classData.id : "",
-				className: formType === "UPDATE" ? classData.name : "",
-				classDescription: formType === "UPDATE" ? classData.description : "",
-				color: formType === "UPDATE" ? classData.color : "#ffffff",
+				seminarId: formType === "UPDATE" ? seminarData.id : "",
+				seminarName: formType === "UPDATE" ? seminarData.name : "",
+				seminarDescription:
+					formType === "UPDATE" ? seminarData.description : "",
+				color: formType === "UPDATE" ? seminarData.color : "#ffffff",
 				limitCancellationTime:
-					formType === "UPDATE" ? classData.limit_cancellation_time : "",
+					formType === "UPDATE" ? seminarData.limit_cancellation_time : "",
 				bookingLimitPerDay:
-					formType === "UPDATE" ? classData.booking_limit_per_day : "",
+					formType === "UPDATE" ? seminarData.booking_limit_per_day : "",
 				minimumPersonsPerClass:
-					formType === "UPDATE" ? classData.minimum_persons_per_class : "",
+					formType === "UPDATE" ? seminarData.minimum_persons_per_class : "",
 				limitTimeForBooking:
-					formType === "UPDATE" ? classData.limit_time_for_booking : "",
+					formType === "UPDATE" ? seminarData.limit_time_for_booking : "",
 				waitingListType:
-					formType === "UPDATE" ? classData.waiting_list_type : "",
-				calendarOrder: formType === "UPDATE" ? classData.calendar_order : "",
-				roomId: formType === "UPDATE" ? classData.room_id : "",
+					formType === "UPDATE" ? seminarData.waiting_list_type : "",
+				calendarOrder: formType === "UPDATE" ? seminarData.calendar_order : "",
+				roomId: formType === "UPDATE" ? seminarData.room_id : "",
 			}}
 			onSubmit={(formData) => {
 				if (formType === "UPDATE") {
-					dispatch(updateClassInfo(formData));
+					dispatch(updateSeminarInfo(formData));
 				}
 				if (formType === "CREATE") {
 					dispatch(
-						createNewClass({ classData: formData, centerId: currentCenter.id })
+						createNewSeminar({
+							seminarData: formData,
+							centerId: currentCenter.id,
+						})
 					);
 				}
 			}}
-			validate={classFormValidation}>
+			validate={seminarFormValidation}>
 			{({
 				values,
 				errors,
@@ -90,30 +97,30 @@ export default function ClassForm({
 					alignItems='center'>
 					<TextField
 						sx={{ display: "none" }}
-						name='classId'
-						value={formType === "UPDATE" && values.classId}
+						name='seminarId'
+						value={formType === "UPDATE" && values.seminarId}
 					/>
 					<TextField
 						fullWidth
-						label='Nombre de la clase*'
-						name='className'
+						label='Nombre del evento*'
+						name='seminarName'
 						onChange={handleChange}
 						error={Boolean(
-							errors.className && touched.className && errors.className
+							errors.seminarName && touched.seminarName && errors.seminarName
 						)}
 						helperText={
-							errors.className && touched.className && errors.className
+							errors.seminarName && touched.seminarName && errors.seminarName
 						}
-						defaultValue={values.className}
+						defaultValue={values.seminarName}
 					/>
 					<TextField
 						multiline
 						rows={3}
 						fullWidth
 						label='Descripción'
-						name='classDescription'
+						name='seminarDescription'
 						onChange={handleChange}
-						defaultValue={values.classDescription}
+						defaultValue={values.seminarDescription}
 					/>
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={4}>
@@ -165,7 +172,7 @@ export default function ClassForm({
 						<Grid item xs={12} md={4}>
 							<TextField
 								select
-								label='Mínimo de personas por clase'
+								label='Mínimo de personas por evento'
 								value={values.minimumPersonsPerClass}
 								name='minimumPersonsPerClass'
 								onChange={handleChange}

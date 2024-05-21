@@ -25,7 +25,7 @@ import { classesUpdated } from "@/redux/features/classesSlice";
 
 type DataTableType = {
 	data: unknown[];
-	type: "MEMBERS" | "COACHES" | "CLASSES";
+	type: "MEMBERS" | "COACHES" | "CLASSES" | "SEMINARS";
 	titleCol: string[];
 	dataCol: string[];
 	onClickOpenDialog?: boolean;

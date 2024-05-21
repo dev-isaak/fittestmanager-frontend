@@ -3,12 +3,13 @@ import MemberForm from "../dashboard/members/components/MemberForm";
 import CoachForm from "../dashboard/coaches/components/CoachForm";
 import RoomsForm from "../dashboard/rooms/components/RoomsForm";
 import ClassForm from "../dashboard/classes/components/ClassForm";
+import SeminarForm from "../dashboard/seminars/components/SeminarForm";
 
 type DialogFormType = {
 	openDialog: boolean;
 	setOpenDialog: any;
 	formData: unknown;
-	type: "MEMBERS" | "COACHES" | "ROOMS" | "CLASSES";
+	type: "MEMBERS" | "COACHES" | "ROOMS" | "CLASSES" | "SEMINARS";
 };
 
 export default function DialogForm({
@@ -52,6 +53,13 @@ export default function DialogForm({
 				{type === "CLASSES" && (
 					<ClassForm
 						classData={formData}
+						formType='UPDATE'
+						onCloseDialog={setOpenDialog}
+					/>
+				)}
+				{type === "SEMINARS" && (
+					<SeminarForm
+						seminarData={formData}
 						formType='UPDATE'
 						onCloseDialog={setOpenDialog}
 					/>

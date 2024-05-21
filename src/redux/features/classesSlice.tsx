@@ -81,18 +81,18 @@ export const classesSlice = createSlice({
 				state.classes = updatedRooms;
 				state.updated = true;
 				state.loading = false;
-				toast.success("Sala actualizada.");
+				toast.success("Clase actualizada.");
 			}),
 			builder.addCase(updateClassInfo.rejected, (state, action) => {
 				toast.error(action.error.message);
 				state.loading = false;
 			});
 		builder.addCase(createNewClass.pending, (state, action) => {
-			toast.success("Sala creada.");
+			toast.success("Clase creada.");
 			state.loading = true;
 		});
 		builder.addCase(createNewClass.fulfilled, (state, action) => {
-			state.classes.push(action.payload);
+			state.classes.push(action.payload[0]);
 			state.created = true;
 			state.loading = false;
 		});

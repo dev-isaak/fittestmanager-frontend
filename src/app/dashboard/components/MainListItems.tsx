@@ -91,6 +91,10 @@ export const MainListItems = () => {
 					text: "Crear clase",
 					path: "/dashboard/classes/create-class",
 				},
+				{
+					text: "Crear evento",
+					path: "/dashboard/seminars/create-seminar",
+				},
 			],
 		},
 		{
