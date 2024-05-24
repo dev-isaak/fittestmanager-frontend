@@ -107,6 +107,7 @@ export default function CoachForm({
 				town: formType === "UPDATE" ? coachData.town : "",
 				postalCode: formType === "UPDATE" ? coachData.postal_code : "",
 				status: formType === "UPDATE" ? coachData.status : "",
+				coachRole: formType === "UPDATE" ? coachData.role : "",
 			}}
 			onSubmit={(formData, { resetForm }) => {
 				if (formType === "UPDATE") dispatch(updateCoachInfo(formData));
@@ -337,6 +338,21 @@ export default function CoachForm({
 						</Grid>
 					</Grid>
 					<Grid item xs={12} md={6}></Grid>
+					<Divider>Otros</Divider>
+					<Grid container spacing={2}>
+						<Grid item xs={12} md={6}>
+							<TextField
+								select
+								fullWidth
+								label='Rol'
+								name='coachRole'
+								onChange={handleChange}
+								defaultValue={values.coachRole}>
+								<MenuItem value='manager'>Manager</MenuItem>
+								<MenuItem value='coach'>Coach</MenuItem>
+							</TextField>
+						</Grid>
+					</Grid>
 					{formType === "UPDATE" && (
 						<Typography variant='body2'>
 							Miembro desde: {memberSinceDate}

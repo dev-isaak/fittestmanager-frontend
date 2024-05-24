@@ -31,8 +31,18 @@ function Coaches() {
 				onClickOpenDialog
 				data={coaches}
 				type='COACHES'
-				titleCol={["Avatar", "Name", "Email", "Phone Number", "Status"]}
-				dataCol={["photo", "first_name", "email", "phone_number", ""]}
+				titleCol={[
+					{ name: "Avatar", align: "left" },
+					{ name: "Name", align: "left" },
+					{ name: "Email", align: "left" },
+					{ name: "Phone Number", align: "left" },
+				]}
+				dataCol={[
+					{ dbName: "photo", align: "left" },
+					{ dbName: "first_name", align: "left" },
+					{ dbName: "email", align: "left" },
+					{ dbName: "phone_number", align: "left" },
+				]}
 			/>
 		</PaperBoard>
 	);

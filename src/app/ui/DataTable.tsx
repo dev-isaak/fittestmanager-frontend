@@ -4,8 +4,6 @@ import {
 	Chip,
 	CircularProgress,
 	Pagination,
-	Paper,
-	Skeleton,
 	Stack,
 	Table,
 	TableBody,
@@ -22,12 +20,26 @@ import { toast } from "react-toastify";
 import { membersUpdated } from "@/redux/features/membersSlice";
 import { coachesUpdated } from "@/redux/features/coachesSlice";
 import { classesUpdated } from "@/redux/features/classesSlice";
+import { seminarsUpdated } from "@/redux/features/seminarsSlice";
+import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
+import { convertDateType } from "../dashboard/lib/utils";
+import dayjs, { Dayjs } from "dayjs";
+
+type TitleColType = {
+	name: string;
+	align: "center" | "right" | "left";
+};
+
+type DataColType = {
+	dbName: string;
+	align: "center" | "right" | "left";
+};
 
 type DataTableType = {
 	data: unknown[];
-	type: "MEMBERS" | "COACHES" | "CLASSES" | "SEMINARS";
-	titleCol: string[];
-	dataCol: string[];
+	type: "MEMBERS" | "COACHES" | "CLASSES" | "SEMINARS" | "SCHEDULES";
+	titleCol: TitleColType[];
+	dataCol: DataColType[];
 	onClickOpenDialog?: boolean;
 };
 
@@ -47,8 +59,19 @@ export default function DataTable({
 	const memberUpdated = useAppSelector((data) => data.membersReducer.updated);
 	const coachUpdated = useAppSelector((data) => data.coachesReducer.updated);
 	const classUpdated = useAppSelector((data) => data.classesReducer.updated);
+	const seminarUpdated = useAppSelector((data) => data.seminarsReducer.updated);
+	const scheduleUpdated = useAppSelector(
+		(data) => data.classesScheduleReducer.updated
+	);
 	const isLoading = useAppSelector((data) => data.coachesReducer.loading);
 	const dispatch = useAppDispatch();
+	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
+
+	// useEffect(() => {
+	// 	if (!rooms.length) {
+	// 		dispatch(fetchRoomsByFitnessCenter(centerId));
+	// 	}
+	// }, [rooms]);
 
 	useEffect(() => {
 		if (memberUpdated) {
@@ -69,6 +92,20 @@ export default function DataTable({
 		}
 	}, [classUpdated]);
 
+	useEffect(() => {
+		if (seminarUpdated) {
+			setOpenDialog(false);
+			dispatch(seminarsUpdated(""));
+		}
+	}, [seminarUpdated]);
+
+	useEffect(() => {
+		if (scheduleUpdated) {
+			setOpenDialog(false);
+			// dispatch(seminarsUpdated(""));
+		}
+	}, [scheduleUpdated]);
+
 	const handleUserClick = (data: unknown[]) => {
 		setOpenDialog(true);
 		setFormData(data);
@@ -86,7 +123,9 @@ export default function DataTable({
 					<TableHead>
 						<TableRow>
 							{titleCol.map((title, index) => (
-								<TableCell key={index}>{title}</TableCell>
+								<TableCell key={index} align={title.align}>
+									{title.name}
+								</TableCell>
 							))}
 						</TableRow>
 					</TableHead>
@@ -103,41 +142,64 @@ export default function DataTable({
 							{_DATA.currentData().map((data: any, index) => (
 								<TableRow key={index} onClick={() => handleUserClick(data)}>
 									{dataCol.map((col) => (
-										<React.Fragment key={`${col}-${data.user_id}`}>
-											{col === "photo" ? (
+										<React.Fragment key={`${col.dbName}-${data.user_id}`}>
+											{col.dbName === "photo" ? (
 												<TableCell>
 													<Avatar
 														sx={{ width: 56, height: 56 }}
-														src={data[col]}
+														src={data[col.dbName]}
 													/>
 												</TableCell>
-											) : col === "status" ? (
-												<TableCell>
+											) : col.dbName === "status" ? (
+												<TableCell align={col.align}>
 													<Chip
-														label={data[col]}
+														label={data[col.dbName]}
 														variant='outlined'
 														color={
-															data[col] === "active"
+															data[col.dbName] === "active"
 																? "success"
-																: data[col] === "canceled"
+																: data[col.dbName] === "canceled"
 																? "error"
-																: data[col] === "paused"
+																: data[col.dbName] === "paused"
 																? "info"
 																: "primary"
 														}
 													/>
 												</TableCell>
-											) : col === "color" ? (
-												<TableCell>
+											) : col.dbName === "color" ? (
+												<TableCell align={col.align} sx={{ display: "flex" }}>
 													<Box
 														sx={{
-															background: data[col],
+															background: data[col.dbName],
 															width: 25,
 															height: 25,
 														}}></Box>
 												</TableCell>
+											) : col.dbName === "room_id" ? (
+												<TableCell>
+													{rooms.map((room) => {
+														if (room.id === data[col.dbName]) return room.name;
+													})}
+												</TableCell>
+											) : col.dbName === "since_day" ||
+											  col.dbName === "until_day" ? (
+												<TableCell>
+													{convertDateType(data[col.dbName])}
+												</TableCell>
+											) : col.dbName === "start" ? (
+												<TableCell>
+													{dayjs(data["start"]).hour()}:
+													{dayjs(data["start"]).minute()}
+												</TableCell>
+											) : col.dbName === "end" ? (
+												<TableCell>
+													{dayjs(data["end"]).hour()}:
+													{dayjs(data["end"]).minute()}
+												</TableCell>
 											) : (
-												<TableCell>{data[col]}</TableCell>
+												<TableCell align={col.align}>
+													{data[col.dbName]}
+												</TableCell>
 											)}
 										</React.Fragment>
 									))}

@@ -3,7 +3,7 @@ import { createClient } from "@/app/utils/supabase/client"
 
 export const getAllCoaches = async(currentCenterId: number) => {
   const supabase = createClient()
-  
+
   try {
     let { data: coaches, error } = await supabase
     .from('coaches')
@@ -16,8 +16,24 @@ export const getAllCoaches = async(currentCenterId: number) => {
   }
 }
 
+export const getCoachRole = async(coachId: string) => {
+  const supabase = createClient()
+  
+  try {
+    let { data: role, error } = await supabase
+    .from('user_roles')
+    .select('*')
+    .eq('user_id', coachId)
+
+    return role || error
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export const updateCoach = async(coach: any) => {
   const supabase = createClient()
+  console.log(coach)
   const fileUploaded = coach.avatar !== undefined
   const formData = {first_name: coach.firstName, last_name: coach.lastName, dni: coach.dni, birth_date: coach.birthDate, phone_number: coach.phone, address: coach.address, country: coach.country, town: coach.town, postal_code: coach.postalCode , gender: coach.gender }
   const formDataWithAvatar = {...formData, photo: ''} 
@@ -26,7 +42,10 @@ export const updateCoach = async(coach: any) => {
       const imagePath = await getAvatarURLFromSupabaseStorage(coach.avatar)
       formDataWithAvatar.photo = imagePath
     }
-    
+
+    const roleUpdated = await updateCoachRole(coach.coachRole, coach.userId)
+    if (!roleUpdated) throw new Error('No se ha podido actualizar el rol')
+
     const { data, error } = await supabase
     .from('coaches')
     .update(fileUploaded ? formDataWithAvatar : formData)
@@ -37,6 +56,24 @@ export const updateCoach = async(coach: any) => {
   } catch (e) {
     console.error(e)
   }
+}
+
+const updateCoachRole = async(role: 'manager' | 'coach', user_uuid: string) => {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+    .from('user_roles')
+    .update({role: role})
+    .eq('user_id', user_uuid)
+    .select()
+    console.log(user_uuid)
+    console.log(error)
+    return true
+  } catch(e) {
+    console.error(e)
+  }
+
 }
 
 export const createCoach = async(coach: any, centerId: number) => {

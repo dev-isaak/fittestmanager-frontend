@@ -19,7 +19,7 @@ export const getAllMembers = async(currentCenterId: number) => {
 export const updateMember = async(member: any) => {
   const supabase = createClient()
   const fileUploaded = member.avatar !== undefined
-  const formData = {first_name: member.firstName, last_name: member.lastName, dni: member.dni, birth_date: member.birthDate, phone_number: member.phone, emergency_phone: member.emergencyPhone, address: member.address, country: member.country, town: member.town, postal_code: member.postalCode , plan: member.plan, gender: member.gender }
+  const formData = {first_name: member.firstName, last_name: member.lastName, dni: member.dni, birth_date: member.birthDate, phone_number: member.phone, emergency_phone: member.emergencyPhone, address: member.address, country: member.country, town: member.town, postal_code: member.postalCode , plan: member.plan, gender: member.gender, status: member.status }
   const formDataWithAvatar = {...formData, photo: ''} 
   try{
     if (fileUploaded){

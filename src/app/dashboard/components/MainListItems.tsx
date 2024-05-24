@@ -54,7 +54,7 @@ export const MainListItems = () => {
 					path: "/dashboard/members",
 				},
 				{
-					text: "Crear coach",
+					text: "Crear miembro",
 					path: "/dashboard/members/create-member",
 				},
 			],

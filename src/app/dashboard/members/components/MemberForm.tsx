@@ -347,12 +347,16 @@ export default function MemberForm({
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<TextField
+								select
 								fullWidth
 								label='Status'
 								name='status'
 								onChange={handleChange}
-								defaultValue={values.status}
-							/>
+								defaultValue={values.status}>
+								<MenuItem value='active'>Activo</MenuItem>
+								<MenuItem value='paused'>Pausado</MenuItem>
+								<MenuItem value='canceled'>Cancelado</MenuItem>
+							</TextField>
 						</Grid>
 					</Grid>
 					{formType === "UPDATE" && (

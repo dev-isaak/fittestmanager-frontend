@@ -1,15 +1,16 @@
-import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
+import { Dialog, DialogContent } from "@mui/material";
 import MemberForm from "../dashboard/members/components/MemberForm";
 import CoachForm from "../dashboard/coaches/components/CoachForm";
 import RoomsForm from "../dashboard/rooms/components/RoomsForm";
 import ClassForm from "../dashboard/classes/components/ClassForm";
 import SeminarForm from "../dashboard/seminars/components/SeminarForm";
+import NewScheduleForm from "../dashboard/classes/components/NewScheduleForm";
 
 type DialogFormType = {
 	openDialog: boolean;
 	setOpenDialog: any;
 	formData: unknown;
-	type: "MEMBERS" | "COACHES" | "ROOMS" | "CLASSES" | "SEMINARS";
+	type: "MEMBERS" | "COACHES" | "ROOMS" | "CLASSES" | "SEMINARS" | "SCHEDULES";
 };
 
 export default function DialogForm({
@@ -60,6 +61,13 @@ export default function DialogForm({
 				{type === "SEMINARS" && (
 					<SeminarForm
 						seminarData={formData}
+						formType='UPDATE'
+						onCloseDialog={setOpenDialog}
+					/>
+				)}
+				{type === "SCHEDULES" && (
+					<NewScheduleForm
+						scheduleData={formData}
 						formType='UPDATE'
 						onCloseDialog={setOpenDialog}
 					/>

@@ -30,7 +30,7 @@ export default function ClassesTable() {
 			<Box m={2}>
 				<Button
 					color='primary'
-					variant='contained'
+					variant='text'
 					component={Link}
 					href='/dashboard/classes/create-class'>
 					<AddIcon /> Crear clase
@@ -39,8 +39,16 @@ export default function ClassesTable() {
 			<DataTable
 				data={classes}
 				type='CLASSES'
-				titleCol={["Clase", "Color"]}
-				dataCol={["name", "color"]}
+				titleCol={[
+					{ name: "Evento", align: "left" },
+					{ name: "Sala", align: "left" },
+					{ name: "Color", align: "right" },
+				]}
+				dataCol={[
+					{ dbName: "name", align: "left" },
+					{ dbName: "room_id", align: "center" },
+					{ dbName: "color", align: "right" },
+				]}
 				onClickOpenDialog
 			/>
 		</PaperBoard>

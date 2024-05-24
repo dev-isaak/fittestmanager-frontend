@@ -67,7 +67,7 @@ export default function MyRooms() {
 			<Box m={2}>
 				<Button
 					color='primary'
-					variant='contained'
+					variant='text'
 					component={Link}
 					href='/dashboard/rooms/create-room'>
 					<AddIcon /> Crear sala
@@ -92,13 +92,17 @@ export default function MyRooms() {
 							</Typography>
 						</CardContent>
 						<CardActions>
-							<Button variant='outlined'>Horarios</Button>
-							<IconButton onClick={() => handleOpenDialog(room)}>
-								<EditIcon />
-							</IconButton>
-							<IconButton>
-								<DeleteIcon sx={{ color: "#cd6868" }} />
-							</IconButton>
+							<Stack flexDirection='row' justifyContent='start' width='100%'>
+								<Button variant='outlined'>Horarios</Button>
+							</Stack>
+							<Stack flexDirection='row' justifyContent='end'>
+								<IconButton onClick={() => handleOpenDialog(room)}>
+									<EditIcon />
+								</IconButton>
+								<IconButton>
+									<DeleteIcon sx={{ color: "#cd6868" }} />
+								</IconButton>
+							</Stack>
 						</CardActions>
 					</Card>
 				))}

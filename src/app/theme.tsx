@@ -9,8 +9,7 @@ const theme: ThemeOptions = createTheme({
 			main: "#E86746",
 		},
 		background: {
-			// default: "blue",
-			paper: "white",
+			paper: "#ffffff",
 		},
 		error: {
 			main: "#d32f2f",

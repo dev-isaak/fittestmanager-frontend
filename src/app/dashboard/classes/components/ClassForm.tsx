@@ -1,19 +1,25 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+	Box,
 	Button,
 	CircularProgress,
 	Divider,
 	Grid,
 	MenuItem,
+	Paper,
 	Stack,
+	Table,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
 	TextField,
 } from "@mui/material";
 import { Formik } from "formik";
 import { classFormValidation } from "../validation/classFormValidation";
 import { MuiColorInput } from "mui-color-input";
 import { createNewClass, updateClassInfo } from "@/redux/features/classesSlice";
-import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
-import { useEffect } from "react";
+import HoursTable from "./HoursTable";
 
 type RoomFormType = {
 	classData?: any;
@@ -30,15 +36,7 @@ export default function ClassForm({
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
-	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
 	const isLoading = useAppSelector((data) => data.roomsReducer.loading);
-
-	useEffect(() => {
-		const centerId = currentCenter.id;
-		if (!rooms.length) {
-			dispatch(fetchRoomsByFitnessCenter(centerId));
-		}
-	}, [rooms]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);
@@ -217,23 +215,11 @@ export default function ClassForm({
 						</Grid>
 					</Grid>
 					<Divider>Horarios</Divider>
-					<Grid container spacing={2}>
-						<Grid item xs={12} md={4}>
-							<TextField
-								select
-								label='Sala'
-								value={values.roomId}
-								name='roomId'
-								onChange={handleChange}
-								fullWidth>
-								{rooms.map((room, index) => (
-									<MenuItem key={index} value={room.id}>
-										{room.name}
-									</MenuItem>
-								))}
-							</TextField>
-						</Grid>
-					</Grid>
+					<HoursTable
+						classId={values.classId}
+						eventColor={values.color}
+						eventName={values.className}
+					/>
 					<Stack flexDirection='row' gap={2} marginTop={4}>
 						{isLoading ? (
 							<CircularProgress />

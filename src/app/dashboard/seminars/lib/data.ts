@@ -30,9 +30,8 @@ export const createSeminar = async(seminarData: any, centerId: number) => {
       error.code = 500;
       throw error;
     }
-    return data || error
     
-
+    return data || error
   } catch(e: any){
     console.error(e)
     return { error: e.message, code: e.code}
@@ -43,7 +42,6 @@ export const updateSeminar = async(seminarData: any) => {
   const supabase = createClient()
   const formData = {name: seminarData.seminarName, description: seminarData.seminarDescription, color: seminarData.color,booking_limit_per_day: seminarData.bookingLimitPerDay, minimum_persons_per_class: seminarData.minimumPersonsPerClass, limit_time_for_booking: seminarData.limitTimeForBooking, waiting_list_type: seminarData.waitingListType, calendar_order: seminarData.calendarOrder, limit_cancellation_time: seminarData.limitCancellationTime, room_id: seminarData.roomId}
   try {
-
     const { data, error } = await supabase
     .from('seminars')
     .update(formData)
@@ -55,9 +53,8 @@ export const updateSeminar = async(seminarData: any) => {
       error.code = 500;
       throw error;
     }
-    return data || error
-    
 
+    return data || error
   } catch(e: any){
     console.error(e)
     return { error: e.message, code: e.code}

@@ -31,14 +31,21 @@ function Members() {
 				onClickOpenDialog
 				data={members}
 				type='MEMBERS'
-				titleCol={["Avatar", "Name", "Email", "Phone Number", "Plan", "Status"]}
+				titleCol={[
+					{ name: "Avatar", align: "left" },
+					{ name: "Name", align: "left" },
+					{ name: "Email", align: "left" },
+					{ name: "Phone Number", align: "left" },
+					{ name: "Plan", align: "left" },
+					{ name: "Status", align: "center" },
+				]}
 				dataCol={[
-					"photo",
-					"first_name",
-					"email",
-					"phone_number",
-					"plan",
-					"status",
+					{ dbName: "photo", align: "left" },
+					{ dbName: "first_name", align: "left" },
+					{ dbName: "email", align: "left" },
+					{ dbName: "phone_number", align: "left" },
+					{ dbName: "plan", align: "left" },
+					{ dbName: "status", align: "center" },
 				]}
 			/>
 		</PaperBoard>

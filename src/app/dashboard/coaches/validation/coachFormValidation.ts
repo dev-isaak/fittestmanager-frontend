@@ -17,11 +17,12 @@ interface IFormValidation {
     gender?: string,
     plan?: string,
     status?: string
+    coachRole?: 'manager' | 'coach'
 }
 
 export const coachFormValidation = (formValues: IFormValidation) => {
   const errors: IFormValidation = {};
-debugger
+
   if (!formValues.firstName) {
     errors.firstName = "Requerido";
   }

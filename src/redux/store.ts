@@ -5,6 +5,7 @@ import coachesReducer from './features/coachesSlice'
 import roomsReducer from './features/roomsSlice'
 import classesReducer from './features/classesSlice'
 import seminarsReducer from './features/seminarsSlice'
+import classesScheduleReducer from './features/classesScheduleSlice'
 
 export const store = () => {
   return configureStore({
@@ -14,7 +15,8 @@ export const store = () => {
       coachesReducer,
       roomsReducer,
       classesReducer,
-      seminarsReducer
+      seminarsReducer,
+      classesScheduleReducer
     },
   })
 }

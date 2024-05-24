@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@aldabil/react-scheduler": "^2.9.2",
 		"@emotion/react": "^11.11.4",
 		"@emotion/styled": "^11.11.5",
 		"@mui/icons-material": "^5.15.15",
@@ -24,6 +25,7 @@
 		"@types/react-redux": "^7.1.33",
 		"cookies-next": "^4.1.1",
 		"country-region-data": "^3.0.0",
+		"date-fns": "^3.6.0",
 		"dayjs": "^1.11.11",
 		"formik": "^2.4.6",
 		"install": "^0.13.0",

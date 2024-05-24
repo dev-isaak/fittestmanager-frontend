@@ -30,7 +30,7 @@ export default function SeminarsTable() {
 			<Box m={2}>
 				<Button
 					color='primary'
-					variant='contained'
+					variant='text'
 					component={Link}
 					href='/dashboard/seminars/create-seminar'>
 					<AddIcon /> Añadir seminario / evento
@@ -40,8 +40,16 @@ export default function SeminarsTable() {
 				onClickOpenDialog
 				data={seminars}
 				type='SEMINARS'
-				titleCol={["Evento", "Color"]}
-				dataCol={["name", "color"]}
+				titleCol={[
+					{ name: "Evento", align: "left" },
+					{ name: "Sala", align: "left" },
+					{ name: "Color", align: "right" },
+				]}
+				dataCol={[
+					{ dbName: "name", align: "left" },
+					{ dbName: "room_id", align: "center" },
+					{ dbName: "color", align: "right" },
+				]}
 			/>
 		</PaperBoard>
 	);

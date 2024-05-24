@@ -50,10 +50,10 @@ export const seminarsSlice = createSlice({
 	initialState,
 	reducers: {
 		seminarsCreated: (state, action) => {
-			state.updated = false;
+			state.created = false;
 		},
 		seminarsUpdated: (state, action) => {
-			state.created = false;
+			state.updated = false;
 		},
 	},
 	extraReducers: (builder) => {
