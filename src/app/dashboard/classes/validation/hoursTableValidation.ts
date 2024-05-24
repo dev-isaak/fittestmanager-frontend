@@ -3,10 +3,11 @@ interface IHoursTableValidation {
   roomId?: string,
   sinceHour?: string,
   toHour?: string,
-  sinceDate?: string,
-  toDate?: string,
+  sinceDate?: any,
+  toDate?: any,
   coach?: string,
   limitPersons?: string
+  scheduleId?: string
 }
 
 export const hoursTableValidation = (formValues: IHoursTableValidation) => {

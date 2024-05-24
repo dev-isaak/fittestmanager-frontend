@@ -373,11 +373,8 @@ export default function MemberForm({
 									{formType === "CREATE" ? "Crear nuevo miembro" : "Actualizar"}
 								</Button>
 								{formType === "UPDATE" && (
-									<Button
-										onClick={handleCloseButton}
-										variant='outlined'
-										color='error'>
-										Cancelar
+									<Button onClick={handleCloseButton} variant='outlined'>
+										Cerrar
 									</Button>
 								)}
 							</>

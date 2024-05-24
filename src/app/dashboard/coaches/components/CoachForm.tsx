@@ -367,11 +367,8 @@ export default function CoachForm({
 									{formType === "CREATE" ? "Crear nuevo coach" : "Actualizar"}
 								</Button>
 								{formType === "UPDATE" && (
-									<Button
-										onClick={handleCloseButton}
-										variant='outlined'
-										color='error'>
-										Cancelar
+									<Button onClick={handleCloseButton} variant='outlined'>
+										Cerrar
 									</Button>
 								)}
 							</>

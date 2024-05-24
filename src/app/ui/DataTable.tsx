@@ -21,9 +21,9 @@ import { membersUpdated } from "@/redux/features/membersSlice";
 import { coachesUpdated } from "@/redux/features/coachesSlice";
 import { classesUpdated } from "@/redux/features/classesSlice";
 import { seminarsUpdated } from "@/redux/features/seminarsSlice";
-import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
 import { convertDateType } from "../dashboard/lib/utils";
 import dayjs, { Dayjs } from "dayjs";
+import { scheduleUpdated } from "@/redux/features/classesScheduleSlice";
 
 type TitleColType = {
 	name: string;
@@ -60,7 +60,7 @@ export default function DataTable({
 	const coachUpdated = useAppSelector((data) => data.coachesReducer.updated);
 	const classUpdated = useAppSelector((data) => data.classesReducer.updated);
 	const seminarUpdated = useAppSelector((data) => data.seminarsReducer.updated);
-	const scheduleUpdated = useAppSelector(
+	const schedulesUpdated = useAppSelector(
 		(data) => data.classesScheduleReducer.updated
 	);
 	const isLoading = useAppSelector((data) => data.coachesReducer.loading);
@@ -100,11 +100,11 @@ export default function DataTable({
 	}, [seminarUpdated]);
 
 	useEffect(() => {
-		if (scheduleUpdated) {
+		if (schedulesUpdated) {
 			setOpenDialog(false);
-			// dispatch(seminarsUpdated(""));
+			dispatch(scheduleUpdated(""));
 		}
-	}, [scheduleUpdated]);
+	}, [schedulesUpdated]);
 
 	const handleUserClick = (data: unknown[]) => {
 		setOpenDialog(true);
@@ -117,7 +117,7 @@ export default function DataTable({
 	};
 
 	return (
-		<Box>
+		<Box width='100%'>
 			<TableContainer>
 				<Table>
 					<TableHead>
@@ -188,13 +188,11 @@ export default function DataTable({
 												</TableCell>
 											) : col.dbName === "start" ? (
 												<TableCell>
-													{dayjs(data["start"]).hour()}:
-													{dayjs(data["start"]).minute()}
+													{dayjs(data["start"]).format("hh:mm")}
 												</TableCell>
 											) : col.dbName === "end" ? (
 												<TableCell>
-													{dayjs(data["end"]).hour()}:
-													{dayjs(data["end"]).minute()}
+													{dayjs(data["end"]).format("hh:mm")}
 												</TableCell>
 											) : (
 												<TableCell align={col.align}>

@@ -60,10 +60,10 @@ export default function HoursTable({ classId, eventColor, eventName }: any) {
 					{ name: "Inicio", align: "left" },
 					{ name: "Fin", align: "left" },
 					{ name: "Límite personas", align: "right" },
-					{ name: "Válido desde", align: "right" },
-					{ name: "Válido hasta", align: "right" },
-					{ name: "Sala", align: "right" },
-					{ name: "Coach", align: "right" },
+					{ name: "Válido desde", align: "left" },
+					{ name: "Válido hasta", align: "left" },
+					{ name: "Sala", align: "left" },
+					{ name: "Coach", align: "left" },
 				]}
 				dataCol={[
 					{ dbName: "week_day", align: "left" },

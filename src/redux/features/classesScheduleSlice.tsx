@@ -1,6 +1,7 @@
 import {
 	createClassSchedule,
 	getAllClassesSchedules,
+	updateClassSchedule,
 } from "@/app/dashboard/calendar/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -49,21 +50,21 @@ export const createNewClassSchedule = createAsyncThunk(
 	}
 );
 
-// export const updateClassInfo = createAsyncThunk(
-// 	"classesSchedules/update",
-// 	async (classData: any) => {
-// 		const response = await updateClass(classData);
-// 		return response;
-// 	}
-// );
+export const updateClassScheduleInfo = createAsyncThunk(
+	"classesSchedules/update",
+	async ({ classData }: any) => {
+		const response = await updateClassSchedule(classData);
+		return response;
+	}
+);
 export const classesScheduleSlice = createSlice({
 	name: "classesSchedules",
 	initialState,
 	reducers: {
-		classesCreated: (state, action) => {
+		scheduleCreated: (state, action) => {
 			state.created = false;
 		},
-		classesUpdated: (state, action) => {
+		scheduleUpdated: (state, action) => {
 			state.updated = false;
 		},
 	},
@@ -88,22 +89,24 @@ export const classesScheduleSlice = createSlice({
 					state.loading = false;
 				}
 			);
-		// builder.addCase(updateClassInfo.pending, (state, action) => {
-		// 	state.loading = true;
-		// }),
-		// 	builder.addCase(updateClassInfo.fulfilled, (state, action) => {
-		// 		const updatedRooms = state.classes.map((classData) =>
-		// 			classData.id === action.payload[0].id ? action.payload[0] : classData
-		// 		);
-		// 		state.classes = updatedRooms;
-		// 		state.updated = true;
-		// 		state.loading = false;
-		// 		toast.success("Clase actualizada.");
-		// 	}),
-		// 	builder.addCase(updateClassInfo.rejected, (state, action) => {
-		// 		toast.error(action.error.message);
-		// 		state.loading = false;
-		// 	});
+		builder.addCase(updateClassScheduleInfo.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(updateClassScheduleInfo.fulfilled, (state, action) => {
+				const updatedSchedules = state.schedule.map((scheduleData) =>
+					scheduleData.schedule_id === action.payload[0].schedule_id
+						? action.payload[0]
+						: scheduleData
+				);
+				state.schedule = updatedSchedules;
+				state.updated = true;
+				state.loading = false;
+				toast.success("Horario actualizado.");
+			}),
+			builder.addCase(updateClassScheduleInfo.rejected, (state, action) => {
+				toast.error(action.error.message);
+				state.loading = false;
+			});
 		builder.addCase(createNewClassSchedule.pending, (state, action) => {
 			toast.success("Horario creado.");
 			state.loading = true;
@@ -121,6 +124,7 @@ export const classesScheduleSlice = createSlice({
 	},
 });
 
-export const { classesCreated, classesUpdated } = classesScheduleSlice.actions;
+export const { scheduleCreated, scheduleUpdated } =
+	classesScheduleSlice.actions;
 
 export default classesScheduleSlice.reducer;

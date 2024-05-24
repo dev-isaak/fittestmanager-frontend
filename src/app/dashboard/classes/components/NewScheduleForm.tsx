@@ -1,4 +1,7 @@
-import { createNewClassSchedule } from "@/redux/features/classesScheduleSlice";
+import {
+	createNewClassSchedule,
+	updateClassScheduleInfo,
+} from "@/redux/features/classesScheduleSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
 	Button,
@@ -13,6 +16,7 @@ import { Formik } from "formik";
 import dayjs, { Dayjs } from "dayjs";
 import { hoursTableValidation } from "../validation/hoursTableValidation";
 import { useEffect } from "react";
+import { fetchCoachesByFitnessCenter } from "@/redux/features/coachesSlice";
 
 type NewScheduleFormType = {
 	eventName?: string;
@@ -38,33 +42,51 @@ export default function NewScheduleForm({
 	const isLoading = useAppSelector(
 		(data) => data.classesScheduleReducer.loading
 	);
-
+	const coaches = useAppSelector((data) => data.coachesReducer.coaches);
+	const currentFitnessCenterId = useAppSelector(
+		(data) => data.fitnessCentersReducer.currentFitnessCenter.id
+	);
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
 
+	useEffect(() => {
+		if (!coaches.length) {
+			dispatch(fetchCoachesByFitnessCenter(currentFitnessCenterId));
+		}
+	}, []);
+
 	return (
 		<Formik
 			initialValues={{
+				scheduleId: formType === "UPDATE" ? scheduleData.event_id : "",
 				weekDay: formType === "UPDATE" ? scheduleData.week_day : "",
 				roomId: formType === "UPDATE" ? scheduleData.room_id : "",
 				sinceHour: formType === "UPDATE" ? scheduleData.start : "",
 				toHour: formType === "UPDATE" ? scheduleData.end : "",
-				sinceDate: formType === "UPDATE" ? scheduleData.since_date : "",
-				toDate: formType === "UPDATE" ? scheduleData.until_date : "",
-				coach: formType === "UPDATE" ? scheduleData.coach : "",
+				sinceDate: formType === "UPDATE" ? scheduleData.since_day : "",
+				toDate: formType === "UPDATE" ? scheduleData.until_day : "",
+				coach: formType === "UPDATE" ? scheduleData.coach_id : "",
 				limitPersons: formType === "UPDATE" ? scheduleData.limit_persons : "",
 			}}
 			onSubmit={(formData) => {
-				dispatch(
-					createNewClassSchedule({
-						classData: formData,
-						eventName: eventName,
-						eventColor: eventColor,
-						classId: classId,
-						currentCenterId: currentCenterId,
-					})
-				);
+				if (formType === "UPDATE") {
+					dispatch(
+						updateClassScheduleInfo({
+							classData: formData,
+						})
+					);
+				}
+				if (formType === "CREATE")
+					dispatch(
+						createNewClassSchedule({
+							classData: formData,
+							eventName: eventName,
+							eventColor: eventColor,
+							classId: classId,
+							currentCenterId: currentCenterId,
+						})
+					);
 			}}
 			validate={hoursTableValidation}>
 			{({
@@ -76,6 +98,11 @@ export default function NewScheduleForm({
 				setFieldValue,
 			}) => (
 				<Stack component='form' onSubmit={handleSubmit} gap={2} p={2}>
+					<TextField
+						sx={{ display: "none" }}
+						name='scheduleId'
+						value={formType === "UPDATE" && scheduleData.schedule_id}
+					/>
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={6} gap={2}>
 							<TextField
@@ -167,6 +194,7 @@ export default function NewScheduleForm({
 								label='Desde día*'
 								name='sinceDate'
 								value={dayjs(values.sinceDate)}
+								format='DD/MM/YYYY'
 								slotProps={{
 									textField: {
 										error: Boolean(
@@ -185,6 +213,7 @@ export default function NewScheduleForm({
 								label='Hasta día*'
 								name='toDate'
 								value={dayjs(values.toDate)}
+								format='DD/MM/YYYY'
 								slotProps={{
 									textField: {
 										error: Boolean(
@@ -210,17 +239,27 @@ export default function NewScheduleForm({
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<TextField
-								fullWidth
 								select
-								label='Coach'
-								name='coach'
+								label='Coach*'
 								value={values.coach}
-								onChange={handleChange}>
-								<MenuItem value={1}>Valor 1</MenuItem>
+								name='coach'
+								onChange={handleChange}
+								fullWidth>
+								{coaches.map((coach, index) => {
+									return (
+										<MenuItem key={index} value={coach.id}>
+											{coach.first_name} {coach.last_name}
+										</MenuItem>
+									);
+								})}
 							</TextField>
 						</Grid>
 					</Grid>
-					<Stack flexDirection='row' gap={2} marginTop={4}>
+					<Stack
+						flexDirection='row'
+						gap={2}
+						marginTop={4}
+						justifyContent='center'>
 						{isLoading ? (
 							<CircularProgress />
 						) : (
@@ -229,11 +268,8 @@ export default function NewScheduleForm({
 									{formType === "CREATE" ? "Añadir" : "Actualizar"}
 								</Button>
 								{formType === "UPDATE" && (
-									<Button
-										onClick={handleCloseButton}
-										variant='outlined'
-										color='error'>
-										Cancelar
+									<Button onClick={handleCloseButton} variant='outlined'>
+										Cerrar
 									</Button>
 								)}
 							</>
