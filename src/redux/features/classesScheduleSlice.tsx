@@ -1,6 +1,8 @@
 import {
 	createClassSchedule,
 	getAllClassesSchedules,
+	getAllClassesSchedulesByClassId,
+	getAllClassesSchedulesByFitnessCenterId,
 	updateClassSchedule,
 } from "@/app/dashboard/calendar/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
@@ -20,27 +22,30 @@ const initialState: IClassesScheduleSlice = {
 	loading: false,
 };
 
-export const fetchClassesSchedulesByFitnessCenter = createAsyncThunk(
-	"classesSchedules/fetch",
+export const fetchClassesSchedulesByClass = createAsyncThunk(
+	"classesSchedulesByClass/fetch",
 	async (classId: number) => {
-		const response = await getAllClassesSchedules(classId);
+		const response = await getAllClassesSchedulesByClassId(classId);
+		return response;
+	}
+);
+
+export const fetchClassesSchedulesByFitnessCenter = createAsyncThunk(
+	"classesSchedulesByFitnessCenter/fetch",
+	async (fitnessCenterId: number) => {
+		const response = await getAllClassesSchedulesByFitnessCenterId(
+			fitnessCenterId
+		);
 		return response;
 	}
 );
 
 export const createNewClassSchedule = createAsyncThunk(
 	"classesSchedules/create",
-	async ({
-		classData,
-		eventName,
-		eventColor,
-		classId,
-		currentCenterId,
-	}: any) => {
+	async ({ classData, eventName, classId, currentCenterId }: any) => {
 		const response = await createClassSchedule(
 			classData,
 			eventName,
-			eventColor,
 			classId,
 			currentCenterId
 		);
@@ -69,6 +74,23 @@ export const classesScheduleSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
+		builder.addCase(fetchClassesSchedulesByClass.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(
+				fetchClassesSchedulesByClass.fulfilled,
+				(state, action) => {
+					state.schedule = action.payload;
+					state.loading = false;
+				}
+			),
+			builder.addCase(
+				fetchClassesSchedulesByClass.rejected,
+				(state, action) => {
+					toast.error(action.error.message);
+					state.loading = false;
+				}
+			);
 		builder.addCase(
 			fetchClassesSchedulesByFitnessCenter.pending,
 			(state, action) => {
@@ -108,13 +130,13 @@ export const classesScheduleSlice = createSlice({
 				state.loading = false;
 			});
 		builder.addCase(createNewClassSchedule.pending, (state, action) => {
-			toast.success("Horario creado.");
 			state.loading = true;
 		});
 		builder.addCase(createNewClassSchedule.fulfilled, (state, action) => {
 			state.schedule.push(action.payload[0]);
 			state.created = true;
 			state.loading = false;
+			toast.success("Horario creado.");
 		});
 		builder.addCase(createNewClassSchedule.rejected, (state, action) => {
 			toast.error(action.error.message);

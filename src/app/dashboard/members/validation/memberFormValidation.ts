@@ -21,7 +21,7 @@ interface IFormValidation {
 
 export const memberFormValidation = (formValues: IFormValidation) => {
   const errors: IFormValidation = {};
-debugger
+
   if (!formValues.firstName) {
     errors.firstName = "Requerido";
   }

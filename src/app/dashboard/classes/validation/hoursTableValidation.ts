@@ -11,7 +11,7 @@ interface IHoursTableValidation {
 }
 
 export const hoursTableValidation = (formValues: IHoursTableValidation) => {
-const errors: IHoursTableValidation = {};
+const errors: any = {};
 
 if (!formValues.weekDay) {
   errors.weekDay = "Requerido";
@@ -33,6 +33,15 @@ if (!formValues.toDate) {
 }
 if (!formValues.limitPersons) {
   errors.limitPersons = "Requerido";
+}
+if (!formValues.coach) {
+  errors.coach = "Requerido";
+}
+if (formValues.sinceHour > formValues.toHour){
+  errors.toHour = "La hora introducida tiene que ser mayor."
+}
+if (formValues.sinceDate > formValues.toDate){
+  errors.toDate = "La fecha introducida tiene que ser mayor."
 }
 return errors;
 };

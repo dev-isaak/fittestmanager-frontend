@@ -11,6 +11,7 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import usePagination from "../dashboard/members/lib/pagination";
@@ -139,7 +140,7 @@ export default function DataTable({
 						</TableBody>
 					) : (
 						<TableBody>
-							{_DATA.currentData().map((data: any, index) => (
+							{_DATA.currentData()?.map((data: any, index) => (
 								<TableRow key={index} onClick={() => handleUserClick(data)}>
 									{dataCol.map((col) => (
 										<React.Fragment key={`${col.dbName}-${data.user_id}`}>
@@ -170,7 +171,7 @@ export default function DataTable({
 												<TableCell align={col.align} sx={{ display: "flex" }}>
 													<Box
 														sx={{
-															background: data[col.dbName],
+															background: data.color?.color,
 															width: 25,
 															height: 25,
 														}}></Box>
@@ -193,6 +194,26 @@ export default function DataTable({
 											) : col.dbName === "end" ? (
 												<TableCell>
 													{dayjs(data["end"]).format("hh:mm")}
+												</TableCell>
+											) : col.dbName === "week_day" ? (
+												<TableCell>
+													{(() => {
+														if (data[col.dbName] === "monday") {
+															return "Lunes";
+														} else if (data[col.dbName] === "tuesday") {
+															return "Martes";
+														} else if (data[col.dbName] === "wednesday") {
+															return "Miércoles";
+														} else if (data[col.dbName] === "thursday") {
+															return "Jueves";
+														} else if (data[col.dbName] === "friday") {
+															return "Viernes";
+														} else if (data[col.dbName] === "saturday") {
+															return "Sábado";
+														} else if (data[col.dbName] === "sunday") {
+															return "Domingo";
+														}
+													})()}
 												</TableCell>
 											) : (
 												<TableCell align={col.align}>

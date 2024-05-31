@@ -20,7 +20,6 @@ import { fetchCoachesByFitnessCenter } from "@/redux/features/coachesSlice";
 
 type NewScheduleFormType = {
 	eventName?: string;
-	eventColor?: string;
 	classId?: string;
 	currentCenterId?: number;
 	formType: "CREATE" | "UPDATE";
@@ -30,7 +29,6 @@ type NewScheduleFormType = {
 
 export default function NewScheduleForm({
 	eventName,
-	eventColor,
 	classId,
 	currentCenterId,
 	scheduleData,
@@ -82,7 +80,6 @@ export default function NewScheduleForm({
 						createNewClassSchedule({
 							classData: formData,
 							eventName: eventName,
-							eventColor: eventColor,
 							classId: classId,
 							currentCenterId: currentCenterId,
 						})
@@ -108,7 +105,7 @@ export default function NewScheduleForm({
 							<TextField
 								fullWidth
 								select
-								label='Día*'
+								label='Todos los...*'
 								name='weekDay'
 								error={Boolean(
 									errors.weekDay && touched.weekDay && errors.weekDay
@@ -117,7 +114,7 @@ export default function NewScheduleForm({
 								value={values.weekDay}
 								onChange={handleChange}>
 								<MenuItem value='monday'>Lunes</MenuItem>
-								<MenuItem value='thuesday'>Martes</MenuItem>
+								<MenuItem value='tuesday'>Martes</MenuItem>
 								<MenuItem value='wednesday'>Miércoles</MenuItem>
 								<MenuItem value='thursday'>Jueves</MenuItem>
 								<MenuItem value='friday'>Viernes</MenuItem>
@@ -191,7 +188,7 @@ export default function NewScheduleForm({
 						<Grid item xs={12} md={6}>
 							<DatePicker
 								onChange={(event) => setFieldValue("sinceDate", event)}
-								label='Desde día*'
+								label='Válido desde día*'
 								name='sinceDate'
 								value={dayjs(values.sinceDate)}
 								format='DD/MM/YYYY'
@@ -210,7 +207,7 @@ export default function NewScheduleForm({
 						<Grid item xs={12} md={6}>
 							<DatePicker
 								onChange={(event) => setFieldValue("toDate", event)}
-								label='Hasta día*'
+								label='Válido hasta día*'
 								name='toDate'
 								value={dayjs(values.toDate)}
 								format='DD/MM/YYYY'
@@ -244,6 +241,8 @@ export default function NewScheduleForm({
 								value={values.coach}
 								name='coach'
 								onChange={handleChange}
+								error={Boolean(errors.coach && touched.coach && errors.coach)}
+								helperText={errors.coach && touched.coach && errors.coach}
 								fullWidth>
 								{coaches.map((coach, index) => {
 									return (

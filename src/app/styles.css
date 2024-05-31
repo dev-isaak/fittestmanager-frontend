@@ -1,0 +1,15 @@
+/* calendar */
+
+.css-e0wbnt .rs__cell .rs__event__item {
+  position: inherit !important;
+}
+
+.rs__event__item {
+  height: auto !important;
+  width: auto !important;
+  left: 0 !important;
+}
+
+.css-1blu04b-MuiPaper-root {
+  height: auto;
+}

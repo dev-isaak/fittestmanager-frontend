@@ -22,6 +22,11 @@ export default function ClassesTable() {
 			}
 		}
 	}, [currentFitnessCenter, dispatch]);
+
+	useEffect(() => {
+		console.log(classes);
+	}, [classes]);
+
 	return (
 		<PaperBoard>
 			<Typography component='h3' variant='h4'>
@@ -41,7 +46,7 @@ export default function ClassesTable() {
 				type='CLASSES'
 				titleCol={[
 					{ name: "Evento", align: "left" },
-					{ name: "Sala", align: "left" },
+					{ name: "Horarios", align: "left" },
 					{ name: "Color", align: "right" },
 				]}
 				dataCol={[

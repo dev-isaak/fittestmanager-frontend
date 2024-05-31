@@ -36,14 +36,3 @@ export const getAvatarURLFromSupabaseStorage = async(file: any) => {
   }
 }
 
-export const inviteUser = async(email: string) => {
-  const supabase = createClient()
-
-  try{
-    let { data, error } = await supabase.auth.admin.inviteUserByEmail(email)
-    console.log('Invite user: ', data)
-    return data || error
-  } catch (e) {
-    console.error(e)
-  }
-}

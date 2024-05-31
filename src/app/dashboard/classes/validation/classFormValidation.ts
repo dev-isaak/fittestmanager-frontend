@@ -2,7 +2,7 @@ interface IClassFormValidation {
   className?: string,
   classDescription?: string
   classId?: string
-  color?: string
+  color?: any
   bookingLimitPerDay?: string
   minimumPersonsPerClass?: string
   limitTimeForBooking?: string

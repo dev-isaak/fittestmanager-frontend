@@ -2,11 +2,11 @@ import { Button, Dialog, DialogTitle, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
-import { fetchClassesSchedulesByFitnessCenter } from "@/redux/features/classesScheduleSlice";
+import { fetchClassesSchedulesByClass } from "@/redux/features/classesScheduleSlice";
 import DataTable from "@/app/ui/DataTable";
 import NewScheduleForm from "./NewScheduleForm";
 
-export default function HoursTable({ classId, eventColor, eventName }: any) {
+export default function HoursTable({ classId, eventName }: any) {
 	const dispatch = useAppDispatch();
 	const [openDialog, setOpenDialog] = useState(false);
 	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
@@ -32,7 +32,7 @@ export default function HoursTable({ classId, eventColor, eventName }: any) {
 	}, [scheduleCreated]);
 
 	useEffect(() => {
-		dispatch(fetchClassesSchedulesByFitnessCenter(classId));
+		dispatch(fetchClassesSchedulesByClass(classId));
 	}, [dispatch]);
 
 	const handleOpen = () => {
@@ -82,7 +82,6 @@ export default function HoursTable({ classId, eventColor, eventName }: any) {
 				<NewScheduleForm
 					formType='CREATE'
 					eventName={eventName}
-					eventColor={eventColor}
 					classId={classId}
 					currentCenterId={currentCenter.id}
 					onCloseDialog={handleClose}

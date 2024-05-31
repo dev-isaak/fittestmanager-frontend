@@ -1,5 +1,6 @@
 import { createClient } from "@/app/utils/supabase/client"
-import { getAvatarURLFromSupabaseStorage, inviteUser } from "@/app/lib/data"
+import { getAvatarURLFromSupabaseStorage } from "@/app/lib/data"
+import { inviteUser } from "@/app/lib/serverData"
 
 export const getAllMembers = async(currentCenterId: number) => {
   const supabase = createClient()

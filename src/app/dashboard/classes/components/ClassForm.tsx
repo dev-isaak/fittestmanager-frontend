@@ -1,18 +1,11 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
-	Box,
 	Button,
 	CircularProgress,
 	Divider,
 	Grid,
 	MenuItem,
-	Paper,
 	Stack,
-	Table,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
 	TextField,
 } from "@mui/material";
 import { Formik } from "formik";
@@ -47,7 +40,7 @@ export default function ClassForm({
 				classId: formType === "UPDATE" ? classData.id : "",
 				className: formType === "UPDATE" ? classData.name : "",
 				classDescription: formType === "UPDATE" ? classData.description : "",
-				color: formType === "UPDATE" ? classData.color : "#ffffff",
+				color: formType === "UPDATE" ? classData.color.color : "#ffffff",
 				limitCancellationTime:
 					formType === "UPDATE" ? classData.limit_cancellation_time : "",
 				bookingLimitPerDay:
@@ -121,6 +114,7 @@ export default function ClassForm({
 								label='Color'
 								value={values.color ? values.color : ""}
 								onChange={(event: any) => {
+									console.log(event);
 									setFieldValue("color", event);
 								}}
 							/>
@@ -215,11 +209,7 @@ export default function ClassForm({
 						</Grid>
 					</Grid>
 					<Divider>Horarios</Divider>
-					<HoursTable
-						classId={values.classId}
-						eventColor={values.color}
-						eventName={values.className}
-					/>
+					<HoursTable classId={values.classId} eventName={values.className} />
 					<Stack flexDirection='row' gap={2} marginTop={4}>
 						{isLoading ? (
 							<CircularProgress />
