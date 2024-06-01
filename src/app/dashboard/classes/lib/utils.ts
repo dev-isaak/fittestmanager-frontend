@@ -1,7 +1,7 @@
 export const getCorrectDateFromDB = (date, hour) => {
   const sinceDateObj = new Date(date);
   const startDateObj = new Date(hour);
-  // debugger;
+  
   // Extraer la fecha de sinceDateObj
   const year = sinceDateObj.getFullYear();
   const month = sinceDateObj.getMonth();
@@ -22,7 +22,7 @@ export const getCorrectDateFromDB = (date, hour) => {
 
 }
 
-export function getDayIndex(dayName) {
+export function getDayIndex(dayName: string) {
   const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   return daysOfWeek.indexOf(dayName)+1;
 }

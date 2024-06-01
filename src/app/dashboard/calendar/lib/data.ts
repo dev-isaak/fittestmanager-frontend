@@ -40,7 +40,7 @@ export const createClassSchedule = async(scheduleData: any, eventName: string, c
     .from('classes_schedule')
     .insert(formData)
     .select()
-    debugger
+    
     return data || error
   } catch (e) {
     console.error(e)
@@ -61,6 +61,64 @@ export const updateClassSchedule = async(scheduleData: any) => {
 
     if(error) {
       const error: any = new Error('Error updating the schedule.');
+      error.code = 500;
+      throw error;
+    }
+    return data || error
+    
+
+  } catch(e: any){
+    console.error(e)
+    return { error: e.message, code: e.code}
+  }
+}
+
+export const getAllBookingsByFitnessCenterId = async(fitnessCenterId: number) => {
+  const supabase = createClient()
+  
+  try {
+    let { data: bookings, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .eq('fitness_center_id', fitnessCenterId)
+    
+    return bookings || error
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+export const bookAClass = async(bookingData: any, classId: any, currentCenterId: any, clientId: any) => {
+  const supabase = createClient()
+  
+  const formData = {client_id: clientId, class_id: classId, fitness_center_id: currentCenterId, date: bookingData.date, hour: bookingData.hour}
+  
+  try {
+    let { data, error } = await supabase
+    .from('bookings')
+    .insert(formData)
+    .select()
+    
+    return data || error
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+export const updateABooking = async(bookingData: any, bookingId: any) => {
+  const supabase = createClient()
+  
+  const formData = { date: bookingData.date, hour: bookingData.hour}
+
+  try {
+    const { data, error } = await supabase
+    .from('bookings')
+    .update(formData)
+    .eq('id', bookingId)
+    .select()
+
+    if(error) {
+      const error: any = new Error('Error updating the booking.');
       error.code = 500;
       throw error;
     }

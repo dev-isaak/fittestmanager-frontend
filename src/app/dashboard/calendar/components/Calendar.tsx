@@ -1,6 +1,6 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { formatMonthYear, startOfWeek } from "../lib/utils";
+import { Button, Stack, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { formatMonthYear } from "../lib/utils";
 import DisplayWeekDays from "./DisplayWeekDays";
 import DisplayEvents from "./DisplayEvents";
 

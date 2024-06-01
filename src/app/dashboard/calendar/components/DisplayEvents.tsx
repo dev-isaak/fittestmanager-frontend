@@ -1,8 +1,15 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
-import { getUniqueStartTimes, startOfWeek } from "../lib/utils";
+import {
+	getTotalBookings,
+	getUniqueStartTimes,
+	startOfWeek,
+} from "../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect } from "react";
-import { fetchClassesSchedulesByFitnessCenter } from "@/redux/features/classesScheduleSlice";
+import {
+	fetchBookingsByFitnessCenter,
+	fetchClassesSchedulesByFitnessCenter,
+} from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
 import { getDayIndex } from "../../classes/lib/utils";
 
@@ -14,36 +21,29 @@ export default function DisplayEvents({ currentDate }) {
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
-	let firstWeekDay = startOfWeek(new Date(currentDate));
+	const centerId = currentCenter.id;
+	const bookingsList = useAppSelector(
+		(data) => data.classesScheduleReducer.bookings
+	);
 
 	useEffect(() => {
-		const centerId = currentCenter.id;
-
 		if (!eventsSchedule.length)
 			dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
-		console.log(eventsSchedule);
 	}, [eventsSchedule]);
 
-	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
+	useEffect(() => {
+		if (!bookingsList.length) dispatch(fetchBookingsByFitnessCenter(centerId));
+		console.log(bookingsList);
+	}, [bookingsList]);
 
-	const weekDays = [
-		"Lunes",
-		"Martes",
-		"Miércoles",
-		"Jueves",
-		"Viernes",
-		"Sábado",
-		"Domingo",
-	];
-	let current = new Date(firstWeekDay);
+	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
+	let firstWeekDay = startOfWeek(new Date(currentDate));
 
 	return (
 		<>
 			{uniqueStartTimes.map((hour, hourIndex) => (
-				<>
-					<Box
-						key={hourIndex}
-						sx={{ background: "lightblue", width: "100%", marginTop: 1 }}>
+				<Box key={hourIndex}>
+					<Box sx={{ background: "lightblue", width: "100%", marginTop: 1 }}>
 						<Typography>{hour}</Typography>
 					</Box>
 					<Stack
@@ -53,42 +53,50 @@ export default function DisplayEvents({ currentDate }) {
 							width: "100%",
 							justifyContent: "space-between",
 						}}>
-						{weekDays.map((day, dayIndex) => {
+						{/* 7 is de number of weekdays (Monday to Sunday) */}
+						{Array.from({ length: 7 }).map((day, index) => {
+							let currentDay = dayjs(firstWeekDay).add(index, "day");
 							const dayEvents = eventsSchedule.filter(
 								(event) =>
-									getDayIndex(event.week_day) === dayIndex + 2 &&
+									getDayIndex(event.week_day) === index + 2 &&
 									dayjs(event.start).format("HH:mm") === hour
 							);
 
 							return (
-								<Box key={dayIndex} sx={{ width: 150 }}>
+								<Box key={index} sx={{ width: 150 }}>
 									{/* ORDENAR LOS DAY EVENTS POR UN NUEVO CAMPO SORT QUE CONTENGA EL EVENTO */}
-									{dayEvents.map((event, eventIndex) => (
-										<Paper
-											key={eventIndex}
-											sx={{
-												marginTop: 1,
-												padding: 1,
-												width: "100%",
-												background: event.class_id.color.color,
-											}}>
-											<Typography sx={{ textAlign: "center", fontWeight: 700 }}>
-												{event.title}
-											</Typography>
-										</Paper>
-									))}
+									{dayEvents.map((event, eventIndex) => {
+										const bookedPersons = getTotalBookings(
+											bookingsList,
+											event,
+											currentDay
+										);
+
+										return (
+											<Paper
+												key={eventIndex}
+												sx={{
+													marginTop: 1,
+													padding: 1,
+													width: "100%",
+													background: event.class_id.color.color,
+												}}>
+												<Typography
+													sx={{ textAlign: "center", fontWeight: 700 }}>
+													{event.title}
+												</Typography>
+												<Typography sx={{ textAlign: "center" }}>
+													{bookedPersons} de {event.limit_persons}
+												</Typography>
+											</Paper>
+										);
+									})}
 								</Box>
 							);
 						})}
 					</Stack>
-				</>
+				</Box>
 			))}
 		</>
 	);
 }
-
-// {eventsSchedule.map((event, index) => {
-//   if (dayjs(event.start).format("HH:mm") == hour) {
-//     return <Paper>{event.title}</Paper>;
-//   }
-// })}

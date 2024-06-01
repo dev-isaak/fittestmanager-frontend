@@ -1,5 +1,6 @@
 import {
 	createClassSchedule,
+	getAllBookingsByFitnessCenterId,
 	getAllClassesSchedules,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
@@ -10,6 +11,7 @@ import { toast } from "react-toastify";
 
 interface IClassesScheduleSlice {
 	schedule: any[];
+	bookings: any[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -17,6 +19,7 @@ interface IClassesScheduleSlice {
 
 const initialState: IClassesScheduleSlice = {
 	schedule: [],
+	bookings: [],
 	updated: false,
 	created: false,
 	loading: false,
@@ -51,6 +54,14 @@ export const createNewClassSchedule = createAsyncThunk(
 		);
 		if (response.error) throw new Error(response.error);
 
+		return response;
+	}
+);
+
+export const fetchBookingsByFitnessCenter = createAsyncThunk(
+	"bookingsByFitnessCenterId/fetch",
+	async (fitnessCenterId: number) => {
+		const response = await getAllBookingsByFitnessCenterId(fitnessCenterId);
 		return response;
 	}
 );
@@ -143,6 +154,23 @@ export const classesScheduleSlice = createSlice({
 			state.created = false;
 			state.loading = false;
 		});
+		builder.addCase(fetchBookingsByFitnessCenter.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(
+				fetchBookingsByFitnessCenter.fulfilled,
+				(state, action) => {
+					state.bookings = action.payload;
+					state.loading = false;
+				}
+			),
+			builder.addCase(
+				fetchBookingsByFitnessCenter.rejected,
+				(state, action) => {
+					toast.error(action.error.message);
+					state.loading = false;
+				}
+			);
 	},
 });
 
