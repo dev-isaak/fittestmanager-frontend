@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { formatMonthYear } from "../lib/utils";
 import DisplayWeekDays from "./DisplayWeekDays";
-import DisplayEvents from "./DisplayEvents";
+import DisplayEvents from "./events/DisplayEvents";
 
 const Calendar = () => {
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,21 +23,24 @@ const Calendar = () => {
 		<Stack>
 			<Stack
 				sx={{
-					width: "100%",
+					width: "1145px",
 					flexDirection: "row",
 					justifyContent: "end",
 					gap: 2,
-					padding: 2,
+					paddingLeft: 2,
+					paddingY: 2,
 				}}>
-				<Typography>{formatMonthYear(currentDate)}</Typography>
+				<Typography variant='h5' sx={{ paddingRight: 2 }}>
+					{formatMonthYear(currentDate)}
+				</Typography>
 				<Button onClick={previousWeek} variant='contained'>
-					Semana Anterior
+					{"<"}
 				</Button>
 				<Button onClick={nextWeek} variant='contained'>
-					Semana Siguiente
+					{">"}
 				</Button>
 			</Stack>
-			<Stack id='calendar'>
+			<Stack id='calendar' sx={{ width: "fit-content" }}>
 				<DisplayWeekDays currentDate={currentDate} />
 				<DisplayEvents currentDate={currentDate} />
 			</Stack>

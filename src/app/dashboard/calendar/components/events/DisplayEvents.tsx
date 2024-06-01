@@ -3,17 +3,21 @@ import {
 	getTotalBookings,
 	getUniqueStartTimes,
 	startOfWeek,
-} from "../lib/utils";
+} from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	fetchBookingsByFitnessCenter,
 	fetchClassesSchedulesByFitnessCenter,
 } from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
-import { getDayIndex } from "../../classes/lib/utils";
+import { getDayIndex } from "../../../classes/lib/utils";
+import DialogForm from "@/app/ui/DialogForm";
 
 export default function DisplayEvents({ currentDate }) {
+	const [openDialog, setOpenDialog] = useState(false);
+	const [eventData, setEventData] = useState({});
+
 	const dispatch = useAppDispatch();
 	const eventsSchedule = useAppSelector(
 		(data) => data.classesScheduleReducer.schedule
@@ -29,22 +33,35 @@ export default function DisplayEvents({ currentDate }) {
 	useEffect(() => {
 		if (!eventsSchedule.length)
 			dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
-	}, [eventsSchedule]);
+	}, [eventsSchedule, currentCenter]);
 
 	useEffect(() => {
 		if (!bookingsList.length) dispatch(fetchBookingsByFitnessCenter(centerId));
-		console.log(bookingsList);
-	}, [bookingsList]);
+	}, [bookingsList, currentCenter]);
 
 	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
 	let firstWeekDay = startOfWeek(new Date(currentDate));
 
+	const handleOpenDialog = (data: any) => {
+		setOpenDialog(true);
+		setEventData(data);
+	};
+
 	return (
-		<>
+		<Stack>
 			{uniqueStartTimes.map((hour, hourIndex) => (
-				<Box key={hourIndex}>
-					<Box sx={{ background: "lightblue", width: "100%", marginTop: 1 }}>
-						<Typography>{hour}</Typography>
+				<Stack key={hourIndex}>
+					<Box
+						sx={{
+							background: "#b7c5e2",
+							marginTop: 1,
+							paddingLeft: 1,
+							// borderTop: "2px solid rgb(28 36 52)",
+							// borderBottom: "2px solid rgb(28 36 52)",
+						}}>
+						<Typography sx={{ letterSpacing: ".1rem", fontSize: "1.1rem" }}>
+							{hour}
+						</Typography>
 					</Box>
 					<Stack
 						sx={{
@@ -63,7 +80,7 @@ export default function DisplayEvents({ currentDate }) {
 							);
 
 							return (
-								<Box key={index} sx={{ width: 150 }}>
+								<Box key={index} sx={{ minWidth: 150 }}>
 									{/* ORDENAR LOS DAY EVENTS POR UN NUEVO CAMPO SORT QUE CONTENGA EL EVENTO */}
 									{dayEvents.map((event, eventIndex) => {
 										const bookedPersons = getTotalBookings(
@@ -74,8 +91,12 @@ export default function DisplayEvents({ currentDate }) {
 
 										return (
 											<Paper
+												onClick={() => handleOpenDialog(event)}
 												key={eventIndex}
 												sx={{
+													"&:hover": {
+														cursor: "pointer",
+													},
 													marginTop: 1,
 													padding: 1,
 													width: "100%",
@@ -95,8 +116,14 @@ export default function DisplayEvents({ currentDate }) {
 							);
 						})}
 					</Stack>
-				</Box>
+				</Stack>
 			))}
-		</>
+			<DialogForm
+				type='EVENTS'
+				openDialog={openDialog}
+				setOpenDialog={setOpenDialog}
+				formData={eventData}
+			/>
+		</Stack>
 	);
 }

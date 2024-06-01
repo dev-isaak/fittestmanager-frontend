@@ -5,12 +5,20 @@ import RoomsForm from "../dashboard/rooms/components/RoomsForm";
 import ClassForm from "../dashboard/classes/components/ClassForm";
 import SeminarForm from "../dashboard/seminars/components/SeminarForm";
 import NewScheduleForm from "../dashboard/classes/components/NewScheduleForm";
+import BookingsForm from "../dashboard/calendar/components/events/EventsForm";
 
 type DialogFormType = {
 	openDialog: boolean;
 	setOpenDialog: any;
 	formData: unknown;
-	type: "MEMBERS" | "COACHES" | "ROOMS" | "CLASSES" | "SEMINARS" | "SCHEDULES";
+	type:
+		| "MEMBERS"
+		| "COACHES"
+		| "ROOMS"
+		| "CLASSES"
+		| "SEMINARS"
+		| "SCHEDULES"
+		| "EVENTS";
 };
 
 export default function DialogForm({
@@ -68,6 +76,13 @@ export default function DialogForm({
 				{type === "SCHEDULES" && (
 					<NewScheduleForm
 						scheduleData={formData}
+						formType='UPDATE'
+						onCloseDialog={setOpenDialog}
+					/>
+				)}
+				{type === "EVENTS" && (
+					<BookingsForm
+						bookingData={formData}
 						formType='UPDATE'
 						onCloseDialog={setOpenDialog}
 					/>

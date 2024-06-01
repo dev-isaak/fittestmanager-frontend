@@ -13,9 +13,10 @@ export const formatDate = (date) => {
 };
 
 export const formatMonthYear = (date) => {
-  const month = date.getMonth() + 1; // Los meses están basados en cero
+  const monthName = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  const month = monthName.filter((month, index) => index + 1 === date.getMonth() + 1)
   const year = date.getFullYear();
-  return `${month}-${year}`;
+  return `${month} ${year}`;
 };
 
 // Returns a list of times
