@@ -3,6 +3,7 @@ import { IMember } from "@/app/dashboard/members/interfaces/interfaces";
 import {
 	createMember,
 	getAllMembers,
+	getAllMembersByStatus,
 	updateMember,
 } from "@/app/dashboard/members/lib/data";
 import { toast } from "react-toastify";
@@ -27,6 +28,14 @@ export const fetchMembersByFitnessCenter = createAsyncThunk(
 	"members/fetch",
 	async (centerId: number) => {
 		const response = await getAllMembers(centerId);
+		return response;
+	}
+);
+
+export const fetchMembersByStatus = createAsyncThunk(
+	"membersByStatus/fetch",
+	async ({ centerId, status }: any) => {
+		const response = await getAllMembersByStatus(centerId, status);
 		return response;
 	}
 );
@@ -71,6 +80,14 @@ export const membersSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
+		builder.addCase(fetchMembersByStatus.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(fetchMembersByStatus.fulfilled, (state, action) => {
+			state.members = action.payload;
+			state.searchMembers = action.payload;
+			state.loading = false;
+		});
 		builder.addCase(fetchMembersByFitnessCenter.pending, (state, action) => {
 			state.loading = true;
 		});

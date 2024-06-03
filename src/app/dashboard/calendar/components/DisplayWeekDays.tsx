@@ -32,9 +32,9 @@ export default function DisplayWeekDays({ currentDate }: DisplayWeekDaysType) {
 					<Box
 						key={index}
 						sx={{
-							color: "rgb(28 36 52)",
-							borderBottom: "3px solid rgb(28 36 52)",
-							borderTop: "3px solid rgb(28 36 52)",
+							color: "rgb(65 65 65)",
+							borderBottom: "3px solid rgb(177 177 177)",
+							borderTop: "3px solid rgb(177 177 177)",
 							textAlign: "center",
 							paddingX: 2,
 							paddingY: 1,

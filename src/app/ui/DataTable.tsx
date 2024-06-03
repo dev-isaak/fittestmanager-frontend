@@ -38,7 +38,13 @@ type DataColType = {
 
 type DataTableType = {
 	data: unknown[];
-	type: "MEMBERS" | "COACHES" | "CLASSES" | "SEMINARS" | "SCHEDULES";
+	type:
+		| "MEMBERS"
+		| "COACHES"
+		| "CLASSES"
+		| "SEMINARS"
+		| "SCHEDULES"
+		| "INVITE_MEMBER";
 	titleCol: TitleColType[];
 	dataCol: DataColType[];
 	onClickOpenDialog?: boolean;
@@ -67,12 +73,6 @@ export default function DataTable({
 	const isLoading = useAppSelector((data) => data.coachesReducer.loading);
 	const dispatch = useAppDispatch();
 	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
-
-	// useEffect(() => {
-	// 	if (!rooms.length) {
-	// 		dispatch(fetchRoomsByFitnessCenter(centerId));
-	// 	}
-	// }, [rooms]);
 
 	useEffect(() => {
 		if (memberUpdated) {

@@ -6,15 +6,12 @@ import {
 } from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
-import {
-	fetchBookingsByFitnessCenter,
-	fetchClassesSchedulesByFitnessCenter,
-} from "@/redux/features/classesScheduleSlice";
+import { fetchClassesSchedulesByFitnessCenter } from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
 import { getDayIndex } from "../../../classes/lib/utils";
 import DialogForm from "@/app/ui/DialogForm";
 
-export default function DisplayEvents({ currentDate }) {
+export default function DisplayEvents({ currentDate, bookingsList }) {
 	const [openDialog, setOpenDialog] = useState(false);
 	const [eventData, setEventData] = useState({});
 
@@ -22,29 +19,21 @@ export default function DisplayEvents({ currentDate }) {
 	const eventsSchedule = useAppSelector(
 		(data) => data.classesScheduleReducer.schedule
 	);
+	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
+	let firstWeekDay = startOfWeek(new Date(currentDate));
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
 	const centerId = currentCenter.id;
-	const bookingsList = useAppSelector(
-		(data) => data.classesScheduleReducer.bookings
-	);
 
 	useEffect(() => {
 		if (!eventsSchedule.length)
 			dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
 	}, [eventsSchedule, currentCenter]);
 
-	useEffect(() => {
-		if (!bookingsList.length) dispatch(fetchBookingsByFitnessCenter(centerId));
-	}, [bookingsList, currentCenter]);
-
-	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
-	let firstWeekDay = startOfWeek(new Date(currentDate));
-
-	const handleOpenDialog = (data: any) => {
+	const handleOpenDialog = (data: any, currentDay, bookedPersons) => {
 		setOpenDialog(true);
-		setEventData(data);
+		setEventData({ ...data, currentDay, bookedPersons });
 	};
 
 	return (
@@ -53,11 +42,9 @@ export default function DisplayEvents({ currentDate }) {
 				<Stack key={hourIndex}>
 					<Box
 						sx={{
-							background: "#b7c5e2",
+							background: "#8e95c24a",
 							marginTop: 1,
 							paddingLeft: 1,
-							// borderTop: "2px solid rgb(28 36 52)",
-							// borderBottom: "2px solid rgb(28 36 52)",
 						}}>
 						<Typography sx={{ letterSpacing: ".1rem", fontSize: "1.1rem" }}>
 							{hour}
@@ -91,7 +78,9 @@ export default function DisplayEvents({ currentDate }) {
 
 										return (
 											<Paper
-												onClick={() => handleOpenDialog(event)}
+												onClick={() =>
+													handleOpenDialog(event, currentDay, bookedPersons)
+												}
 												key={eventIndex}
 												sx={{
 													"&:hover": {

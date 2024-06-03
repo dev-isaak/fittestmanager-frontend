@@ -1,6 +1,7 @@
 import {
 	createClassSchedule,
 	getAllBookingsByFitnessCenterId,
+	getAllBookingsByFitnessCenterIdBetweenTwoDates,
 	getAllClassesSchedules,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
@@ -60,8 +61,12 @@ export const createNewClassSchedule = createAsyncThunk(
 
 export const fetchBookingsByFitnessCenter = createAsyncThunk(
 	"bookingsByFitnessCenterId/fetch",
-	async (fitnessCenterId: number) => {
-		const response = await getAllBookingsByFitnessCenterId(fitnessCenterId);
+	async ({ fitnessCenterId, startDate, endDate }: any) => {
+		const response = await getAllBookingsByFitnessCenterIdBetweenTwoDates(
+			fitnessCenterId,
+			startDate,
+			endDate
+		);
 		return response;
 	}
 );

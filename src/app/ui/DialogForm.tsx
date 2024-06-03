@@ -6,6 +6,7 @@ import ClassForm from "../dashboard/classes/components/ClassForm";
 import SeminarForm from "../dashboard/seminars/components/SeminarForm";
 import NewScheduleForm from "../dashboard/classes/components/NewScheduleForm";
 import BookingsForm from "../dashboard/calendar/components/events/EventsForm";
+import InviteUserForm from "../dashboard/calendar/components/events/InviteUserForm";
 
 type DialogFormType = {
 	openDialog: boolean;
@@ -18,7 +19,8 @@ type DialogFormType = {
 		| "CLASSES"
 		| "SEMINARS"
 		| "SCHEDULES"
-		| "EVENTS";
+		| "EVENTS"
+		| "INVITE_MEMBER";
 };
 
 export default function DialogForm({
@@ -81,11 +83,10 @@ export default function DialogForm({
 					/>
 				)}
 				{type === "EVENTS" && (
-					<BookingsForm
-						bookingData={formData}
-						formType='UPDATE'
-						onCloseDialog={setOpenDialog}
-					/>
+					<BookingsForm bookingData={formData} onCloseDialog={setOpenDialog} />
+				)}
+				{type === "INVITE_MEMBER" && (
+					<InviteUserForm userData={formData} onCloseDialog={setOpenDialog} />
 				)}
 			</DialogContent>
 		</Dialog>
