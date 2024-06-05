@@ -12,10 +12,8 @@ const Calendar = () => {
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
-	const bookingsList = useAppSelector(
-		(data) => data.classesScheduleReducer.bookings
-	);
 
+	// This function is beeing used in DisplayEvents component.
 	const getWeeklyBookings = (
 		startDate: Date,
 		getPreviousDates: boolean = false
@@ -34,12 +32,6 @@ const Calendar = () => {
 			})
 		);
 	};
-
-	useEffect(() => {
-		if (!bookingsList.length) {
-			getWeeklyBookings(currentDate);
-		}
-	}, [bookingsList]);
 
 	const previousWeek = () => {
 		const newDate = new Date(currentDate);
@@ -78,7 +70,7 @@ const Calendar = () => {
 			</Stack>
 			<Stack id='calendar' sx={{ width: "fit-content" }}>
 				<DisplayWeekDays currentDate={currentDate} />
-				<DisplayEvents currentDate={currentDate} bookingsList={bookingsList} />
+				<DisplayEvents currentDate={currentDate} />
 			</Stack>
 		</Stack>
 	);

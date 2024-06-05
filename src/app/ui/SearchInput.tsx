@@ -1,11 +1,14 @@
 import { searchCoaches } from "@/redux/features/coachesSlice";
-import { searchMembers } from "@/redux/features/membersSlice";
+import {
+	searchActiveMembers,
+	searchMembers,
+} from "@/redux/features/membersSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { IconButton, Stack, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 type SearchInputType = {
-	type: "MEMBERS" | "COACHES";
+	type: "MEMBERS" | "COACHES" | "ACTIVE_MEMBERS";
 };
 
 export default function SearchInput({ type }: SearchInputType) {
@@ -19,6 +22,8 @@ export default function SearchInput({ type }: SearchInputType) {
 				dispatch(searchMembers(data.get("inputSearch")));
 			case "COACHES":
 				dispatch(searchCoaches(data.get("inputSearch")));
+			case "ACTIVE_MEMBERS":
+				dispatch(searchActiveMembers(data.get("inputSearch")));
 		}
 	};
 

@@ -11,7 +11,6 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
-	Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import usePagination from "../dashboard/members/lib/pagination";
@@ -48,6 +47,7 @@ type DataTableType = {
 	titleCol: TitleColType[];
 	dataCol: DataColType[];
 	onClickOpenDialog?: boolean;
+	bookingData?: any;
 };
 
 export default function DataTable({
@@ -56,6 +56,7 @@ export default function DataTable({
 	type,
 	dataCol,
 	onClickOpenDialog,
+	bookingData,
 }: DataTableType) {
 	const [page, setPage] = useState(0);
 	const [openDialog, setOpenDialog] = useState(false);
@@ -242,6 +243,7 @@ export default function DataTable({
 					openDialog={openDialog}
 					setOpenDialog={setOpenDialog}
 					formData={formData}
+					bookingData={bookingData}
 				/>
 			)}
 		</Box>

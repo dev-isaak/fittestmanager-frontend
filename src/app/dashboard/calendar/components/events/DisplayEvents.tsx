@@ -1,19 +1,27 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import {
+	getBooking,
 	getTotalBookings,
 	getUniqueStartTimes,
 	startOfWeek,
 } from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
-import { fetchClassesSchedulesByFitnessCenter } from "@/redux/features/classesScheduleSlice";
+import {
+	fetchBookingsByFitnessCenter,
+	fetchClassesSchedulesByFitnessCenter,
+} from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
 import { getDayIndex } from "../../../classes/lib/utils";
 import DialogForm from "@/app/ui/DialogForm";
 
-export default function DisplayEvents({ currentDate, bookingsList }) {
+export default function DisplayEvents({ currentDate }) {
 	const [openDialog, setOpenDialog] = useState(false);
 	const [eventData, setEventData] = useState({});
+
+	const bookingsList = useAppSelector(
+		(data) => data.classesScheduleReducer.bookings
+	);
 
 	const dispatch = useAppDispatch();
 	const eventsSchedule = useAppSelector(
@@ -25,6 +33,32 @@ export default function DisplayEvents({ currentDate, bookingsList }) {
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
 	const centerId = currentCenter.id;
+
+	// This function is beeing used in Calendar component.
+	const getWeeklyBookings = (
+		startDate: Date,
+		getPreviousDates: boolean = false
+	) => {
+		const startWeek = startOfWeek(new Date(startDate));
+		const endWeek = new Date(startWeek);
+		getPreviousDates
+			? endWeek.setDate(startWeek.getDate() - 7)
+			: endWeek.setDate(startWeek.getDate() + 7);
+
+		dispatch(
+			fetchBookingsByFitnessCenter({
+				fitnessCenterId: currentCenter.id,
+				startDate: startWeek,
+				endDate: new Date(endWeek),
+			})
+		);
+	};
+
+	useEffect(() => {
+		if (!bookingsList.length) {
+			getWeeklyBookings(currentDate);
+		}
+	}, [bookingsList]);
 
 	useEffect(() => {
 		if (!eventsSchedule.length)
@@ -75,7 +109,6 @@ export default function DisplayEvents({ currentDate, bookingsList }) {
 											event,
 											currentDay
 										);
-
 										return (
 											<Paper
 												onClick={() =>
@@ -91,6 +124,7 @@ export default function DisplayEvents({ currentDate, bookingsList }) {
 													width: "100%",
 													background: event.class_id.color.color,
 												}}>
+												{event.is_cancelled && <Box>Evento cancelado</Box>}
 												<Typography
 													sx={{ textAlign: "center", fontWeight: 700 }}>
 													{event.title}

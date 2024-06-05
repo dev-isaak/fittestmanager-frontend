@@ -1,10 +1,10 @@
 import {
+	bookAClass,
 	createClassSchedule,
-	getAllBookingsByFitnessCenterId,
 	getAllBookingsByFitnessCenterIdBetweenTwoDates,
-	getAllClassesSchedules,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
+	updateABooking,
 	updateClassSchedule,
 } from "@/app/dashboard/calendar/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
@@ -71,6 +71,26 @@ export const fetchBookingsByFitnessCenter = createAsyncThunk(
 	}
 );
 
+export const bookUserToClass = createAsyncThunk(
+	"bookClass/create",
+	async ({ bookingData }: any) => {
+		const response = await bookAClass(bookingData);
+		if (response.error) throw new Error(response.error);
+
+		return response;
+	}
+);
+
+export const updateBookingClass = createAsyncThunk(
+	"updatebookClass/update",
+	async ({ bookingData }: any) => {
+		const response = await updateABooking(bookingData);
+		if (response.error) throw new Error(response.error);
+
+		return response;
+	}
+);
+
 export const updateClassScheduleInfo = createAsyncThunk(
 	"classesSchedules/update",
 	async ({ classData }: any) => {
@@ -131,10 +151,10 @@ export const classesScheduleSlice = createSlice({
 			state.loading = true;
 		}),
 			builder.addCase(updateClassScheduleInfo.fulfilled, (state, action) => {
-				const updatedSchedules = state.schedule.map((scheduleData) =>
-					scheduleData.schedule_id === action.payload[0].schedule_id
+				const updatedSchedules = state.schedule.map((bookingData) =>
+					bookingData.schedule_id === action.payload[0].schedule_id
 						? action.payload[0]
-						: scheduleData
+						: bookingData
 				);
 				state.schedule = updatedSchedules;
 				state.updated = true;
@@ -176,6 +196,44 @@ export const classesScheduleSlice = createSlice({
 					state.loading = false;
 				}
 			);
+		builder.addCase(bookUserToClass.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(bookUserToClass.fulfilled, (state, action) => {
+			state.bookings.push(action.payload[0]);
+			state.created = true;
+			state.loading = false;
+			toast.success("Usuario apuntado.");
+		});
+		builder.addCase(bookUserToClass.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(updateBookingClass.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(updateBookingClass.fulfilled, (state, action) => {
+			const updatedSchedules = state.bookings.map((bookingData) =>
+				bookingData.id === action.payload[0].id
+					? action.payload[0]
+					: bookingData
+			);
+
+			state.bookings = updatedSchedules;
+			state.updated = true;
+			state.loading = false;
+			if (action.payload[0].is_cancelled) {
+				toast.success("Clase cancelada.");
+			} else if (!action.payload[0].is_cancelled) {
+				toast.success("Clase abierta de nuevo.");
+			}
+		});
+		builder.addCase(updateBookingClass.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
 	},
 });
 

@@ -10,7 +10,9 @@ import { toast } from "react-toastify";
 
 interface IMembersSlice {
 	members: IMember[];
+	activeMembers: IMember[];
 	searchMembers: IMember[];
+	searchActiveMembers: IMember[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -18,7 +20,9 @@ interface IMembersSlice {
 
 const initialState: IMembersSlice = {
 	members: [],
+	activeMembers: [],
 	searchMembers: [],
+	searchActiveMembers: [],
 	updated: false,
 	created: false,
 	loading: false,
@@ -72,6 +76,16 @@ export const membersSlice = createSlice({
 			);
 			state.searchMembers = membersFiltered;
 		},
+		searchActiveMembers: (state, action) => {
+			const inputText = action.payload.toLowerCase();
+			const membersFiltered = state.activeMembers.filter(
+				(member) =>
+					member.first_name.toLowerCase().includes(inputText) ||
+					member.last_name.toLowerCase().includes(inputText) ||
+					member.email.toLowerCase().includes(inputText)
+			);
+			state.searchActiveMembers = membersFiltered;
+		},
 		membersUpdated: (state, action) => {
 			state.updated = false;
 		},
@@ -84,8 +98,8 @@ export const membersSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(fetchMembersByStatus.fulfilled, (state, action) => {
-			state.members = action.payload;
-			state.searchMembers = action.payload;
+			state.activeMembers = action.payload;
+			state.searchActiveMembers = action.payload;
 			state.loading = false;
 		});
 		builder.addCase(fetchMembersByFitnessCenter.pending, (state, action) => {
@@ -123,7 +137,11 @@ export const membersSlice = createSlice({
 	},
 });
 
-export const { searchMembers, membersUpdated, memberCreated } =
-	membersSlice.actions;
+export const {
+	searchMembers,
+	membersUpdated,
+	memberCreated,
+	searchActiveMembers,
+} = membersSlice.actions;
 
 export default membersSlice.reducer;

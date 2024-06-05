@@ -21,6 +21,7 @@ type DialogFormType = {
 		| "SCHEDULES"
 		| "EVENTS"
 		| "INVITE_MEMBER";
+	bookingData?: any;
 };
 
 export default function DialogForm({
@@ -28,6 +29,7 @@ export default function DialogForm({
 	setOpenDialog,
 	formData,
 	type,
+	bookingData,
 }: DialogFormType) {
 	const handleCloseDialog = () => {
 		setOpenDialog(false);
@@ -86,7 +88,11 @@ export default function DialogForm({
 					<BookingsForm bookingData={formData} onCloseDialog={setOpenDialog} />
 				)}
 				{type === "INVITE_MEMBER" && (
-					<InviteUserForm userData={formData} onCloseDialog={setOpenDialog} />
+					<InviteUserForm
+						userData={formData}
+						onCloseDialog={setOpenDialog}
+						bookingData={bookingData}
+					/>
 				)}
 			</DialogContent>
 		</Dialog>

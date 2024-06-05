@@ -7,7 +7,7 @@ export const getAllClassesSchedulesByFitnessCenterId = async (fitnessCenterId: n
   try {
     let { data: schedule, error } = await supabase
       .from('classes_schedule')
-      .select('*, class_id(color(*)), bookings(*, members(*))')
+      .select('*, class_id(id, color(*)), bookings(*, members(*))')
       .eq('fitness_center_id', fitnessCenterId)
 
     return schedule || error
@@ -22,7 +22,7 @@ export const getAllClassesSchedulesByClassId = async (classId: number) => {
   try {
     let { data: schedule, error } = await supabase
       .from('classes_schedule')
-      .select('*, class_id(color(*)), bookings(*, members(*))')
+      .select('*, class_id(id, color(*)), bookings(*, members(*))')
       .eq('class_id', classId)
 
     return schedule || error
@@ -66,8 +66,6 @@ export const updateClassSchedule = async (scheduleData: any) => {
       throw error;
     }
     return data || error
-
-
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
@@ -85,7 +83,7 @@ export const getAllBookingsByFitnessCenterIdBetweenTwoDates = async (fitnessCent
   try {
     let { data: bookings, error } = await supabase
       .from('bookings')
-      .select('*')
+      .select('*, member_id(*)')
       .eq('fitness_center_id', fitnessCenterId)
       .gte('date', start)
       .lte('date', end)
@@ -96,34 +94,40 @@ export const getAllBookingsByFitnessCenterIdBetweenTwoDates = async (fitnessCent
   }
 }
 
-export const bookAClass = async (bookingData: any, classId: any, currentCenterId: any, clientId: any) => {
+export const bookAClass = async (bookingData: any) => {
   const supabase = createClient()
-
-  const formData = { client_id: clientId, class_id: classId, fitness_center_id: currentCenterId, date: bookingData.date, hour: bookingData.hour }
+  const formData = { class_id: null, member_id: bookingData.userId, schedule_id: bookingData.scheduleId, fitness_center_id: bookingData.fitnessCenterId, date: bookingData.date, hour: bookingData.hour }
 
   try {
     let { data, error } = await supabase
       .from('bookings')
       .insert(formData)
-      .select()
+      .select('*, member_id(*)')
+
+    if (error?.code === 'P0001') {
+      const error: any = new Error('El usuario ya está apuntando en esta clase.');
+      error.code = 500;
+      throw error;
+    }
 
     return data || error
-  } catch (e) {
+  } catch (e: any) {
     console.error(e)
+    return { error: e.message, code: e.code }
   }
 }
 
-export const updateABooking = async (bookingData: any, bookingId: any) => {
+export const updateABooking = async (bookingData: any) => {
   const supabase = createClient()
 
-  const formData = { date: bookingData.date, hour: bookingData.hour }
+  const formData = { date: bookingData.date, hour: bookingData.hour, is_cancelled: bookingData.is_cancelled }
 
   try {
     const { data, error } = await supabase
       .from('bookings')
       .update(formData)
-      .eq('id', bookingId)
-      .select()
+      .eq('id', bookingData.id)
+      .select('*, member_id(*)')
 
     if (error) {
       const error: any = new Error('Error updating the booking.');

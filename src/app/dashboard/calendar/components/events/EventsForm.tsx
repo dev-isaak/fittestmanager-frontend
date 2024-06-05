@@ -1,17 +1,22 @@
 import {
 	Avatar,
+	Box,
 	Button,
 	Card,
 	Divider,
+	IconButton,
+	Paper,
 	Stack,
 	Typography,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import SearchInput from "@/app/ui/SearchInput";
 import DataTable from "@/app/ui/DataTable";
 import { fetchMembersByStatus } from "@/redux/features/membersSlice";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { updateBookingClass } from "@/redux/features/classesScheduleSlice";
 
 type EventsFormType = {
 	bookingData?: any;
@@ -23,120 +28,327 @@ export default function BookingsForm({
 	onCloseDialog,
 }: EventsFormType) {
 	const dispatch = useAppDispatch();
+	const [personsBooked, setPersonsBooked] = useState([]);
+	const [currentEvent, setCurrentEvent] = useState({});
+	const [isEventOutdated, setIsEventOutdated] = useState(false);
 	const currentFitnessCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
-	const members = useAppSelector((data) => data.membersReducer.searchMembers);
+	const activeMembers = useAppSelector(
+		(data) => data.membersReducer.searchActiveMembers
+	);
+	const bookings = useAppSelector(
+		(data) => data.classesScheduleReducer.bookings
+	);
+
+	useEffect(() => {
+		bookings.map((booking) => {
+			if (
+				bookingData.event_id === booking.schedule_id &&
+				dayjs(bookingData.start).format("HH:mm") ===
+					dayjs(booking.hour).format("HH:mm") &&
+				dayjs(bookingData.currentDay).format("YYYY-MM-DD") === booking.date
+			) {
+				setCurrentEvent(booking);
+			}
+		});
+	}, [bookings]);
+
+	useEffect(() => {
+		checkIfCurrentEventIsOutdated();
+	}, [currentEvent]);
+
+	useEffect(() => {
+		let personsBooked = [];
+		bookings.map((booking) => {
+			if (
+				bookingData.event_id === booking.schedule_id &&
+				dayjs(bookingData.start).format("HH:mm") ===
+					dayjs(booking.hour).format("HH:mm") &&
+				dayjs(bookingData.currentDay).format("YYYY-MM-DD") === booking.date
+			) {
+				personsBooked.push(booking);
+			}
+		});
+		setPersonsBooked(personsBooked);
+	}, [bookings]);
 
 	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
-			if (!members.length) {
+			if (!activeMembers.length) {
 				dispatch(fetchMembersByStatus({ centerId, status: "active" }));
 			}
 		}
-	}, [currentFitnessCenter, dispatch]);
+	}, [currentFitnessCenter]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
 
+	const checkIfCurrentEventIsOutdated = () => {
+		const eventDateTime = dayjs(
+			`${dayjs(currentEvent.date).format("YYYY-MM-DD")} ${dayjs(
+				currentEvent.hour
+			).format("HH:mm")}`
+		);
+		const now = dayjs();
+
+		if (eventDateTime.isBefore(now)) {
+			setIsEventOutdated(true);
+		} else {
+			setIsEventOutdated(false);
+		}
+	};
+
+	const handleCancelClass = () => {
+		const data = { ...currentEvent, is_cancelled: true };
+		dispatch(updateBookingClass({ bookingData: data }));
+	};
+
+	const handleReopenClass = () => {
+		const data = { ...currentEvent, is_cancelled: false };
+		dispatch(updateBookingClass({ bookingData: data }));
+	};
+
+	const handleCancelUserBooking = (booking) => {
+		console.log("usuario cancelado: ", booking);
+	};
+
 	return (
 		<>
-			<Stack sx={{ width: "100%", alignItems: "end" }}>
-				<Button variant='contained' sx={{ width: "fit-content" }}>
-					Cancelar Clase
-				</Button>
-			</Stack>
-			<Divider>Usuarios apuntados</Divider>
-			{bookingData.limit_persons - bookingData.bookedPersons === 0 && (
-				<Typography variant='h5' color='error'>
-					No quedan plazas libres
-				</Typography>
+			{currentEvent.is_cancelled && (
+				<Box
+					sx={{
+						display: "flex",
+						gap: 4,
+						alignItems: "center",
+						justifyContent: "space-between",
+						background: "#ff00003d",
+						width: "100%",
+						marginBottom: 2,
+						padding: 2,
+					}}>
+					<Typography sx={{ fontWeight: 700 }}>Clase cancelada.</Typography>
+					{!isEventOutdated && (
+						<Button onClick={handleReopenClass} variant='outlined'>
+							Abrir de nuevo
+						</Button>
+					)}
+				</Box>
 			)}
-			{bookingData.limit_persons - bookingData.bookedPersons === 1 && (
-				<Typography variant='h5' color='warning'>
-					{bookingData.limit_persons - bookingData.bookedPersons} plaza libres
-				</Typography>
+			{isEventOutdated && (
+				<Box
+					sx={{
+						display: "flex",
+						gap: 4,
+						alignItems: "center",
+						justifyContent: "space-between",
+						background: "#ffa50045",
+						width: "100%",
+						marginBottom: 2,
+						padding: 2,
+					}}>
+					<Typography sx={{ fontWeight: 700 }}>
+						Esta clase ya no está disponible.
+					</Typography>
+				</Box>
 			)}
-
-			{bookingData.limit_persons - bookingData.bookedPersons > 1 && (
-				<Typography variant='h5' color='success'>
-					{bookingData.limit_persons - bookingData.bookedPersons} plazas libres
-				</Typography>
-			)}
-
-			<Stack sx={{ width: "100%", gap: 2, flexDirection: "row", padding: 2 }}>
-				{bookingData.bookings.length &&
-					bookingData.bookings.map((booking, index: number) => {
-						if (
-							bookingData.event_id === booking.schedule_id &&
-							dayjs(bookingData.start).format("HH:mm") ===
-								dayjs(booking.hour).format("HH:mm") &&
-							dayjs(bookingData.currentDay).format("YYYY-MM-DD") ===
-								booking.date
-						) {
-							return (
-								<Card
-									key={index}
-									sx={{
-										padding: 2,
-										minWidth: 270,
-										background: "#414C63",
-										color: "#D0D0D0",
-										borderRadius: 2,
-									}}>
-									<Stack
-										sx={{
-											gap: 2,
-											flexDirection: "row",
-											justifyContent: "space-between",
-										}}>
-										<Avatar
-											src={booking.members.photo}
-											sx={{ width: 80, height: 80 }}
-										/>
-										<Typography sx={{ fontWeight: 700 }}>
-											{booking.members.first_name} {booking.members.last_name}
-										</Typography>
-									</Stack>
-								</Card>
-							);
-						}
-					})}
-			</Stack>
-			<Divider>Lista de espera</Divider>
-			<Divider>Cancelaciones</Divider>
-			<Divider>Apuntar usuario</Divider>
-
-			<SearchInput type='MEMBERS' />
 			<Stack
 				sx={{
 					width: "100%",
 					flexDirection: "row",
-					justifyContent: "end",
-					margin: 2,
+					justifyContent: "space-between",
 				}}>
-				<Button variant='contained'>Apuntar invitado</Button>
+				<Paper
+					sx={{
+						background: "#f5f5f5",
+						color: "#898989",
+						padding: 2,
+						margin: 2,
+					}}>
+					<Typography variant='h4'>
+						{bookingData.title} - {dayjs(bookingData.start).format("HH:mm")}
+					</Typography>
+					<Divider></Divider>
+					<Typography variant='h5' sx={{ textAlign: "center" }}>
+						{dayjs(bookingData.currentDay).format("DD/MM/YYYY")}
+					</Typography>
+				</Paper>
+				{!currentEvent.is_cancelled && !isEventOutdated && (
+					<Button
+						onClick={handleCancelClass}
+						variant='contained'
+						sx={{ width: "fit-content", height: "fit-content" }}>
+						Cancelar Clase
+					</Button>
+				)}
 			</Stack>
-			{/* PASAR MEMBERS Y BOOKINGDATA AL DIALOG */}
-			<DataTable
-				onClickOpenDialog
-				data={members}
-				type='INVITE_MEMBER'
-				titleCol={[
-					{ name: "Avatar", align: "left" },
-					{ name: "Name", align: "left" },
-					{ name: "Email", align: "left" },
-					{ name: "Status", align: "center" },
-				]}
-				dataCol={[
-					{ dbName: "photo", align: "left" },
-					{ dbName: "first_name", align: "left" },
-					{ dbName: "email", align: "left" },
-					{ dbName: "status", align: "center" },
-				]}
-			/>
+			<Divider>Usuarios apuntados</Divider>
+			{console.log(currentEvent)}
+			{/* {currentEvent.limit_persons - currentEvent.bookedPersons === 0 && (
+				<Typography variant='h5' color='error'>
+					No quedan plazas libres
+				</Typography>
+			)}
+			{currentEvent.limit_persons - currentEvent.bookedPersons === 1 && (
+				<Typography variant='h5' color='warning'>
+					{currentEvent.limit_persons - currentEvent.bookedPersons} plaza libres
+				</Typography>
+			)}
+
+			{currentEvent.limit_persons - currentEvent.bookedPersons > 1 && (
+				<Typography variant='h5' color='success'>
+					{currentEvent.limit_persons - currentEvent.bookedPersons} plazas
+					libres
+				</Typography>
+			)} */}
+			<Stack
+				sx={{
+					width: "100%",
+					gap: 4,
+					flexWrap: "wrap",
+					justifyContent: "flex-start",
+					flexDirection: "row",
+					padding: 2,
+				}}>
+				{personsBooked.length > 0 ? (
+					personsBooked.map((booking, index: number) => (
+						<Card
+							key={index}
+							sx={{
+								paddingY: 2,
+								paddingLeft: 2,
+								paddingRight:
+									currentEvent.is_cancelled || isEventOutdated ? 2 : 0,
+								width: 300,
+								background: "#414C63",
+								color: "#D0D0D0",
+								borderRadius: 2,
+							}}>
+							<Stack
+								sx={{
+									gap: 2,
+									flexDirection: "row",
+									justifyContent: "space-between",
+								}}>
+								<Avatar
+									src={booking.member_id.photo}
+									sx={{ width: 80, height: 80 }}
+								/>
+								<Typography sx={{ fontWeight: 700 }}>
+									{booking.member_id.first_name} {booking.member_id.last_name}
+								</Typography>
+								{!currentEvent.is_cancelled && !isEventOutdated && (
+									<Box sx={{ height: "100%", marginTop: -2 }}>
+										<IconButton
+											onClick={() => handleCancelUserBooking(booking)}>
+											<CancelIcon
+												sx={{ width: 30, height: 30, color: "#dadada" }}
+											/>
+										</IconButton>
+									</Box>
+								)}
+							</Stack>
+						</Card>
+					))
+				) : (
+					<Card
+						sx={{
+							padding: 2,
+							width: 300,
+							background: "#f5f5f5",
+							color: "#adadad",
+							borderRadius: 2,
+						}}>
+						<Stack
+							sx={{
+								gap: 2,
+								flexDirection: "row",
+								justifyContent: "space-between",
+							}}>
+							<Typography sx={{ fontWeight: 700 }}>
+								No hay nadie apuntado en esta clase
+							</Typography>
+						</Stack>
+					</Card>
+				)}
+			</Stack>
+			<Divider>Lista de espera</Divider>
+			<Card
+				sx={{
+					padding: 2,
+					margin: 2,
+					width: 300,
+					background: "#f5f5f5",
+					color: "#adadad",
+					borderRadius: 2,
+				}}>
+				<Stack
+					sx={{
+						gap: 2,
+						flexDirection: "row",
+						justifyContent: "space-between",
+					}}>
+					<Typography sx={{ fontWeight: 700 }}>
+						No hay nadie en lista de espera
+					</Typography>
+				</Stack>
+			</Card>
+			<Divider>Cancelaciones</Divider>
+			<Card
+				sx={{
+					padding: 2,
+					margin: 2,
+					width: 300,
+					background: "#f5f5f5",
+					color: "#adadad",
+					borderRadius: 2,
+				}}>
+				<Stack
+					sx={{
+						gap: 2,
+						flexDirection: "row",
+						justifyContent: "space-between",
+					}}>
+					<Typography sx={{ fontWeight: 700 }}>
+						No hay ninguna cancelación
+					</Typography>
+				</Stack>
+			</Card>
+			{!currentEvent.is_cancelled && !isEventOutdated && (
+				<>
+					<Divider>Apuntar usuario</Divider>
+					<SearchInput type='ACTIVE_MEMBERS' />
+					<DataTable
+						onClickOpenDialog
+						data={activeMembers}
+						type='INVITE_MEMBER'
+						bookingData={bookingData}
+						titleCol={[
+							{ name: "Avatar", align: "left" },
+							{ name: "Name", align: "left" },
+							{ name: "Email", align: "left" },
+							{ name: "Status", align: "center" },
+						]}
+						dataCol={[
+							{ dbName: "photo", align: "left" },
+							{ dbName: "first_name", align: "left" },
+							{ dbName: "email", align: "left" },
+							{ dbName: "status", align: "center" },
+						]}
+					/>
+					<Stack
+						sx={{
+							width: "100%",
+							flexDirection: "row",
+							justifyContent: "end",
+						}}>
+						<Button variant='contained'>Apuntar invitado</Button>
+					</Stack>
+				</>
+			)}
+
 			<Stack
 				sx={{
 					flexDirection: "row",
