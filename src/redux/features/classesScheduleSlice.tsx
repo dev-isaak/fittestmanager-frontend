@@ -2,16 +2,20 @@ import {
 	bookAClass,
 	createClassSchedule,
 	getAllBookingsByFitnessCenterIdBetweenTwoDates,
+	getAllBookingsBySchedule,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
+	getAllSchedulesBetweenTwoDates,
 	updateABooking,
 	updateClassSchedule,
+	updateSchedule,
 } from "@/app/dashboard/calendar/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 interface IClassesScheduleSlice {
 	schedule: any[];
+	weeklySchedules: any[];
 	bookings: any[];
 	updated: boolean;
 	created: boolean;
@@ -20,6 +24,7 @@ interface IClassesScheduleSlice {
 
 const initialState: IClassesScheduleSlice = {
 	schedule: [],
+	weeklySchedules: [],
 	bookings: [],
 	updated: false,
 	created: false,
@@ -34,15 +39,27 @@ export const fetchClassesSchedulesByClass = createAsyncThunk(
 	}
 );
 
-export const fetchClassesSchedulesByFitnessCenter = createAsyncThunk(
-	"classesSchedulesByFitnessCenter/fetch",
-	async (fitnessCenterId: number) => {
-		const response = await getAllClassesSchedulesByFitnessCenterId(
-			fitnessCenterId
+export const fetchSchedulesBetweenTwoDates = createAsyncThunk(
+	"schedulesBetweenTwoDates/fetch",
+	async ({ fitnessCenterId, startDate, endDate }: any) => {
+		const response = await getAllSchedulesBetweenTwoDates(
+			fitnessCenterId,
+			startDate,
+			endDate
 		);
 		return response;
 	}
 );
+
+// export const fetchClassesSchedulesByFitnessCenter = createAsyncThunk(
+// 	"classesSchedulesByFitnessCenter/fetch",
+// 	async (fitnessCenterId: number) => {
+// 		const response = await getAllClassesSchedulesByFitnessCenterId(
+// 			fitnessCenterId
+// 		);
+// 		return response;
+// 	}
+// );
 
 export const createNewClassSchedule = createAsyncThunk(
 	"classesSchedules/create",
@@ -59,6 +76,14 @@ export const createNewClassSchedule = createAsyncThunk(
 	}
 );
 
+export const fetchBookingsByScheduleId = createAsyncThunk(
+	"bookingsByScheduleId/fetch",
+	async (scheduleId: number) => {
+		const response = await getAllBookingsBySchedule(scheduleId);
+		return response;
+	}
+);
+
 export const fetchBookingsByFitnessCenter = createAsyncThunk(
 	"bookingsByFitnessCenterId/fetch",
 	async ({ fitnessCenterId, startDate, endDate }: any) => {
@@ -67,6 +92,16 @@ export const fetchBookingsByFitnessCenter = createAsyncThunk(
 			startDate,
 			endDate
 		);
+		return response;
+	}
+);
+
+export const updateScheduleData = createAsyncThunk(
+	"updateSchedule/update",
+	async ({ bookingData }: any) => {
+		const response = await updateSchedule(bookingData);
+		if (response.error) throw new Error(response.error);
+
 		return response;
 	}
 );
@@ -110,6 +145,17 @@ export const classesScheduleSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
+		builder.addCase(fetchBookingsByScheduleId.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(fetchBookingsByScheduleId.fulfilled, (state, action) => {
+				state.bookings = action.payload;
+				state.loading = false;
+			}),
+			builder.addCase(fetchBookingsByScheduleId.rejected, (state, action) => {
+				toast.error(action.error.message);
+				state.loading = false;
+			});
 		builder.addCase(fetchClassesSchedulesByClass.pending, (state, action) => {
 			state.loading = true;
 		}),
@@ -127,32 +173,48 @@ export const classesScheduleSlice = createSlice({
 					state.loading = false;
 				}
 			);
-		builder.addCase(
-			fetchClassesSchedulesByFitnessCenter.pending,
-			(state, action) => {
-				state.loading = true;
-			}
-		),
+		builder.addCase(fetchSchedulesBetweenTwoDates.pending, (state, action) => {
+			state.loading = true;
+		}),
 			builder.addCase(
-				fetchClassesSchedulesByFitnessCenter.fulfilled,
+				fetchSchedulesBetweenTwoDates.fulfilled,
 				(state, action) => {
-					state.schedule = action.payload;
+					state.weeklySchedules = action.payload;
 					state.loading = false;
 				}
 			),
 			builder.addCase(
-				fetchClassesSchedulesByFitnessCenter.rejected,
+				fetchSchedulesBetweenTwoDates.rejected,
 				(state, action) => {
 					toast.error(action.error.message);
 					state.loading = false;
 				}
 			);
+		builder.addCase(updateScheduleData.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(updateScheduleData.fulfilled, (state, action) => {
+				const updatedSchedules = state.weeklySchedules.map((bookingData) =>
+					bookingData.id === action.payload[0].id
+						? action.payload[0]
+						: bookingData
+				);
+
+				state.weeklySchedules = updatedSchedules;
+				state.updated = true;
+				state.loading = false;
+				toast.success("Horario actualizado.");
+			}),
+			builder.addCase(updateScheduleData.rejected, (state, action) => {
+				toast.error(action.error.message);
+				state.loading = false;
+			});
 		builder.addCase(updateClassScheduleInfo.pending, (state, action) => {
 			state.loading = true;
 		}),
 			builder.addCase(updateClassScheduleInfo.fulfilled, (state, action) => {
 				const updatedSchedules = state.schedule.map((bookingData) =>
-					bookingData.schedule_id === action.payload[0].schedule_id
+					bookingData.id === action.payload[0].id
 						? action.payload[0]
 						: bookingData
 				);
@@ -219,7 +281,6 @@ export const classesScheduleSlice = createSlice({
 					? action.payload[0]
 					: bookingData
 			);
-
 			state.bookings = updatedSchedules;
 			state.updated = true;
 			state.loading = false;

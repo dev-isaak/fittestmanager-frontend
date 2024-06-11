@@ -21,23 +21,20 @@ export const formatMonthYear = (date) => {
 
 // Returns a list of times
 export const getUniqueStartTimes = (events, currentDay) => {
-
   const startTimesSet = new Set();
 
   events.forEach((event) => {
-    const eventStartTime = new Date(event.since_day);
-    const eventEndTime = new Date(event.until_day);
+    const eventStartTime = new Date(event.classes_schedule_id.since_day);
+    const eventEndTime = new Date(event.classes_schedule_id.until_day);
     const currentTime = currentDay;
 
     if (
-      currentTime >= eventStartTime &&
-      currentTime <= eventEndTime
+      currentTime >= eventStartTime && currentTime <= eventEndTime
     ) {
-      const startTime = dayjs(event.start).format('HH:mm');
+      const startTime = dayjs(event.date_time).format('HH:mm');
       startTimesSet.add(startTime);
     }
   });
-
   // Convertimos el Set a un Array y lo ordenamos
   return Array.from(startTimesSet).sort((a, b) => {
     const aTime = dayjs(a, 'HH:mm');

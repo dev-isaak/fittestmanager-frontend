@@ -1,38 +1,28 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import {
-	getBooking,
 	getTotalBookings,
 	getUniqueStartTimes,
 	startOfWeek,
 } from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
-import {
-	fetchBookingsByFitnessCenter,
-	fetchClassesSchedulesByFitnessCenter,
-} from "@/redux/features/classesScheduleSlice";
+import { fetchSchedulesBetweenTwoDates } from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
-import { getDayIndex } from "../../../classes/lib/utils";
 import DialogForm from "@/app/ui/DialogForm";
 
 export default function DisplayEvents({ currentDate }) {
 	const [openDialog, setOpenDialog] = useState(false);
 	const [eventData, setEventData] = useState({});
 
-	const bookingsList = useAppSelector(
-		(data) => data.classesScheduleReducer.bookings
-	);
-
 	const dispatch = useAppDispatch();
-	const eventsSchedule = useAppSelector(
-		(data) => data.classesScheduleReducer.schedule
-	);
-	const uniqueStartTimes = getUniqueStartTimes(eventsSchedule, currentDate);
-	let firstWeekDay = startOfWeek(new Date(currentDate));
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
 	const centerId = currentCenter.id;
+	const schedules = useAppSelector(
+		(data) => data.classesScheduleReducer.weeklySchedules
+	);
+	const uniqueStartTimes = getUniqueStartTimes(schedules, currentDate);
 
 	// This function is beeing used in Calendar component.
 	const getWeeklyBookings = (
@@ -46,8 +36,8 @@ export default function DisplayEvents({ currentDate }) {
 			: endWeek.setDate(startWeek.getDate() + 7);
 
 		dispatch(
-			fetchBookingsByFitnessCenter({
-				fitnessCenterId: currentCenter.id,
+			fetchSchedulesBetweenTwoDates({
+				fitnessCenterId: centerId,
 				startDate: startWeek,
 				endDate: new Date(endWeek),
 			})
@@ -55,19 +45,19 @@ export default function DisplayEvents({ currentDate }) {
 	};
 
 	useEffect(() => {
-		if (!bookingsList.length) {
-			getWeeklyBookings(currentDate);
-		}
-	}, [bookingsList]);
+		// if (!schedules.length) {
+		getWeeklyBookings(currentDate);
+		// }
+	}, [currentCenter, currentDate]);
 
-	useEffect(() => {
-		if (!eventsSchedule.length)
-			dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
-	}, [eventsSchedule, currentCenter]);
+	// useEffect(() => {
+	// 	if (!eventsSchedule.length)
+	// 		dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
+	// }, [eventsSchedule, currentCenter]);
 
-	const handleOpenDialog = (data: any, currentDay, bookedPersons) => {
+	const handleOpenDialog = (data: any) => {
 		setOpenDialog(true);
-		setEventData({ ...data, currentDay, bookedPersons });
+		setEventData({ ...data });
 	};
 
 	return (
@@ -93,27 +83,26 @@ export default function DisplayEvents({ currentDate }) {
 						}}>
 						{/* 7 is de number of weekdays (Monday to Sunday) */}
 						{Array.from({ length: 7 }).map((day, index) => {
-							let currentDay = dayjs(firstWeekDay).add(index, "day");
-							const dayEvents = eventsSchedule.filter(
+							// let currentDay = dayjs(firstWeekDay).add(index, "day");
+							const dayEvents = schedules.filter(
 								(event) =>
-									getDayIndex(event.week_day) === index + 2 &&
-									dayjs(event.start).format("HH:mm") === hour
+									dayjs(event.date_time).day() + 1 === index + 2 &&
+									dayjs(event.date_time).format("HH:mm") === hour
 							);
 
 							return (
 								<Box key={index} sx={{ minWidth: 150 }}>
 									{/* ORDENAR LOS DAY EVENTS POR UN NUEVO CAMPO SORT QUE CONTENGA EL EVENTO */}
 									{dayEvents.map((event, eventIndex) => {
-										const bookedPersons = getTotalBookings(
-											bookingsList,
-											event,
-											currentDay
-										);
+										// const bookedPersons = getTotalBookings(
+										// 	bookingsList,
+										// 	event,
+										// 	currentDay
+										// );
+										// console.log(event);
 										return (
 											<Paper
-												onClick={() =>
-													handleOpenDialog(event, currentDay, bookedPersons)
-												}
+												onClick={() => handleOpenDialog(event)}
 												key={eventIndex}
 												sx={{
 													"&:hover": {
@@ -121,16 +110,34 @@ export default function DisplayEvents({ currentDate }) {
 													},
 													marginTop: 1,
 													padding: 1,
-													width: "100%",
-													background: event.class_id.color.color,
+													width: 150,
+													height: 85,
+													background: event.is_cancelled
+														? "#d8d8d836"
+														: event.class_id.color.color,
+													position: "relative",
 												}}>
-												{event.is_cancelled && <Box>Evento cancelado</Box>}
+												{event.is_cancelled && (
+													<Box
+														sx={{
+															position: "absolute",
+															background: "#efcaca",
+															// padding: 1,
+															paddingY: 1,
+															marginLeft: -1,
+															textAlign: "center",
+															bottom: 10,
+															width: "100%",
+														}}>
+														Clase cancelada
+													</Box>
+												)}
 												<Typography
 													sx={{ textAlign: "center", fontWeight: 700 }}>
 													{event.title}
 												</Typography>
 												<Typography sx={{ textAlign: "center" }}>
-													{bookedPersons} de {event.limit_persons}
+													bookedPersons de {event.limit_persons}
 												</Typography>
 											</Paper>
 										);

@@ -46,7 +46,7 @@ export default function InviteUserForm({
 				date: dayjs(bookingData.currentDay).format(),
 				hour: dayjs(bookingData.start).format(),
 				fitnessCenterId: bookingData.fitness_center_id,
-				scheduleId: bookingData.event_id,
+				scheduleId: bookingData.id,
 				userId: userData.id,
 				bookedPersons: bookingData.bookedPersons,
 				limitPersons: bookingData.limit_persons,
@@ -83,11 +83,11 @@ export default function InviteUserForm({
 						}}>
 						<Typography>
 							<strong>Día: </strong>
-							{dayjs(bookingData.currentDay).format("DD-MM-YYYY")}
+							{dayjs(bookingData.date_time).format("DD-MM-YYYY")}
 						</Typography>
 						<Typography>
 							<strong>Hora: </strong>
-							{dayjs(bookingData.start).format("HH:mm")}
+							{dayjs(bookingData.date_time).format("HH:mm")}
 						</Typography>
 					</Stack>
 					<RadioGroup
