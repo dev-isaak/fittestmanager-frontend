@@ -9,6 +9,7 @@ import {
 	updateABooking,
 	updateClassSchedule,
 	updateSchedule,
+	userCancelsBooking,
 } from "@/app/dashboard/calendar/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -130,6 +131,14 @@ export const updateClassScheduleInfo = createAsyncThunk(
 	"classesSchedules/update",
 	async ({ classData }: any) => {
 		const response = await updateClassSchedule(classData);
+		return response;
+	}
+);
+
+export const cancelBooking = createAsyncThunk(
+	"bookings/delete",
+	async ({ booking }: any) => {
+		const response = await userCancelsBooking(booking);
 		return response;
 	}
 );
@@ -263,10 +272,23 @@ export const classesScheduleSlice = createSlice({
 		});
 		builder.addCase(bookUserToClass.fulfilled, (state, action) => {
 			state.bookings.push(action.payload[0]);
+
+			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+				if (scheduleData.id === action.payload[0].schedule_id) {
+					return {
+						...scheduleData,
+						total_bookings: scheduleData.total_bookings + 1,
+					};
+				}
+
+				return scheduleData;
+			});
+
 			state.created = true;
 			state.loading = false;
 			toast.success("Usuario apuntado.");
 		});
+
 		builder.addCase(bookUserToClass.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
@@ -291,6 +313,33 @@ export const classesScheduleSlice = createSlice({
 			}
 		});
 		builder.addCase(updateBookingClass.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(cancelBooking.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(cancelBooking.fulfilled, (state, action) => {
+			const updatedBookings = state.bookings.filter((bookingData) => {
+				return bookingData.id !== action.payload[0].id;
+			});
+			state.bookings = updatedBookings;
+
+			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+				if (scheduleData.id === action.payload[0].schedule_id) {
+					return {
+						...scheduleData,
+						total_bookings: scheduleData.total_bookings - 1,
+					};
+				}
+				return scheduleData;
+			});
+
+			state.updated = true;
+			state.loading = false;
+		});
+		builder.addCase(cancelBooking.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
 			state.loading = false;

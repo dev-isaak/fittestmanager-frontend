@@ -22,7 +22,7 @@ export const getAllClassesSchedulesByClassId = async (classId: number) => {
   try {
     let { data: schedule, error } = await supabase
       .from('classes_schedule')
-      .select('*, class_id(id, color(*)), bookings(*, members(*))')
+      .select('*, class_id(id, color(*))')
       .eq('class_id', classId)
 
     return schedule || error
@@ -260,11 +260,34 @@ export const updateABooking = async (bookingData: any) => {
       error.code = 500;
       throw error;
     }
-    return data || error
 
-
+    return data
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
   }
+}
+
+export const userCancelsBooking = async (booking) => {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', booking.id)
+      .select()
+
+    if (error) {
+      const error: any = new Error('Error cancelling the booking.');
+      error.code = 500;
+      throw error;
+    }
+
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+
 }

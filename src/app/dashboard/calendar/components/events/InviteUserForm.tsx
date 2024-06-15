@@ -32,11 +32,8 @@ export default function InviteUserForm({
 		onCloseDialog(false);
 	};
 
-	useEffect(() => {
-		console.log(bookingData);
-	}, []);
-
 	const isFullClass = (usersBooked, limit) => {
+		console.log("full class?");
 		return limit - usersBooked <= 0 ? true : false;
 	};
 
@@ -48,7 +45,7 @@ export default function InviteUserForm({
 				fitnessCenterId: bookingData.fitness_center_id,
 				scheduleId: bookingData.id,
 				userId: userData.id,
-				bookedPersons: bookingData.bookedPersons,
+				bookedPersons: bookingData.total_bookings,
 				limitPersons: bookingData.limit_persons,
 			}}
 			validate={inviteUsersValidation}

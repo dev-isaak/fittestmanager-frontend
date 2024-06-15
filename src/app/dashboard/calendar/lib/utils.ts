@@ -43,25 +43,3 @@ export const getUniqueStartTimes = (events, currentDay) => {
   });
 
 };
-
-
-export const getTotalBookings = (bookingsList, event, currentDay) => {
-  let bookedPersons = 0;
-  bookingsList.forEach((bookingEvent) => {
-    const eventStart = dayjs(event.start).format("HH:mm");
-    const bookingHour = dayjs(bookingEvent.hour).format("HH:mm");
-    const bookingDate = dayjs(bookingEvent.date).format("YYYY-MM-DD")
-    const current = dayjs(currentDay).format("YYYY-MM-DD")
-
-    if (
-      event.event_id === bookingEvent.schedule_id &&
-      dayjs(bookingEvent.date) > dayjs(event.since_day) &&
-      dayjs(bookingEvent.date) < dayjs(event.until_day) &&
-      eventStart === bookingHour &&
-      bookingDate === current
-    ) {
-      bookedPersons += 1;
-    }
-  });
-  return bookedPersons;
-};

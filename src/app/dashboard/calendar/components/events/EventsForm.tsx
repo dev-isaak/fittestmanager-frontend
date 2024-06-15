@@ -17,11 +17,11 @@ import DataTable from "@/app/ui/DataTable";
 import { fetchMembersByStatus } from "@/redux/features/membersSlice";
 import CancelIcon from "@mui/icons-material/Cancel";
 import {
+	cancelBooking,
 	fetchBookingsByScheduleId,
 	updateScheduleData,
 } from "@/redux/features/classesScheduleSlice";
 import TextEditor from "./TextEditor";
-import { getAllBookingsBySchedule } from "../../lib/data";
 
 type EventsFormType = {
 	bookingData?: any;
@@ -34,6 +34,7 @@ export default function BookingsForm({
 }: EventsFormType) {
 	const dispatch = useAppDispatch();
 	const [isEventOutdated, setIsEventOutdated] = useState(false);
+	const [currentSchedule, setCurrentSchedule] = useState(bookingData);
 	const currentFitnessCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
@@ -42,6 +43,9 @@ export default function BookingsForm({
 	);
 	const bookings = useAppSelector(
 		(data) => data.classesScheduleReducer.bookings
+	);
+	const weeklySchedules = useAppSelector(
+		(data) => data.classesScheduleReducer.weeklySchedules
 	);
 
 	useEffect(() => {
@@ -59,6 +63,13 @@ export default function BookingsForm({
 		}
 	}, [currentFitnessCenter]);
 
+	useEffect(() => {
+		const schedules = weeklySchedules.filter((schedule) => {
+			return schedule.id === bookingData.id;
+		});
+		setCurrentSchedule(schedules[0]);
+	}, [weeklySchedules]);
+
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
@@ -73,22 +84,22 @@ export default function BookingsForm({
 	};
 
 	const handleCancelClass = () => {
-		const data = { ...bookingData, is_cancelled: true };
+		const data = { ...currentSchedule, is_cancelled: true };
 		dispatch(updateScheduleData({ bookingData: data }));
 	};
 
 	const handleReopenClass = () => {
-		const data = { ...bookingData, is_cancelled: false };
+		const data = { ...currentSchedule, is_cancelled: false };
 		dispatch(updateScheduleData({ bookingData: data }));
 	};
 
 	const handleCancelUserBooking = (booking) => {
-		console.log("usuario cancelado: ", booking);
+		dispatch(cancelBooking({ booking: booking }));
 	};
 
 	return (
 		<>
-			{bookingData.is_cancelled && (
+			{currentSchedule.is_cancelled && (
 				<Box
 					sx={{
 						display: "flex",
@@ -139,14 +150,15 @@ export default function BookingsForm({
 						margin: 2,
 					}}>
 					<Typography variant='h4'>
-						{bookingData.title} - {dayjs(bookingData.date_time).format("HH:mm")}
+						{currentSchedule.title} -{" "}
+						{dayjs(currentSchedule.date_time).format("HH:mm")}
 					</Typography>
 					<Divider></Divider>
 					<Typography variant='h5' sx={{ textAlign: "center" }}>
-						{dayjs(bookingData.date_time).format("DD/MM/YYYY")}
+						{dayjs(currentSchedule.date_time).format("DD/MM/YYYY")}
 					</Typography>
 				</Paper>
-				{!bookingData.is_cancelled && !isEventOutdated && (
+				{!currentSchedule.is_cancelled && !isEventOutdated && (
 					<Button
 						onClick={handleCancelClass}
 						variant='outlined'
@@ -158,28 +170,28 @@ export default function BookingsForm({
 			</Stack>
 			<TextEditor
 				eventIsOutdated={isEventOutdated}
-				eventIsCancelled={bookingData.is_cancelled}
-				eventData={bookingData}
+				eventIsCancelled={currentSchedule.is_cancelled}
+				eventData={currentSchedule}
 			/>
 			<Divider>Usuarios apuntados</Divider>
-			{/* {console.log(currentEvent)} */}
-			{/* {currentEvent.limit_persons - currentEvent.bookedPersons === 0 && (
+			{currentSchedule.limit_persons - currentSchedule.total_bookings === 0 && (
 				<Typography variant='h5' color='error'>
 					No quedan plazas libres
 				</Typography>
 			)}
-			{currentEvent.limit_persons - currentEvent.bookedPersons === 1 && (
+			{currentSchedule.limit_persons - currentSchedule.total_bookings === 1 && (
 				<Typography variant='h5' color='warning'>
-					{currentEvent.limit_persons - currentEvent.bookedPersons} plaza libres
+					{currentSchedule.limit_persons - currentSchedule.total_bookings} plaza
+					libre
 				</Typography>
 			)}
 
-			{currentEvent.limit_persons - currentEvent.bookedPersons > 1 && (
+			{currentSchedule.limit_persons - currentSchedule.total_bookings > 1 && (
 				<Typography variant='h5' color='success'>
-					{currentEvent.limit_persons - currentEvent.bookedPersons} plazas
-					libres
+					{currentSchedule.limit_persons - currentSchedule.total_bookings}{" "}
+					plazas libres
 				</Typography>
-			)} */}
+			)}
 			<Stack
 				sx={{
 					width: "100%",
@@ -197,7 +209,7 @@ export default function BookingsForm({
 								paddingY: 2,
 								paddingLeft: 2,
 								paddingRight:
-									bookingData.is_cancelled || isEventOutdated ? 2 : 0,
+									currentSchedule.is_cancelled || isEventOutdated ? 2 : 0,
 								width: 300,
 								background: "#414C63",
 								color: "#D0D0D0",
@@ -216,7 +228,7 @@ export default function BookingsForm({
 								<Typography sx={{ fontWeight: 700 }}>
 									{booking.member_id.first_name} {booking.member_id.last_name}
 								</Typography>
-								{!bookingData.is_cancelled && !isEventOutdated && (
+								{!currentSchedule.is_cancelled && !isEventOutdated && (
 									<Box sx={{ height: "100%", marginTop: -2 }}>
 										<IconButton
 											onClick={() => handleCancelUserBooking(booking)}>
@@ -293,7 +305,7 @@ export default function BookingsForm({
 					</Typography>
 				</Stack>
 			</Card>
-			{!bookingData.is_cancelled && !isEventOutdated && (
+			{!currentSchedule.is_cancelled && !isEventOutdated && (
 				<>
 					<Divider>Apuntar usuario</Divider>
 					<SearchInput type='ACTIVE_MEMBERS' />
@@ -301,7 +313,7 @@ export default function BookingsForm({
 						onClickOpenDialog
 						data={activeMembers}
 						type='INVITE_MEMBER'
-						bookingData={bookingData}
+						bookingData={currentSchedule}
 						titleCol={[
 							{ name: "Avatar", align: "left" },
 							{ name: "Name", align: "left" },

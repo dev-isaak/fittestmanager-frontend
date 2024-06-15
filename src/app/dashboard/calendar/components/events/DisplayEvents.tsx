@@ -1,9 +1,5 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
-import {
-	getTotalBookings,
-	getUniqueStartTimes,
-	startOfWeek,
-} from "../../lib/utils";
+import { getUniqueStartTimes, startOfWeek } from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
 import { fetchSchedulesBetweenTwoDates } from "@/redux/features/classesScheduleSlice";
@@ -45,15 +41,8 @@ export default function DisplayEvents({ currentDate }) {
 	};
 
 	useEffect(() => {
-		// if (!schedules.length) {
 		getWeeklyBookings(currentDate);
-		// }
 	}, [currentCenter, currentDate]);
-
-	// useEffect(() => {
-	// 	if (!eventsSchedule.length)
-	// 		dispatch(fetchClassesSchedulesByFitnessCenter(centerId));
-	// }, [eventsSchedule, currentCenter]);
 
 	const handleOpenDialog = (data: any) => {
 		setOpenDialog(true);
@@ -83,7 +72,6 @@ export default function DisplayEvents({ currentDate }) {
 						}}>
 						{/* 7 is de number of weekdays (Monday to Sunday) */}
 						{Array.from({ length: 7 }).map((day, index) => {
-							// let currentDay = dayjs(firstWeekDay).add(index, "day");
 							const dayEvents = schedules.filter(
 								(event) =>
 									dayjs(event.date_time).day() + 1 === index + 2 &&
@@ -94,12 +82,6 @@ export default function DisplayEvents({ currentDate }) {
 								<Box key={index} sx={{ minWidth: 150 }}>
 									{/* ORDENAR LOS DAY EVENTS POR UN NUEVO CAMPO SORT QUE CONTENGA EL EVENTO */}
 									{dayEvents.map((event, eventIndex) => {
-										// const bookedPersons = getTotalBookings(
-										// 	bookingsList,
-										// 	event,
-										// 	currentDay
-										// );
-										// console.log(event);
 										return (
 											<Paper
 												onClick={() => handleOpenDialog(event)}
@@ -122,7 +104,6 @@ export default function DisplayEvents({ currentDate }) {
 														sx={{
 															position: "absolute",
 															background: "#efcaca",
-															// padding: 1,
 															paddingY: 1,
 															marginLeft: -1,
 															textAlign: "center",
@@ -137,7 +118,7 @@ export default function DisplayEvents({ currentDate }) {
 													{event.title}
 												</Typography>
 												<Typography sx={{ textAlign: "center" }}>
-													bookedPersons de {event.limit_persons}
+													{event.total_bookings} de {event.limit_persons}
 												</Typography>
 											</Paper>
 										);
