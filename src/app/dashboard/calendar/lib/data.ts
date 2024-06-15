@@ -222,7 +222,7 @@ export const getAllBookingsBySchedule = async (scheduleId: number) => {
 export const bookAClass = async (bookingData: any) => {
   const supabase = createClient()
 
-  const formData = { class_id: null, member_id: bookingData.userId, schedule_id: bookingData.scheduleId, fitness_center_id: bookingData.fitnessCenterId, date: bookingData.date, hour: bookingData.hour }
+  const formData = { member_id: bookingData.userId, schedule_id: bookingData.scheduleId, fitness_center_id: bookingData.fitnessCenterId, date: bookingData.date, hour: bookingData.hour }
 
   try {
     let { data, error } = await supabase
@@ -289,5 +289,74 @@ export const userCancelsBooking = async (booking) => {
     console.error(e)
     return { error: e.message, code: e.code }
   }
+}
 
+export const getWaitingListBySchedule = async (scheduleId: number) => {
+  const supabase = createClient()
+
+  try {
+    let { data: bookings, error } = await supabase
+      .from('booking_waiting_list')
+      .select('*, member_id(*)')
+      .eq('schedule_id', scheduleId)
+
+
+    if (error) {
+      const error: any = new Error('Error getting waiting list.');
+      error.code = 500;
+      throw error;
+    }
+
+    return bookings
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}
+
+export const addUserToWaitingList = async (bookingData: any) => {
+  const supabase = createClient()
+
+  const formData = { member_id: bookingData.userId, schedule_id: bookingData.scheduleId, fitness_center_id: bookingData.fitnessCenterId, date: bookingData.date, hour: bookingData.hour }
+
+  try {
+    let { data, error } = await supabase
+      .from('booking_waiting_list')
+      .insert(formData)
+      .select('*, member_id(*)')
+
+    if (error) {
+      const error: any = new Error('Error adding user to waiting list.');
+      error.code = 500;
+      throw error;
+    }
+
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}
+
+export const deleteUserFromWaitingList = async (booking) => {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('booking_waiting_list')
+      .delete()
+      .eq('id', booking.id)
+      .select()
+
+    if (error) {
+      const error: any = new Error('Error cancelling the booking.');
+      error.code = 500;
+      throw error;
+    }
+
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
 }

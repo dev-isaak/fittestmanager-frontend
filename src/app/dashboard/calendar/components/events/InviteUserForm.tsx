@@ -1,5 +1,8 @@
-import { bookUserToClass } from "@/redux/features/classesScheduleSlice";
-import { useAppDispatch } from "@/redux/hooks";
+import {
+	bookUserToClass,
+	bookUserToWaitingList,
+} from "@/redux/features/classesScheduleSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
 	Button,
 	FormControlLabel,
@@ -10,7 +13,7 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import { Formik } from "formik";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { inviteUsersValidation } from "./validation/inviteUsersValidation";
 import { toast } from "react-toastify";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -27,14 +30,36 @@ export default function InviteUserForm({
 	bookingData,
 }: InviteUserFormType) {
 	const dispatch = useAppDispatch();
+	const [currentSchedule, setCurrentSchedule] = useState(bookingData);
+
+	const weeklySchedules = useAppSelector(
+		(data) => data.classesScheduleReducer.weeklySchedules
+	);
+	const bookings = useAppSelector(
+		(data) => data.classesScheduleReducer.bookings
+	);
+
+	useEffect(() => {
+		const schedules = weeklySchedules.filter((schedule) => {
+			return schedule.id === bookingData.id;
+		});
+		setCurrentSchedule(schedules[0]);
+	}, [weeklySchedules]);
+
+	useEffect(() => {
+		console.log(bookings);
+	}, [bookings]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
 
 	const isFullClass = (usersBooked, limit) => {
-		console.log("full class?");
 		return limit - usersBooked <= 0 ? true : false;
+	};
+
+	const isUserAlreadyBooked = (userId: number) => {
+		return bookings.some((booking) => booking.member_id.id === userId);
 	};
 
 	return (
@@ -50,10 +75,16 @@ export default function InviteUserForm({
 			}}
 			validate={inviteUsersValidation}
 			onSubmit={(formData) => {
-				if (isFullClass(formData.bookedPersons, formData.limitPersons)) {
-					toast.info(
-						"La clase está llena. Se te ha añadido a la lista de espera."
-					);
+				if (
+					isFullClass(
+						currentSchedule.total_bookings,
+						currentSchedule.limit_persons
+					) &&
+					!isUserAlreadyBooked(formData.userId)
+				) {
+					dispatch(bookUserToWaitingList({ bookingData: formData }));
+				} else if (isUserAlreadyBooked(formData.userId)) {
+					toast.info("El usuario ya está apuntado en esta clase.");
 				} else {
 					dispatch(bookUserToClass({ bookingData: formData }));
 				}

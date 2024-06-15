@@ -1,11 +1,14 @@
 import {
+	addUserToWaitingList,
 	bookAClass,
 	createClassSchedule,
+	deleteUserFromWaitingList,
 	getAllBookingsByFitnessCenterIdBetweenTwoDates,
 	getAllBookingsBySchedule,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
 	getAllSchedulesBetweenTwoDates,
+	getWaitingListBySchedule,
 	updateABooking,
 	updateClassSchedule,
 	updateSchedule,
@@ -18,6 +21,7 @@ interface IClassesScheduleSlice {
 	schedule: any[];
 	weeklySchedules: any[];
 	bookings: any[];
+	waitingList: any[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -27,6 +31,7 @@ const initialState: IClassesScheduleSlice = {
 	schedule: [],
 	weeklySchedules: [],
 	bookings: [],
+	waitingList: [],
 	updated: false,
 	created: false,
 	loading: false,
@@ -85,6 +90,14 @@ export const fetchBookingsByScheduleId = createAsyncThunk(
 	}
 );
 
+export const fetchWaitingListByScheduleId = createAsyncThunk(
+	"waitingListByScheduleId/fetch",
+	async (scheduleId: number) => {
+		const response = await getWaitingListBySchedule(scheduleId);
+		return response;
+	}
+);
+
 export const fetchBookingsByFitnessCenter = createAsyncThunk(
 	"bookingsByFitnessCenterId/fetch",
 	async ({ fitnessCenterId, startDate, endDate }: any) => {
@@ -117,6 +130,16 @@ export const bookUserToClass = createAsyncThunk(
 	}
 );
 
+export const bookUserToWaitingList = createAsyncThunk(
+	"addUserToWaitingList/create",
+	async ({ bookingData }: any) => {
+		const response = await addUserToWaitingList(bookingData);
+		if (response.error) throw new Error(response.error);
+
+		return response;
+	}
+);
+
 export const updateBookingClass = createAsyncThunk(
 	"updatebookClass/update",
 	async ({ bookingData }: any) => {
@@ -142,6 +165,15 @@ export const cancelBooking = createAsyncThunk(
 		return response;
 	}
 );
+
+export const cancelUserFromWaitingList = createAsyncThunk(
+	"waitingList/delete",
+	async ({ booking }: any) => {
+		const response = await deleteUserFromWaitingList(booking);
+		return response;
+	}
+);
+
 export const classesScheduleSlice = createSlice({
 	name: "classesSchedules",
 	initialState,
@@ -340,6 +372,77 @@ export const classesScheduleSlice = createSlice({
 			state.loading = false;
 		});
 		builder.addCase(cancelBooking.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(fetchWaitingListByScheduleId.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(
+				fetchWaitingListByScheduleId.fulfilled,
+				(state, action) => {
+					state.waitingList = action.payload;
+					state.loading = false;
+				}
+			),
+			builder.addCase(
+				fetchWaitingListByScheduleId.rejected,
+				(state, action) => {
+					toast.error(action.error.message);
+					state.loading = false;
+				}
+			);
+		builder.addCase(bookUserToWaitingList.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(bookUserToWaitingList.fulfilled, (state, action) => {
+			state.waitingList.push(action.payload[0]);
+
+			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+				if (scheduleData.id === action.payload[0].schedule_id) {
+					return {
+						...scheduleData,
+						total_bookings: scheduleData.total_bookings + 1,
+					};
+				}
+
+				return scheduleData;
+			});
+
+			state.created = true;
+			state.loading = false;
+			toast.info("La clase está llena. Se te ha añadido a la lista de espera.");
+		});
+
+		builder.addCase(bookUserToWaitingList.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(cancelUserFromWaitingList.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(cancelUserFromWaitingList.fulfilled, (state, action) => {
+			const updatedBookings = state.waitingList.filter((bookingData) => {
+				return bookingData.id !== action.payload[0].id;
+			});
+			state.waitingList = updatedBookings;
+
+			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+				if (scheduleData.id === action.payload[0].schedule_id) {
+					return {
+						...scheduleData,
+						total_bookings: scheduleData.total_bookings - 1,
+					};
+				}
+				return scheduleData;
+			});
+
+			state.updated = true;
+			state.loading = false;
+		});
+		builder.addCase(cancelUserFromWaitingList.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
 			state.loading = false;

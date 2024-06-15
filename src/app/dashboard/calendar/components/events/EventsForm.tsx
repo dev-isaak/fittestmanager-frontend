@@ -18,7 +18,9 @@ import { fetchMembersByStatus } from "@/redux/features/membersSlice";
 import CancelIcon from "@mui/icons-material/Cancel";
 import {
 	cancelBooking,
+	cancelUserFromWaitingList,
 	fetchBookingsByScheduleId,
+	fetchWaitingListByScheduleId,
 	updateScheduleData,
 } from "@/redux/features/classesScheduleSlice";
 import TextEditor from "./TextEditor";
@@ -43,6 +45,9 @@ export default function BookingsForm({
 	);
 	const bookings = useAppSelector(
 		(data) => data.classesScheduleReducer.bookings
+	);
+	const waitingList = useAppSelector(
+		(data) => data.classesScheduleReducer.waitingList
 	);
 	const weeklySchedules = useAppSelector(
 		(data) => data.classesScheduleReducer.weeklySchedules
@@ -70,6 +75,12 @@ export default function BookingsForm({
 		setCurrentSchedule(schedules[0]);
 	}, [weeklySchedules]);
 
+	useEffect(() => {
+		if (currentSchedule) {
+			dispatch(fetchWaitingListByScheduleId(currentSchedule.id));
+		}
+	}, [currentSchedule]);
+
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
@@ -95,6 +106,10 @@ export default function BookingsForm({
 
 	const handleCancelUserBooking = (booking) => {
 		dispatch(cancelBooking({ booking: booking }));
+	};
+
+	const handleCancelUserFromWaitingList = (booking) => {
+		dispatch(cancelUserFromWaitingList({ booking: booking }));
 	};
 
 	return (
@@ -264,26 +279,78 @@ export default function BookingsForm({
 				)}
 			</Stack>
 			<Divider>Lista de espera</Divider>
-			<Card
+			<Stack
 				sx={{
+					width: "100%",
+					gap: 4,
+					flexWrap: "wrap",
+					justifyContent: "flex-start",
+					flexDirection: "row",
 					padding: 2,
-					margin: 2,
-					width: 300,
-					background: "#f5f5f5",
-					color: "#adadad",
-					borderRadius: 2,
 				}}>
-				<Stack
-					sx={{
-						gap: 2,
-						flexDirection: "row",
-						justifyContent: "space-between",
-					}}>
-					<Typography sx={{ fontWeight: 700 }}>
-						No hay nadie en lista de espera
-					</Typography>
-				</Stack>
-			</Card>
+				{waitingList.length ? (
+					waitingList.map((booking, index: number) => (
+						<Card
+							key={index}
+							sx={{
+								paddingY: 2,
+								paddingLeft: 2,
+								paddingRight:
+									currentSchedule.is_cancelled || isEventOutdated ? 2 : 0,
+								width: 300,
+								background: "#758097",
+								color: "#D0D0D0",
+								borderRadius: 2,
+							}}>
+							<Stack
+								sx={{
+									gap: 2,
+									flexDirection: "row",
+									justifyContent: "space-between",
+								}}>
+								<Avatar
+									src={booking.member_id.photo}
+									sx={{ width: 80, height: 80 }}
+								/>
+								<Typography sx={{ fontWeight: 700 }}>
+									{booking.member_id.first_name} {booking.member_id.last_name}
+								</Typography>
+								{!currentSchedule.is_cancelled && !isEventOutdated && (
+									<Box sx={{ height: "100%", marginTop: -2 }}>
+										<IconButton
+											onClick={() => handleCancelUserFromWaitingList(booking)}>
+											<CancelIcon
+												sx={{ width: 30, height: 30, color: "#dadada" }}
+											/>
+										</IconButton>
+									</Box>
+								)}
+							</Stack>
+						</Card>
+					))
+				) : (
+					<Card
+						sx={{
+							padding: 2,
+							// margin: 2,
+							width: 300,
+							background: "#f5f5f5",
+							color: "#adadad",
+							borderRadius: 2,
+						}}>
+						<Stack
+							sx={{
+								gap: 2,
+								flexDirection: "row",
+								justifyContent: "space-between",
+							}}>
+							<Typography sx={{ fontWeight: 700 }}>
+								No hay nadie en lista de espera
+							</Typography>
+						</Stack>
+					</Card>
+				)}
+			</Stack>
 			<Divider>Cancelaciones</Divider>
 			<Card
 				sx={{
