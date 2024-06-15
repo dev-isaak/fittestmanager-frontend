@@ -360,3 +360,73 @@ export const deleteUserFromWaitingList = async (booking) => {
     return { error: e.message, code: e.code }
   }
 }
+
+export const getCancellationsBySchedule = async (scheduleId: number) => {
+  const supabase = createClient()
+
+  try {
+    let { data: bookings, error } = await supabase
+      .from('booking_cancellations')
+      .select('*, member_id(*)')
+      .eq('schedule_id', scheduleId)
+
+
+    if (error) {
+      const error: any = new Error('Error getting cancellation list.');
+      error.code = 500;
+      throw error;
+    }
+
+    return bookings
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}
+
+export const addUserToCancelationList = async (bookingData: any) => {
+  const supabase = createClient()
+
+  const formData = { member_id: bookingData.member_id.id, schedule_id: bookingData.schedule_id, fitness_center_id: bookingData.fitness_center_id, date: bookingData.date, hour: bookingData.hour }
+  // debugger
+  try {
+    let { data, error } = await supabase
+      .from('booking_cancellations')
+      .insert(formData)
+      .select('*, member_id(*)')
+
+    if (error) {
+      const error: any = new Error('Error adding user to cancellations list.');
+      error.code = 500;
+      throw error;
+    }
+
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}
+
+export const deleteUserFromCancellationList = async (booking) => {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('booking_cancellations')
+      .delete()
+      .eq('id', booking.id)
+      .select()
+
+    if (error) {
+      const error: any = new Error('Error cancelling the booking.');
+      error.code = 500;
+      throw error;
+    }
+
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}

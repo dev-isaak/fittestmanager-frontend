@@ -17,13 +17,17 @@ import DataTable from "@/app/ui/DataTable";
 import { fetchMembersByStatus } from "@/redux/features/membersSlice";
 import CancelIcon from "@mui/icons-material/Cancel";
 import {
+	bookUserToCancellationList,
 	cancelBooking,
+	cancelUserFromCancellationList,
 	cancelUserFromWaitingList,
 	fetchBookingsByScheduleId,
+	fetchCancellationListByScheduleId,
 	fetchWaitingListByScheduleId,
 	updateScheduleData,
 } from "@/redux/features/classesScheduleSlice";
 import TextEditor from "./TextEditor";
+import { addUserToCancelationList } from "../../lib/data";
 
 type EventsFormType = {
 	bookingData?: any;
@@ -48,6 +52,9 @@ export default function BookingsForm({
 	);
 	const waitingList = useAppSelector(
 		(data) => data.classesScheduleReducer.waitingList
+	);
+	const cancellationList = useAppSelector(
+		(data) => data.classesScheduleReducer.cancellations
 	);
 	const weeklySchedules = useAppSelector(
 		(data) => data.classesScheduleReducer.weeklySchedules
@@ -78,6 +85,7 @@ export default function BookingsForm({
 	useEffect(() => {
 		if (currentSchedule) {
 			dispatch(fetchWaitingListByScheduleId(currentSchedule.id));
+			dispatch(fetchCancellationListByScheduleId(currentSchedule.id));
 		}
 	}, [currentSchedule]);
 
@@ -105,11 +113,16 @@ export default function BookingsForm({
 	};
 
 	const handleCancelUserBooking = (booking) => {
+		dispatch(bookUserToCancellationList({ bookingData: booking }));
 		dispatch(cancelBooking({ booking: booking }));
 	};
 
 	const handleCancelUserFromWaitingList = (booking) => {
 		dispatch(cancelUserFromWaitingList({ booking: booking }));
+	};
+
+	const handleCancelUserFromCancellations = (booking) => {
+		dispatch(cancelUserFromCancellationList({ booking: booking }));
 	};
 
 	return (
@@ -332,7 +345,6 @@ export default function BookingsForm({
 					<Card
 						sx={{
 							padding: 2,
-							// margin: 2,
 							width: 300,
 							background: "#f5f5f5",
 							color: "#adadad",
@@ -352,26 +364,79 @@ export default function BookingsForm({
 				)}
 			</Stack>
 			<Divider>Cancelaciones</Divider>
-			<Card
+			<Stack
 				sx={{
+					width: "100%",
+					gap: 4,
+					flexWrap: "wrap",
+					justifyContent: "flex-start",
+					flexDirection: "row",
 					padding: 2,
-					margin: 2,
-					width: 300,
-					background: "#f5f5f5",
-					color: "#adadad",
-					borderRadius: 2,
 				}}>
-				<Stack
-					sx={{
-						gap: 2,
-						flexDirection: "row",
-						justifyContent: "space-between",
-					}}>
-					<Typography sx={{ fontWeight: 700 }}>
-						No hay ninguna cancelación
-					</Typography>
-				</Stack>
-			</Card>
+				{cancellationList.length ? (
+					cancellationList.map((booking, index: number) => (
+						<Card
+							key={index}
+							sx={{
+								paddingY: 2,
+								paddingLeft: 2,
+								paddingRight:
+									currentSchedule.is_cancelled || isEventOutdated ? 2 : 0,
+								width: 300,
+								background: "#758097",
+								color: "#D0D0D0",
+								borderRadius: 2,
+							}}>
+							<Stack
+								sx={{
+									gap: 2,
+									flexDirection: "row",
+									justifyContent: "space-between",
+								}}>
+								<Avatar
+									src={booking.member_id.photo}
+									sx={{ width: 80, height: 80 }}
+								/>
+								<Typography sx={{ fontWeight: 700 }}>
+									{booking.member_id.first_name} {booking.member_id.last_name}
+								</Typography>
+								{!currentSchedule.is_cancelled && !isEventOutdated && (
+									<Box sx={{ height: "100%", marginTop: -2 }}>
+										<IconButton
+											onClick={() =>
+												handleCancelUserFromCancellations(booking)
+											}>
+											<CancelIcon
+												sx={{ width: 30, height: 30, color: "#dadada" }}
+											/>
+										</IconButton>
+									</Box>
+								)}
+							</Stack>
+						</Card>
+					))
+				) : (
+					<Card
+						sx={{
+							padding: 2,
+							width: 300,
+							background: "#f5f5f5",
+							color: "#adadad",
+							borderRadius: 2,
+						}}>
+						<Stack
+							sx={{
+								gap: 2,
+								flexDirection: "row",
+								justifyContent: "space-between",
+							}}>
+							<Typography sx={{ fontWeight: 700 }}>
+								No hay nadie en lista de espera
+							</Typography>
+						</Stack>
+					</Card>
+				)}
+			</Stack>
 			{!currentSchedule.is_cancelled && !isEventOutdated && (
 				<>
 					<Divider>Apuntar usuario</Divider>

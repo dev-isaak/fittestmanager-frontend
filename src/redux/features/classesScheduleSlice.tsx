@@ -1,13 +1,16 @@
 import {
+	addUserToCancelationList,
 	addUserToWaitingList,
 	bookAClass,
 	createClassSchedule,
+	deleteUserFromCancellationList,
 	deleteUserFromWaitingList,
 	getAllBookingsByFitnessCenterIdBetweenTwoDates,
 	getAllBookingsBySchedule,
 	getAllClassesSchedulesByClassId,
 	getAllClassesSchedulesByFitnessCenterId,
 	getAllSchedulesBetweenTwoDates,
+	getCancellationsBySchedule,
 	getWaitingListBySchedule,
 	updateABooking,
 	updateClassSchedule,
@@ -22,6 +25,7 @@ interface IClassesScheduleSlice {
 	weeklySchedules: any[];
 	bookings: any[];
 	waitingList: any[];
+	cancellations: any[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -32,6 +36,7 @@ const initialState: IClassesScheduleSlice = {
 	weeklySchedules: [],
 	bookings: [],
 	waitingList: [],
+	cancellations: [],
 	updated: false,
 	created: false,
 	loading: false,
@@ -98,6 +103,14 @@ export const fetchWaitingListByScheduleId = createAsyncThunk(
 	}
 );
 
+export const fetchCancellationListByScheduleId = createAsyncThunk(
+	"cancellationListByScheduleId/fetch",
+	async (scheduleId: number) => {
+		const response = await getCancellationsBySchedule(scheduleId);
+		return response;
+	}
+);
+
 export const fetchBookingsByFitnessCenter = createAsyncThunk(
 	"bookingsByFitnessCenterId/fetch",
 	async ({ fitnessCenterId, startDate, endDate }: any) => {
@@ -140,6 +153,16 @@ export const bookUserToWaitingList = createAsyncThunk(
 	}
 );
 
+export const bookUserToCancellationList = createAsyncThunk(
+	"addUserToCancellationList/create",
+	async ({ bookingData }: any) => {
+		const response = await addUserToCancelationList(bookingData);
+		if (response.error) throw new Error(response.error);
+
+		return response;
+	}
+);
+
 export const updateBookingClass = createAsyncThunk(
 	"updatebookClass/update",
 	async ({ bookingData }: any) => {
@@ -170,6 +193,14 @@ export const cancelUserFromWaitingList = createAsyncThunk(
 	"waitingList/delete",
 	async ({ booking }: any) => {
 		const response = await deleteUserFromWaitingList(booking);
+		return response;
+	}
+);
+
+export const cancelUserFromCancellationList = createAsyncThunk(
+	"cancellationList/delete",
+	async ({ booking }: any) => {
+		const response = await deleteUserFromCancellationList(booking);
 		return response;
 	}
 );
@@ -447,6 +478,85 @@ export const classesScheduleSlice = createSlice({
 			state.created = false;
 			state.loading = false;
 		});
+		builder.addCase(
+			fetchCancellationListByScheduleId.pending,
+			(state, action) => {
+				state.loading = true;
+			}
+		),
+			builder.addCase(
+				fetchCancellationListByScheduleId.fulfilled,
+				(state, action) => {
+					state.cancellations = action.payload;
+					state.loading = false;
+				}
+			),
+			builder.addCase(
+				fetchCancellationListByScheduleId.rejected,
+				(state, action) => {
+					toast.error(action.error.message);
+					state.loading = false;
+				}
+			);
+		builder.addCase(bookUserToCancellationList.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(bookUserToCancellationList.fulfilled, (state, action) => {
+			state.cancellations.push(action.payload[0]);
+
+			// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+			// 	if (scheduleData.id === action.payload[0].schedule_id) {
+			// 		return {
+			// 			...scheduleData,
+			// 			total_bookings: scheduleData.total_bookings + 1,
+			// 		};
+			// 	}
+
+			// 	return scheduleData;
+			// });
+
+			state.created = true;
+			state.loading = false;
+		});
+
+		builder.addCase(bookUserToCancellationList.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(cancelUserFromCancellationList.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(
+			cancelUserFromCancellationList.fulfilled,
+			(state, action) => {
+				const updatedBookings = state.cancellations.filter((bookingData) => {
+					return bookingData.id !== action.payload[0].id;
+				});
+				state.cancellations = updatedBookings;
+
+				// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+				// 	if (scheduleData.id === action.payload[0].schedule_id) {
+				// 		return {
+				// 			...scheduleData,
+				// 			total_bookings: scheduleData.total_bookings - 1,
+				// 		};
+				// 	}
+				// 	return scheduleData;
+				// });
+
+				state.updated = true;
+				state.loading = false;
+			}
+		);
+		builder.addCase(
+			cancelUserFromCancellationList.rejected,
+			(state, action) => {
+				toast.error(action.error.message);
+				state.created = false;
+				state.loading = false;
+			}
+		);
 	},
 });
 
