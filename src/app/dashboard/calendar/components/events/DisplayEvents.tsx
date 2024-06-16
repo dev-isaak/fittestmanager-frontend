@@ -72,11 +72,16 @@ export default function DisplayEvents({ currentDate }) {
 						}}>
 						{/* 7 is de number of weekdays (Monday to Sunday) */}
 						{Array.from({ length: 7 }).map((day, index) => {
-							const dayEvents = schedules.filter(
-								(event) =>
-									dayjs(event.date_time).day() + 1 === index + 2 &&
-									dayjs(event.date_time).format("HH:mm") === hour
-							);
+							const dayEvents = schedules
+								.filter(
+									(event) =>
+										dayjs(event.date_time).day() + 1 === index + 2 &&
+										dayjs(event.date_time).format("HH:mm") === hour
+								)
+								.sort(
+									(a, b) =>
+										a.class_id.calendar_order - b.class_id.calendar_order
+								);
 
 							return (
 								<Box key={index} sx={{ minWidth: 150 }}>

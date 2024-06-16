@@ -430,16 +430,16 @@ export const classesScheduleSlice = createSlice({
 		builder.addCase(bookUserToWaitingList.fulfilled, (state, action) => {
 			state.waitingList.push(action.payload[0]);
 
-			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
-				if (scheduleData.id === action.payload[0].schedule_id) {
-					return {
-						...scheduleData,
-						total_bookings: scheduleData.total_bookings + 1,
-					};
-				}
+			// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+			// 	if (scheduleData.id === action.payload[0].schedule_id) {
+			// 		return {
+			// 			...scheduleData,
+			// 			total_bookings: scheduleData.total_bookings + 1,
+			// 		};
+			// 	}
 
-				return scheduleData;
-			});
+			// 	return scheduleData;
+			// });
 
 			state.created = true;
 			state.loading = false;
@@ -460,15 +460,15 @@ export const classesScheduleSlice = createSlice({
 			});
 			state.waitingList = updatedBookings;
 
-			state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
-				if (scheduleData.id === action.payload[0].schedule_id) {
-					return {
-						...scheduleData,
-						total_bookings: scheduleData.total_bookings - 1,
-					};
-				}
-				return scheduleData;
-			});
+			// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
+			// 	if (scheduleData.id === action.payload[0].schedule_id) {
+			// 		return {
+			// 			...scheduleData,
+			// 			total_bookings: scheduleData.total_bookings - 1,
+			// 		};
+			// 	}
+			// 	return scheduleData;
+			// });
 
 			state.updated = true;
 			state.loading = false;

@@ -16,7 +16,6 @@ import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import { inviteUsersValidation } from "./validation/inviteUsersValidation";
 import { toast } from "react-toastify";
-import CancelIcon from "@mui/icons-material/Cancel";
 
 type InviteUserFormType = {
 	userData: any;
@@ -38,6 +37,9 @@ export default function InviteUserForm({
 	const bookings = useAppSelector(
 		(data) => data.classesScheduleReducer.bookings
 	);
+	const waitingList = useAppSelector(
+		(data) => data.classesScheduleReducer.waitingList
+	);
 
 	useEffect(() => {
 		const schedules = weeklySchedules.filter((schedule) => {
@@ -45,10 +47,6 @@ export default function InviteUserForm({
 		});
 		setCurrentSchedule(schedules[0]);
 	}, [weeklySchedules]);
-
-	useEffect(() => {
-		console.log(bookings);
-	}, [bookings]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);
@@ -60,6 +58,10 @@ export default function InviteUserForm({
 
 	const isUserAlreadyBooked = (userId: number) => {
 		return bookings.some((booking) => booking.member_id.id === userId);
+	};
+
+	const isUserAlreadyInWaitingList = (userId: number) => {
+		return waitingList.some((booking) => booking.member_id.id === userId);
 	};
 
 	return (
@@ -80,11 +82,14 @@ export default function InviteUserForm({
 						currentSchedule.total_bookings,
 						currentSchedule.limit_persons
 					) &&
-					!isUserAlreadyBooked(formData.userId)
+					!isUserAlreadyBooked(formData.userId) &&
+					!isUserAlreadyInWaitingList(formData.userId)
 				) {
 					dispatch(bookUserToWaitingList({ bookingData: formData }));
 				} else if (isUserAlreadyBooked(formData.userId)) {
 					toast.info("El usuario ya está apuntado en esta clase.");
+				} else if (isUserAlreadyInWaitingList(formData.userId)) {
+					toast.info("El usuario ya está en lista de espera.");
 				} else {
 					dispatch(bookUserToClass({ bookingData: formData }));
 				}

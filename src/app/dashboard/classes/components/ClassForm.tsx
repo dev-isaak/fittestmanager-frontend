@@ -114,7 +114,6 @@ export default function ClassForm({
 								label='Color'
 								value={values.color ? values.color : ""}
 								onChange={(event: any) => {
-									console.log(event);
 									setFieldValue("color", event);
 								}}
 							/>

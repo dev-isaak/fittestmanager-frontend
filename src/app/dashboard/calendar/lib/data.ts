@@ -33,7 +33,6 @@ export const getAllClassesSchedulesByClassId = async (classId: number) => {
 
 export const getAllSchedulesBetweenTwoDates = async (fitnessCenterId: any, startDate, endDate) => {
   const supabase = createClient()
-  // arreglar esto:
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
@@ -43,7 +42,7 @@ export const getAllSchedulesBetweenTwoDates = async (fitnessCenterId: any, start
   try {
     let { data: schedule, error } = await supabase
       .from('schedules')
-      .select('*, class_id(id, color(*)), classes_schedule_id(event_id, since_day, until_day)')
+      .select('*, coach_id(*), class_id(*, color(*)), classes_schedule_id(event_id, since_day, until_day)')
       .eq('fitness_center_id', fitnessCenterId)
       .gte('date_time', start)
       .lte('date_time', end)
