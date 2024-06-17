@@ -1,7 +1,12 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+	Box,
 	Button,
 	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
 	Divider,
 	Grid,
 	MenuItem,
@@ -11,8 +16,13 @@ import {
 import { Formik } from "formik";
 import { classFormValidation } from "../validation/classFormValidation";
 import { MuiColorInput } from "mui-color-input";
-import { createNewClass, updateClassInfo } from "@/redux/features/classesSlice";
+import {
+	createNewClass,
+	deleteClassById,
+	updateClassInfo,
+} from "@/redux/features/classesSlice";
 import HoursTable from "./HoursTable";
+import { useState } from "react";
 
 type RoomFormType = {
 	classData?: any;
@@ -26,6 +36,8 @@ export default function ClassForm({
 	onCloseDialog,
 }: RoomFormType) {
 	const dispatch = useAppDispatch();
+	const [openDialog, setOpenDialog] = useState(false);
+	const [repeatText, setRepeatText] = useState("");
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
@@ -34,6 +46,20 @@ export default function ClassForm({
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
+
+	const handleClickOpenDialog = () => {
+		setOpenDialog(true);
+	};
+
+	const handleCloseDialog = () => {
+		setOpenDialog(false);
+	};
+
+	const handleDeleteClass = () => {
+		dispatch(deleteClassById(classData.id));
+		setOpenDialog(false);
+	};
+
 	return (
 		<Formik
 			initialValues={{
@@ -84,6 +110,48 @@ export default function ClassForm({
 						name='classId'
 						value={formType === "UPDATE" && values.classId}
 					/>
+					{formType === "UPDATE" && (
+						<Stack sx={{ width: "100%", alignItems: "end" }}>
+							<Button
+								onClick={handleClickOpenDialog}
+								color='error'
+								variant='outlined'
+								sx={{ width: "fit-content" }}>
+								Eliminar
+							</Button>
+						</Stack>
+					)}
+					<Dialog open={openDialog} onClose={handleCloseDialog}>
+						<DialogTitle>
+							Estás seguro que quieres eliminar esta clase?
+						</DialogTitle>
+						<DialogContent>
+							<Box>
+								Esta acción no se puede deshacer. Eliminar esta clase también
+								eliminará todos los horarios relacionados. <br />
+								Si estás seguro que quieres eliminar esta clase escribe &ldquo;
+								{classData?.name}&ldquo;.
+							</Box>
+							<Box sx={{ marginTop: 2 }}>
+								<TextField
+									value={repeatText}
+									variant='filled'
+									onChange={(e) => setRepeatText(e.target.value)}></TextField>
+							</Box>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={handleCloseDialog} variant='outlined'>
+								Cancelar
+							</Button>
+							<Button
+								onClick={handleDeleteClass}
+								color='error'
+								variant='contained'
+								disabled={classData?.name === repeatText ? false : true}>
+								Eliminar
+							</Button>
+						</DialogActions>
+					</Dialog>
 					<TextField
 						fullWidth
 						label='Nombre de la clase*'
@@ -207,8 +275,15 @@ export default function ClassForm({
 							</TextField>
 						</Grid>
 					</Grid>
-					<Divider>Horarios</Divider>
-					<HoursTable classId={values.classId} eventName={values.className} />
+					{formType === "UPDATE" && (
+						<>
+							<Divider>Horarios</Divider>
+							<HoursTable
+								classId={values.classId}
+								eventName={values.className}
+							/>
+						</>
+					)}
 					<Stack flexDirection='row' gap={2} marginTop={4}>
 						{isLoading ? (
 							<CircularProgress />

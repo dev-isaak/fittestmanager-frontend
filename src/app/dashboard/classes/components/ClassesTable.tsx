@@ -23,10 +23,6 @@ export default function ClassesTable() {
 		}
 	}, [currentFitnessCenter, dispatch]);
 
-	useEffect(() => {
-		console.log(classes);
-	}, [classes]);
-
 	return (
 		<PaperBoard>
 			<Typography component='h3' variant='h4'>

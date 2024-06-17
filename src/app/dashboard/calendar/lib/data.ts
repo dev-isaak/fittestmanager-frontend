@@ -180,6 +180,28 @@ export const updateClassSchedule = async (scheduleData: any) => {
   }
 }
 
+export const deleteClassSchedule = async (classScheduleId: any) => {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('classes_schedule')
+      .delete()
+      .eq('event_id', classScheduleId)
+      .select('*')
+
+    if (error) {
+      const error: any = new Error('Error updating the schedule.');
+      error.code = 500;
+      throw error;
+    }
+    return data
+  } catch (e: any) {
+    console.error(e)
+    return { error: e.message, code: e.code }
+  }
+}
+
 
 export const getAllBookingsByFitnessCenterIdBetweenTwoDates = async (fitnessCenterId: number, startDate, endDate) => {
   const supabase = createClient()

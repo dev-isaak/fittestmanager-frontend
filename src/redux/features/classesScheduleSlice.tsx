@@ -3,6 +3,7 @@ import {
 	addUserToWaitingList,
 	bookAClass,
 	createClassSchedule,
+	deleteClassSchedule,
 	deleteUserFromCancellationList,
 	deleteUserFromWaitingList,
 	getAllBookingsByFitnessCenterIdBetweenTwoDates,
@@ -177,6 +178,14 @@ export const updateClassScheduleInfo = createAsyncThunk(
 	"classesSchedules/update",
 	async ({ classData }: any) => {
 		const response = await updateClassSchedule(classData);
+		return response;
+	}
+);
+
+export const deleteClassScheduleInfo = createAsyncThunk(
+	"classesSchedules/delete",
+	async ({ classScheduleId }: any) => {
+		const response = await deleteClassSchedule(classScheduleId);
 		return response;
 	}
 );
@@ -503,18 +512,6 @@ export const classesScheduleSlice = createSlice({
 		});
 		builder.addCase(bookUserToCancellationList.fulfilled, (state, action) => {
 			state.cancellations.push(action.payload[0]);
-
-			// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
-			// 	if (scheduleData.id === action.payload[0].schedule_id) {
-			// 		return {
-			// 			...scheduleData,
-			// 			total_bookings: scheduleData.total_bookings + 1,
-			// 		};
-			// 	}
-
-			// 	return scheduleData;
-			// });
-
 			state.created = true;
 			state.loading = false;
 		});
@@ -534,17 +531,6 @@ export const classesScheduleSlice = createSlice({
 					return bookingData.id !== action.payload[0].id;
 				});
 				state.cancellations = updatedBookings;
-
-				// state.weeklySchedules = state.weeklySchedules.map((scheduleData) => {
-				// 	if (scheduleData.id === action.payload[0].schedule_id) {
-				// 		return {
-				// 			...scheduleData,
-				// 			total_bookings: scheduleData.total_bookings - 1,
-				// 		};
-				// 	}
-				// 	return scheduleData;
-				// });
-
 				state.updated = true;
 				state.loading = false;
 			}
@@ -557,6 +543,24 @@ export const classesScheduleSlice = createSlice({
 				state.loading = false;
 			}
 		);
+		builder.addCase(deleteClassScheduleInfo.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteClassScheduleInfo.fulfilled, (state, action) => {
+			const updatedBookings = state.bookings.filter((bookingData) => {
+				return bookingData.id !== action.payload[0].id;
+			});
+			state.bookings = updatedBookings;
+			toast.success("Horarios eliminados con éxito.");
+
+			state.updated = true;
+			state.loading = false;
+		});
+		builder.addCase(deleteClassScheduleInfo.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.updated = false;
+			state.loading = false;
+		});
 	},
 });
 

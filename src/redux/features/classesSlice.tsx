@@ -1,5 +1,6 @@
 import {
 	createClass,
+	deleteClass,
 	getAllClasses,
 	updateClass,
 } from "@/app/dashboard/classes/lib/data";
@@ -42,6 +43,14 @@ export const updateClassInfo = createAsyncThunk(
 	"classes/update",
 	async (classData: any) => {
 		const response = await updateClass(classData);
+		return response;
+	}
+);
+
+export const deleteClassById = createAsyncThunk(
+	"classes/delete",
+	async (classId) => {
+		const response = await deleteClass(classId);
 		return response;
 	}
 );
@@ -99,6 +108,23 @@ export const classesSlice = createSlice({
 		builder.addCase(createNewClass.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(deleteClassById.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteClassById.fulfilled, (state, action) => {
+			state.classes = state.classes.filter((classData) => {
+				return classData.id !== action.payload[0].id;
+			});
+			toast.success("Clase eliminada.");
+
+			state.updated = true;
+			state.loading = false;
+		});
+		builder.addCase(deleteClassById.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.updated = false;
 			state.loading = false;
 		});
 	},

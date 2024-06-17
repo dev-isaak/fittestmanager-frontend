@@ -1,11 +1,17 @@
 import {
 	createNewClassSchedule,
+	deleteClassScheduleInfo,
 	updateClassScheduleInfo,
 } from "@/redux/features/classesScheduleSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+	Box,
 	Button,
 	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
 	Grid,
 	MenuItem,
 	Stack,
@@ -15,7 +21,7 @@ import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { Formik } from "formik";
 import dayjs, { Dayjs } from "dayjs";
 import { hoursTableValidation } from "../validation/hoursTableValidation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchCoachesByFitnessCenter } from "@/redux/features/coachesSlice";
 
 type NewScheduleFormType = {
@@ -36,6 +42,8 @@ export default function NewScheduleForm({
 	formType,
 }: NewScheduleFormType) {
 	const dispatch = useAppDispatch();
+	const [openDialog, setOpenDialog] = useState(false);
+	const [repeatText, setRepeatText] = useState("");
 	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
 	const isLoading = useAppSelector(
 		(data) => data.classesScheduleReducer.loading
@@ -53,6 +61,45 @@ export default function NewScheduleForm({
 			dispatch(fetchCoachesByFitnessCenter(currentFitnessCenterId));
 		}
 	}, []);
+
+	const handleClickOpenDialog = () => {
+		setOpenDialog(true);
+	};
+
+	const handleCloseDialog = () => {
+		setOpenDialog(false);
+	};
+
+	const handleDeleteClass = () => {
+		dispatch(
+			deleteClassScheduleInfo({ classScheduleId: scheduleData.event_id })
+		);
+		setOpenDialog(false);
+	};
+
+	const getWeekDay = (weekday: string) => {
+		if (weekday === "monday") {
+			return "Lunes";
+		}
+		if (weekday === "tuesday") {
+			return "Martes";
+		}
+		if (weekday === "wednesday") {
+			return "Miércoles";
+		}
+		if (weekday === "thursday") {
+			return "Jueves";
+		}
+		if (weekday === "friday") {
+			return "Viernes";
+		}
+		if (weekday === "saturday") {
+			return "Sábado";
+		}
+		if (weekday === "sunday") {
+			return "Domingo";
+		}
+	};
 
 	return (
 		<Formik
@@ -100,6 +147,59 @@ export default function NewScheduleForm({
 						name='scheduleId'
 						value={formType === "UPDATE" && scheduleData.schedule_id}
 					/>
+					{formType === "UPDATE" && (
+						<Stack sx={{ width: "100%", alignItems: "end" }}>
+							<Button
+								onClick={handleClickOpenDialog}
+								color='error'
+								variant='outlined'
+								sx={{ width: "fit-content" }}>
+								Eliminar
+							</Button>
+						</Stack>
+					)}
+					<Dialog open={openDialog} onClose={handleCloseDialog}>
+						<DialogTitle>
+							Estás seguro que quieres eliminar este horario?
+						</DialogTitle>
+						<DialogContent>
+							<Box>
+								Esta acción no se puede deshacer. <br />
+								Se eliminarán todos los horarios en{" "}
+								<strong>
+									{getWeekDay(scheduleData.week_day)} entre{" "}
+									{dayjs(scheduleData.since_day).format("DD-MM-YYYY")} y{" "}
+									{dayjs(scheduleData.until_day).format("DD-MM-YYYY")}.
+								</strong>
+								<br />
+								Si estás seguro que quieres eliminar este horario escribe
+								&ldquo;
+								{getWeekDay(scheduleData.week_day)}&ldquo;.
+							</Box>
+							<Box sx={{ marginTop: 2 }}>
+								<TextField
+									value={repeatText}
+									variant='filled'
+									onChange={(e) => setRepeatText(e.target.value)}></TextField>
+							</Box>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={handleCloseDialog} variant='outlined'>
+								Cancelar
+							</Button>
+							<Button
+								onClick={handleDeleteClass}
+								color='error'
+								variant='contained'
+								disabled={
+									getWeekDay(scheduleData?.week_day) === repeatText
+										? false
+										: true
+								}>
+								Eliminar
+							</Button>
+						</DialogActions>
+					</Dialog>
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={6} gap={2}>
 							<TextField
