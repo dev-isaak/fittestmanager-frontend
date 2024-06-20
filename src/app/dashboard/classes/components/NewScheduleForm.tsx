@@ -167,14 +167,14 @@ export default function NewScheduleForm({
 								Esta acción no se puede deshacer. <br />
 								Se eliminarán todos los horarios en{" "}
 								<strong>
-									{getWeekDay(scheduleData.week_day)} entre{" "}
-									{dayjs(scheduleData.since_day).format("DD-MM-YYYY")} y{" "}
-									{dayjs(scheduleData.until_day).format("DD-MM-YYYY")}.
+									{getWeekDay(scheduleData?.week_day)} entre{" "}
+									{dayjs(scheduleData?.since_day).format("DD-MM-YYYY")} y{" "}
+									{dayjs(scheduleData?.until_day).format("DD-MM-YYYY")}.
 								</strong>
 								<br />
 								Si estás seguro que quieres eliminar este horario escribe
 								&ldquo;
-								{getWeekDay(scheduleData.week_day)}&ldquo;.
+								{getWeekDay(scheduleData?.week_day)}&ldquo;.
 							</Box>
 							<Box sx={{ marginTop: 2 }}>
 								<TextField

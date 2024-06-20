@@ -68,7 +68,7 @@ export const updateClass = async (classData: any) => {
       throw error;
     }
 
-    return data || error
+    return data
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
@@ -132,7 +132,7 @@ export const deleteClass = async (classId) => {
       .select('*')
 
     if (error) {
-      const error: any = new Error('Error updating the color.');
+      const error: any = new Error('Error deleting the class.');
       error.code = 500;
       throw error;
     }

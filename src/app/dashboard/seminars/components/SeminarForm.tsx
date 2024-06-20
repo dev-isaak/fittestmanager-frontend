@@ -1,7 +1,12 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+	Box,
 	Button,
 	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
 	Divider,
 	Grid,
 	MenuItem,
@@ -13,10 +18,13 @@ import { MuiColorInput } from "mui-color-input";
 import { seminarFormValidation } from "../validation/seminarFormValidation";
 import {
 	createNewSeminar,
+	deleteSeminarById,
 	updateSeminarInfo,
 } from "@/redux/features/seminarsSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 type SeminarFormType = {
 	seminarData?: any;
@@ -30,6 +38,8 @@ export default function SeminarForm({
 	onCloseDialog,
 }: SeminarFormType) {
 	const dispatch = useAppDispatch();
+	const [openDialog, setOpenDialog] = useState(false);
+	const [repeatText, setRepeatText] = useState("");
 	const currentCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
@@ -46,6 +56,20 @@ export default function SeminarForm({
 	const handleCloseButton = () => {
 		onCloseDialog(false);
 	};
+
+	const handleClickOpenDialog = () => {
+		setOpenDialog(true);
+	};
+
+	const handleCloseDialog = () => {
+		setOpenDialog(false);
+	};
+
+	const handleDeleteClass = () => {
+		dispatch(deleteSeminarById(seminarData.id));
+		setOpenDialog(false);
+	};
+
 	return (
 		<Formik
 			initialValues={{
@@ -53,7 +77,7 @@ export default function SeminarForm({
 				seminarName: formType === "UPDATE" ? seminarData.name : "",
 				seminarDescription:
 					formType === "UPDATE" ? seminarData.description : "",
-				color: formType === "UPDATE" ? seminarData.color : "#ffffff",
+				color: formType === "UPDATE" ? seminarData.color?.color : "#ffffff",
 				limitCancellationTime:
 					formType === "UPDATE" ? seminarData.limit_cancellation_time : "",
 				bookingLimitPerDay:
@@ -66,6 +90,8 @@ export default function SeminarForm({
 					formType === "UPDATE" ? seminarData.waiting_list_type : "",
 				calendarOrder: formType === "UPDATE" ? seminarData.calendar_order : "",
 				roomId: formType === "UPDATE" ? seminarData.room_id : "",
+				date: formType === "UPDATE" ? seminarData.date : "",
+				time: formType === "UPDATE" ? `1999-04-12T${seminarData.time}` : "",
 			}}
 			onSubmit={(formData) => {
 				if (formType === "UPDATE") {
@@ -100,6 +126,47 @@ export default function SeminarForm({
 						name='seminarId'
 						value={formType === "UPDATE" && values.seminarId}
 					/>
+					{formType === "UPDATE" && (
+						<Stack sx={{ width: "100%", alignItems: "end" }}>
+							<Button
+								onClick={handleClickOpenDialog}
+								color='error'
+								variant='outlined'
+								sx={{ width: "fit-content" }}>
+								Eliminar
+							</Button>
+						</Stack>
+					)}
+					<Dialog open={openDialog} onClose={handleCloseDialog}>
+						<DialogTitle>
+							Estás seguro que quieres eliminar este horario?
+						</DialogTitle>
+						<DialogContent>
+							<Box>
+								Esta acción no se puede deshacer. <br />
+								Si estás seguro que quieres eliminar este horario escribe
+								&ldquo; {seminarData?.name} &ldquo;
+							</Box>
+							<Box sx={{ marginTop: 2 }}>
+								<TextField
+									value={repeatText}
+									variant='filled'
+									onChange={(e) => setRepeatText(e.target.value)}></TextField>
+							</Box>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={handleCloseDialog} variant='outlined'>
+								Cancelar
+							</Button>
+							<Button
+								onClick={handleDeleteClass}
+								color='error'
+								variant='contained'
+								disabled={seminarData?.name === repeatText ? false : true}>
+								Eliminar
+							</Button>
+						</DialogActions>
+					</Dialog>
 					<TextField
 						fullWidth
 						label='Nombre del evento*'
@@ -223,7 +290,6 @@ export default function SeminarForm({
 							</TextField>
 						</Grid>
 					</Grid>
-					<Divider>Horarios</Divider>
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={4}>
 							<TextField
@@ -239,6 +305,41 @@ export default function SeminarForm({
 									</MenuItem>
 								))}
 							</TextField>
+						</Grid>
+					</Grid>
+					<Grid container spacing={2}>
+						<Grid item xs={12} md={4}>
+							<DatePicker
+								onChange={(event) => setFieldValue("date", event)}
+								label='Día*'
+								name='date'
+								value={dayjs(values.date)}
+								format='DD/MM/YYYY'
+								slotProps={{
+									textField: {
+										error: Boolean(errors.date && touched.date && errors.date),
+										helperText: errors.date && touched.date && errors.date,
+									},
+								}}
+								sx={{ width: "100%" }}
+							/>
+						</Grid>
+						<Grid item xs={12} md={4}>
+							<TimePicker
+								onChange={(event) => setFieldValue("time", event)}
+								ampm={false}
+								minutesStep={15}
+								label='Hora*'
+								value={dayjs(values.time)}
+								name='time'
+								slotProps={{
+									textField: {
+										error: Boolean(errors.time && touched.time && errors.time),
+										helperText: errors.time && touched.time && errors.time,
+									},
+								}}
+								sx={{ width: "100%" }}
+							/>
 						</Grid>
 					</Grid>
 					<Stack flexDirection='row' gap={2} marginTop={4}>

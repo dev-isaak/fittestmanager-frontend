@@ -1,5 +1,12 @@
 import { useAppDispatch } from "@/redux/hooks";
-import { Box, Button, FormControlLabel, Stack, Switch } from "@mui/material";
+import {
+	Box,
+	Button,
+	FormControlLabel,
+	Stack,
+	Switch,
+	Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -61,7 +68,14 @@ export default function TextEditor({
 			</Stack>
 		</>
 	) : (
-		<Box>
+		<Box
+			sx={{
+				border: "1px solid #d2d2d2",
+				padding: 2,
+				// borderRadius: 5,
+				marginY: 2,
+			}}>
+			<Typography variant='h4'>Workout Of the Day</Typography>
 			<div
 				dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }}></div>
 		</Box>

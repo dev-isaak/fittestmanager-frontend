@@ -10,13 +10,15 @@ interface ISeminarFormValidation {
   calendarOrder?: string
   limitCancellationTime?: string
   roomId?: string
+  date: any,
+  time: any
 }
 
 export const seminarFormValidation = (formValues: ISeminarFormValidation) => {
-const errors: ISeminarFormValidation = {};
+  const errors: ISeminarFormValidation = {};
 
-if (!formValues.seminarName) {
-  errors.seminarName = "Requerido";
-}
-return errors;
+  if (!formValues.seminarName) {
+    errors.seminarName = "Requerido";
+  }
+  return errors;
 };

@@ -1,4 +1,15 @@
-import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material";
+import {
+	Box,
+	Button,
+	Divider,
+	IconButton,
+	MenuItem,
+	Paper,
+	Select,
+	Stack,
+	TextField,
+	Typography,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -13,6 +24,10 @@ import {
 } from "@/redux/features/classesScheduleSlice";
 import TextEditor from "./TextEditor";
 import UserList from "../UserList";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { fetchCoachesByFitnessCenter } from "@/redux/features/coachesSlice";
 
 type EventsFormType = {
 	bookingData?: any;
@@ -26,6 +41,12 @@ export default function BookingsForm({
 	const dispatch = useAppDispatch();
 	const [isEventOutdated, setIsEventOutdated] = useState(false);
 	const [currentSchedule, setCurrentSchedule] = useState(bookingData);
+	const [editLimit, setEditLimit] = useState(false);
+	const [editCoach, setEditCoach] = useState(false);
+	const [limitPersonsOnClass, setLimitPersonsOnClass] = useState(
+		currentSchedule.limit_persons
+	);
+	const [coachOnClass, setCoachOnClass] = useState(currentSchedule.coach_id.id);
 	const currentFitnessCenter = useAppSelector(
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
@@ -44,11 +65,16 @@ export default function BookingsForm({
 	const weeklySchedules = useAppSelector(
 		(data) => data.classesScheduleReducer.weeklySchedules
 	);
+	const coaches = useAppSelector((data) => data.coachesReducer.coaches);
 
 	useEffect(() => {
 		dispatch(fetchBookingsByScheduleId(bookingData.id));
 
 		checkIfCurrentEventIsOutdated();
+
+		if (!coaches.length) {
+			dispatch(fetchCoachesByFitnessCenter(currentFitnessCenter.id));
+		}
 	}, []);
 
 	useEffect(() => {
@@ -95,6 +121,85 @@ export default function BookingsForm({
 	const handleReopenClass = () => {
 		const data = { ...currentSchedule, is_cancelled: false };
 		dispatch(updateScheduleData({ bookingData: data }));
+	};
+
+	const handleUpdateLimitPersonsOnClass = () => {
+		const data = { ...currentSchedule, limit_persons: limitPersonsOnClass };
+		dispatch(updateScheduleData({ bookingData: data }));
+		setEditLimit(false);
+	};
+
+	const handleChangeEditLimitPersonsOnClass = (event) => {
+		setLimitPersonsOnClass(event.target.value);
+	};
+
+	const handleEditCoach = () => {
+		const data = { ...currentSchedule, coach_id: coachOnClass };
+		dispatch(updateScheduleData({ bookingData: data }));
+		setEditCoach(false);
+	};
+
+	const handleChangeCoach = (event) => {
+		setCoachOnClass(event.target.value);
+	};
+
+	const RenderEditLimitPersons = ({ personsLimit }) => {
+		return (
+			<>
+				{!editLimit ? (
+					<> {personsLimit}</>
+				) : (
+					<>
+						<TextField
+							value={limitPersonsOnClass}
+							variant='standard'
+							onChange={handleChangeEditLimitPersonsOnClass}
+							sx={{
+								width: 50,
+								marginLeft: 2,
+								fontSize: "24px",
+							}}
+						/>
+						<IconButton onClick={handleUpdateLimitPersonsOnClass}>
+							<CheckIcon color='success' />
+						</IconButton>
+					</>
+				)}
+			</>
+		);
+	};
+
+	const RenderEditCoach = ({ coach }) => {
+		return (
+			<>
+				{!editCoach ? (
+					<Stack>
+						{coach.first_name} {coach.last_name}
+					</Stack>
+				) : (
+					<>
+						<TextField
+							select
+							variant='filled'
+							label='Coach*'
+							value={coachOnClass}
+							name='coach'
+							onChange={handleChangeCoach}>
+							{coaches.map((coach, index) => {
+								return (
+									<MenuItem key={index} value={coach.id}>
+										{coach.first_name} {coach.last_name}
+									</MenuItem>
+								);
+							})}
+						</TextField>
+						<IconButton onClick={handleEditCoach}>
+							<CheckIcon color='success' />
+						</IconButton>
+					</>
+				)}
+			</>
+		);
 	};
 
 	return (
@@ -148,6 +253,7 @@ export default function BookingsForm({
 						color: "#898989",
 						padding: 2,
 						margin: 2,
+						width: 300,
 					}}>
 					<Typography variant='h4'>
 						{currentSchedule.title} -{" "}
@@ -157,10 +263,21 @@ export default function BookingsForm({
 					<Typography variant='h5' sx={{ textAlign: "center" }}>
 						{dayjs(currentSchedule.date_time).format("DD/MM/YYYY")}
 					</Typography>
-					<Typography sx={{ marginTop: 1 }}>
-						Coach: {currentSchedule.coach_id.first_name}{" "}
-						{currentSchedule.coach_id.last_name}
-					</Typography>
+					<Stack
+						sx={{
+							flexDirection: "row",
+							alignItems: editCoach ? "end" : "center",
+							justifyContent: "left",
+							marginTop: 2,
+						}}>
+						{editCoach ? "" : <strong>Coach: &nbsp;</strong>}
+						<RenderEditCoach coach={currentSchedule.coach_id} />
+						{!isEventOutdated && !currentSchedule.is_cancelled && (
+							<IconButton onClick={() => setEditCoach(!editCoach)}>
+								{!editCoach ? <EditIcon /> : <CloseIcon color='error' />}
+							</IconButton>
+						)}
+					</Stack>
 				</Paper>
 				{!currentSchedule.is_cancelled && !isEventOutdated && (
 					<Button
@@ -188,13 +305,24 @@ export default function BookingsForm({
 					libre
 				</Typography>
 			)}
-
-			{currentSchedule.limit_persons - currentSchedule.total_bookings > 1 && (
-				<Typography variant='h5' color='success'>
-					{currentSchedule.limit_persons - currentSchedule.total_bookings}{" "}
-					plazas libres
-				</Typography>
-			)}
+			<Stack sx={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+				{currentSchedule.limit_persons - currentSchedule.total_bookings > 1 && (
+					<Typography variant='h5' color='success'>
+						{currentSchedule.limit_persons - currentSchedule.total_bookings}{" "}
+						plazas libres de
+						<RenderEditLimitPersons
+							personsLimit={currentSchedule.limit_persons}
+						/>
+					</Typography>
+				)}
+				{!isEventOutdated && !currentSchedule.is_cancelled && (
+					<IconButton
+						aria-label='edit'
+						onClick={() => setEditLimit(!editLimit)}>
+						{!editLimit ? <EditIcon /> : <CloseIcon color='error' />}
+					</IconButton>
+				)}
+			</Stack>
 			<UserList
 				type='BOOKINGS'
 				title='Usuarios apuntados'

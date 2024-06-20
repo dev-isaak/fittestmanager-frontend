@@ -55,20 +55,21 @@ export const getAllSchedulesBetweenTwoDates = async (fitnessCenterId: any, start
 
 export const updateSchedule = async (scheduleData: any) => {
   const supabase = createClient()
-  const formData = { ...scheduleData, class_id: scheduleData.class_id.id, classes_schedule_id: scheduleData.classes_schedule_id.event_id }
+  const formData = { ...scheduleData, coach_id: scheduleData.coach_id.id || scheduleData.coach_id, class_id: scheduleData.class_id.id, classes_schedule_id: scheduleData.classes_schedule_id.event_id, limit_persons: parseInt(scheduleData.limit_persons) }
+
   try {
     const { data, error } = await supabase
       .from('schedules')
       .update(formData)
       .eq('id', scheduleData.id)
-      .select('*, class_id(id, color(*)), classes_schedule_id(event_id, since_day, until_day)')
+      .select('*, class_id(id, color(*)), classes_schedule_id(event_id, since_day, until_day), coach_id(*)')
 
     if (error) {
       const error: any = new Error('Error updating the schedule.');
       error.code = 500;
       throw error;
     }
-    console.log(error)
+
     return data || error
   } catch (e: any) {
     console.error(e)

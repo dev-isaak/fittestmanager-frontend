@@ -28,6 +28,10 @@ export default function HoursTable({ classId, eventName }: any) {
 	}, [rooms]);
 
 	useEffect(() => {
+		console.log(schedule);
+	}, [schedule]);
+
+	useEffect(() => {
 		setOpenDialog(false);
 	}, [scheduleCreated]);
 

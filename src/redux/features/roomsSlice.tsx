@@ -1,5 +1,6 @@
 import {
 	createRoom,
+	deleteRoom,
 	getAllRooms,
 	updateRoom,
 } from "@/app/dashboard/rooms/lib/data";
@@ -42,6 +43,14 @@ export const updateRoomInfo = createAsyncThunk(
 	"rooms/update",
 	async (room: any) => {
 		const response = await updateRoom(room);
+		return response;
+	}
+);
+
+export const deleteRoomInfo = createAsyncThunk(
+	"rooms/delete",
+	async (roomId: number) => {
+		const response = await deleteRoom(roomId);
 		return response;
 	}
 );
@@ -95,6 +104,22 @@ export const roomsSlice = createSlice({
 			state.loading = false;
 		});
 		builder.addCase(createNewRoom.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(deleteRoomInfo.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteRoomInfo.fulfilled, (state, action) => {
+			state.rooms = state.rooms.filter((roomData) => {
+				return roomData.id !== action.payload[0].id;
+			});
+			toast.success("Sala eliminada con éxito.");
+			state.created = true;
+			state.loading = false;
+		});
+		builder.addCase(deleteRoomInfo.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
 			state.loading = false;

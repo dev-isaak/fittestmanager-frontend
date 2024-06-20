@@ -22,6 +22,7 @@ export default function SeminarsTable() {
 			}
 		}
 	}, [currentFitnessCenter, dispatch]);
+
 	return (
 		<PaperBoard>
 			<Typography component='h3' variant='h4'>

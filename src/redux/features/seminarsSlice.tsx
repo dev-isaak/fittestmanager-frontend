@@ -1,5 +1,6 @@
 import {
 	createSeminar,
+	deleteSeminar,
 	getAllSeminars,
 	updateSeminar,
 } from "@/app/dashboard/seminars/lib/data";
@@ -42,6 +43,14 @@ export const updateSeminarInfo = createAsyncThunk(
 	"seminars/update",
 	async (classData: any) => {
 		const response = await updateSeminar(classData);
+		return response;
+	}
+);
+
+export const deleteSeminarById = createAsyncThunk(
+	"classes/delete",
+	async (seminarId) => {
+		const response = await deleteSeminar(seminarId);
 		return response;
 	}
 );
@@ -104,6 +113,23 @@ export const seminarsSlice = createSlice({
 		builder.addCase(createNewSeminar.rejected, (state, action) => {
 			toast.error(action.error.message);
 			state.created = false;
+			state.loading = false;
+		});
+		builder.addCase(deleteSeminarById.pending, (state, action) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteSeminarById.fulfilled, (state, action) => {
+			state.seminars = state.seminars.filter((classData) => {
+				return classData.id !== action.payload[0].id;
+			});
+			toast.success("Seminario eliminada.");
+
+			state.updated = true;
+			state.loading = false;
+		});
+		builder.addCase(deleteSeminarById.rejected, (state, action) => {
+			toast.error(action.error.message);
+			state.updated = false;
 			state.loading = false;
 		});
 	},
