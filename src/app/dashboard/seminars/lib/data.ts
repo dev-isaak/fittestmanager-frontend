@@ -7,7 +7,7 @@ export const getAllSeminars = async (currentCenterId: number) => {
   try {
     let { data: seminars, error } = await supabase
       .from('seminars')
-      .select('*, color(color)')
+      .select('*, color(*)')
       .eq('fitness_center_id', currentCenterId)
 
     return seminars || error
@@ -25,19 +25,21 @@ export const createSeminar = async (seminarData: any, centerId: number) => {
     const { data, error } = await supabase
       .from('seminars')
       .insert(formData)
-      .select('*, color(color)')
+      .select('*, color(*)')
 
     if (error) {
       const error: any = new Error('Error creating the seminar.');
       error.code = 500;
       throw error;
     }
+
     const color = await createColor(data[0].id, seminarData.color)
+
     if (color) {
       finalData = await updateSeminar({ ...formData, color: color[0].id, seminarId: data[0].id })
     }
 
-    return data
+    return finalData
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
@@ -54,12 +56,13 @@ export const updateSeminar = async (seminarData: any) => {
     colorId = seminarData.color
   }
   const formData = { name: seminarData.name, description: seminarData.description, color: colorId, booking_limit_per_day: seminarData.booking_limit_per_day, minimum_persons_per_class: seminarData.minimum_persons_per_class, limit_time_for_booking: seminarData.limit_time_for_booking, waiting_list_type: seminarData.waiting_list_type, calendar_order: seminarData.calendar_order, limit_cancellation_time: seminarData.limit_cancellation_time, room_id: seminarData.room_id, date: seminarData.date, time: seminarData.time }
+
   try {
     const { data, error } = await supabase
       .from('seminars')
       .update(formData)
       .eq('id', seminarData.seminarId)
-      .select('*, color(color)')
+      .select('*, color(*)')
 
     if (error) {
       const error: any = new Error('Error updating the seminar.');

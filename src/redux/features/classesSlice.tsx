@@ -97,11 +97,11 @@ export const classesSlice = createSlice({
 				state.loading = false;
 			});
 		builder.addCase(createNewClass.pending, (state, action) => {
-			toast.success("Clase creada.");
 			state.loading = true;
 		});
 		builder.addCase(createNewClass.fulfilled, (state, action) => {
 			state.classes.push(action.payload[0]);
+			toast.success("Clase creada.");
 			state.created = true;
 			state.loading = false;
 		});

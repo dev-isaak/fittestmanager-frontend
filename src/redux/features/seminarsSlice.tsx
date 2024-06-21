@@ -8,7 +8,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 interface ISeminarsSlice {
-	seminars: any;
+	seminars: any[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -48,7 +48,7 @@ export const updateSeminarInfo = createAsyncThunk(
 );
 
 export const deleteSeminarById = createAsyncThunk(
-	"classes/delete",
+	"seminars/delete",
 	async (seminarId) => {
 		const response = await deleteSeminar(seminarId);
 		return response;
@@ -102,11 +102,11 @@ export const seminarsSlice = createSlice({
 				state.loading = false;
 			});
 		builder.addCase(createNewSeminar.pending, (state, action) => {
-			toast.success("Evento / Seminario creado.");
 			state.loading = true;
 		});
 		builder.addCase(createNewSeminar.fulfilled, (state, action) => {
 			state.seminars.push(action.payload[0]);
+			toast.success("Evento / Seminario creado.");
 			state.created = true;
 			state.loading = false;
 		});
@@ -122,7 +122,7 @@ export const seminarsSlice = createSlice({
 			state.seminars = state.seminars.filter((classData) => {
 				return classData.id !== action.payload[0].id;
 			});
-			toast.success("Seminario eliminada.");
+			toast.success("Seminario eliminado.");
 
 			state.updated = true;
 			state.loading = false;
