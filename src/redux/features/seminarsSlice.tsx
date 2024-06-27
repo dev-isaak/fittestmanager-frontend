@@ -2,6 +2,7 @@ import {
 	createSeminar,
 	deleteSeminar,
 	getAllSeminars,
+	getAllSeminarsBetweenTwoDates,
 	updateSeminar,
 } from "@/app/dashboard/seminars/lib/data";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
@@ -9,6 +10,7 @@ import { toast } from "react-toastify";
 
 interface ISeminarsSlice {
 	seminars: any[];
+	weeklySeminars: any[];
 	updated: boolean;
 	created: boolean;
 	loading: boolean;
@@ -16,6 +18,7 @@ interface ISeminarsSlice {
 
 const initialState: ISeminarsSlice = {
 	seminars: [],
+	weeklySeminars: [],
 	updated: false,
 	created: false,
 	loading: false,
@@ -54,12 +57,24 @@ export const deleteSeminarById = createAsyncThunk(
 		return response;
 	}
 );
+
+export const fetchSeminarsBetweenTwoDates = createAsyncThunk(
+	"seminarsBetweenTwoDates/fetch",
+	async ({ fitnessCenterId, startDate, endDate }: any) => {
+		const response = await getAllSeminarsBetweenTwoDates(
+			fitnessCenterId,
+			startDate,
+			endDate
+		);
+		return response;
+	}
+);
 export const seminarsSlice = createSlice({
 	name: "seminars",
 	initialState,
 	reducers: {
 		seminarsCreated: (state, action) => {
-			state.created = false;
+			state.created = action.payload;
 		},
 		seminarsUpdated: (state, action) => {
 			state.updated = false;
@@ -132,6 +147,23 @@ export const seminarsSlice = createSlice({
 			state.updated = false;
 			state.loading = false;
 		});
+		builder.addCase(fetchSeminarsBetweenTwoDates.pending, (state, action) => {
+			state.loading = true;
+		}),
+			builder.addCase(
+				fetchSeminarsBetweenTwoDates.fulfilled,
+				(state, action) => {
+					state.weeklySeminars = action.payload;
+					state.loading = false;
+				}
+			),
+			builder.addCase(
+				fetchSeminarsBetweenTwoDates.rejected,
+				(state, action) => {
+					toast.error(action.error.message);
+					state.loading = false;
+				}
+			);
 	},
 });
 

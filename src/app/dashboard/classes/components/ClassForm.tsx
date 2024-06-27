@@ -17,12 +17,14 @@ import { Formik } from "formik";
 import { classFormValidation } from "../validation/classFormValidation";
 import { MuiColorInput } from "mui-color-input";
 import {
+	classesCreated,
 	createNewClass,
 	deleteClassById,
 	updateClassInfo,
 } from "@/redux/features/classesSlice";
 import HoursTable from "./HoursTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 
 type RoomFormType = {
 	classData?: any;
@@ -42,6 +44,14 @@ export default function ClassForm({
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
 	const isLoading = useAppSelector((data) => data.roomsReducer.loading);
+	const isClassCreated = useAppSelector((data) => data.classesReducer.created);
+
+	useEffect(() => {
+		if (isClassCreated) {
+			dispatch(classesCreated(false));
+			redirect("/dashboard/rooms");
+		}
+	}, [isClassCreated]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);

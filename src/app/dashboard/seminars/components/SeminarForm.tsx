@@ -19,12 +19,14 @@ import { seminarFormValidation } from "../validation/seminarFormValidation";
 import {
 	createNewSeminar,
 	deleteSeminarById,
+	seminarsCreated,
 	updateSeminarInfo,
 } from "@/redux/features/seminarsSlice";
 import { useEffect, useState } from "react";
 import { fetchRoomsByFitnessCenter } from "@/redux/features/roomsSlice";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { redirect } from "next/navigation";
 
 type SeminarFormType = {
 	seminarData?: any;
@@ -45,6 +47,14 @@ export default function SeminarForm({
 	);
 	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
 	const isLoading = useAppSelector((data) => data.roomsReducer.loading);
+	const isEventCreated = useAppSelector((data) => data.seminarsReducer.created);
+
+	useEffect(() => {
+		if (isEventCreated) {
+			dispatch(seminarsCreated(false));
+			redirect("/dashboard/rooms");
+		}
+	}, [isEventCreated]);
 
 	useEffect(() => {
 		const centerId = currentCenter.id;
@@ -73,23 +83,22 @@ export default function SeminarForm({
 	return (
 		<Formik
 			initialValues={{
-				seminarId: formType === "UPDATE" ? seminarData.id : "",
-				seminarName: formType === "UPDATE" ? seminarData.name : "",
-				seminarDescription:
-					formType === "UPDATE" ? seminarData.description : "",
+				id: formType === "UPDATE" ? seminarData.id : "",
+				name: formType === "UPDATE" ? seminarData.name : "",
+				description: formType === "UPDATE" ? seminarData.description : "",
 				color: formType === "UPDATE" ? seminarData.color?.color : "#ffffff",
-				limitCancellationTime:
+				limit_cancellation_time:
 					formType === "UPDATE" ? seminarData.limit_cancellation_time : "",
-				bookingLimitPerDay:
+				booking_limit_per_day:
 					formType === "UPDATE" ? seminarData.booking_limit_per_day : "",
-				minimumPersonsPerClass:
+				minimum_persons_per_class:
 					formType === "UPDATE" ? seminarData.minimum_persons_per_class : "",
-				limitTimeForBooking:
+				limit_time_for_booking:
 					formType === "UPDATE" ? seminarData.limit_time_for_booking : "",
-				waitingListType:
+				waiting_list_type:
 					formType === "UPDATE" ? seminarData.waiting_list_type : "",
-				calendarOrder: formType === "UPDATE" ? seminarData.calendar_order : "",
-				roomId: formType === "UPDATE" ? seminarData.room_id : "",
+				calendar_order: formType === "UPDATE" ? seminarData.calendar_order : "",
+				room_id: formType === "UPDATE" ? seminarData.room_id : "",
 				date: formType === "UPDATE" ? seminarData.date : "",
 				time: formType === "UPDATE" ? `1999-04-12T${seminarData.time}` : "",
 			}}
@@ -123,8 +132,8 @@ export default function SeminarForm({
 					alignItems='center'>
 					<TextField
 						sx={{ display: "none" }}
-						name='seminarId'
-						value={formType === "UPDATE" && values.seminarId}
+						name='seminar_id'
+						value={formType === "UPDATE" && values.id}
 					/>
 					{formType === "UPDATE" && (
 						<Stack sx={{ width: "100%", alignItems: "end" }}>
@@ -170,24 +179,20 @@ export default function SeminarForm({
 					<TextField
 						fullWidth
 						label='Nombre del evento*'
-						name='seminarName'
+						name='name'
 						onChange={handleChange}
-						error={Boolean(
-							errors.seminarName && touched.seminarName && errors.seminarName
-						)}
-						helperText={
-							errors.seminarName && touched.seminarName && errors.seminarName
-						}
-						defaultValue={values.seminarName}
+						error={Boolean(errors.name && touched.name && errors.name)}
+						helperText={errors.name && touched.name && errors.name}
+						defaultValue={values.name}
 					/>
 					<TextField
 						multiline
 						rows={3}
 						fullWidth
 						label='Descripción'
-						name='seminarDescription'
+						name='description'
 						onChange={handleChange}
-						defaultValue={values.seminarDescription}
+						defaultValue={values.description}
 					/>
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={4}>
@@ -205,8 +210,8 @@ export default function SeminarForm({
 							<TextField
 								select
 								label='Orden en el calendario'
-								value={values.calendarOrder}
-								name='calendarOrder'
+								value={values.calendar_order}
+								name='calendar_order'
 								onChange={handleChange}
 								fullWidth>
 								<MenuItem value={0}>0</MenuItem>
@@ -223,8 +228,8 @@ export default function SeminarForm({
 							<TextField
 								select
 								label='Límite de reservas por día'
-								value={values.bookingLimitPerDay}
-								name='bookingLimitPerDay'
+								value={values.booking_limit_per_day}
+								name='booking_limit_per_day'
 								onChange={handleChange}
 								helperText='0 = Sin límite'
 								fullWidth>
@@ -240,8 +245,8 @@ export default function SeminarForm({
 							<TextField
 								select
 								label='Mínimo de personas por evento'
-								value={values.minimumPersonsPerClass}
-								name='minimumPersonsPerClass'
+								value={values.minimum_persons_per_class}
+								name='minimum_persons_per_class'
 								onChange={handleChange}
 								helperText='0 = Sin mínimo'
 								fullWidth>
@@ -258,8 +263,8 @@ export default function SeminarForm({
 						<Grid item xs={12} md={4}>
 							<TextField
 								label='Tiempo límite para reservar (minutos)'
-								defaultValue={values.limitTimeForBooking}
-								name='limitTimeForBooking'
+								defaultValue={values.limit_time_for_bookings}
+								name='limit_time_for_bookings'
 								onChange={handleChange}
 								helperText='0 = Sin límite'
 								fullWidth></TextField>
@@ -267,8 +272,8 @@ export default function SeminarForm({
 						<Grid item xs={12} md={4}>
 							<TextField
 								label='Tiempo límite para cancelar (minutos)'
-								defaultValue={values.limitCancellationTime}
-								name='limitCancellationTime'
+								defaultValue={values.limit_cancellation_time}
+								name='limit_cancellation_time'
 								onChange={handleChange}
 								helperText='0 = Sin límite'
 								fullWidth></TextField>
@@ -279,8 +284,8 @@ export default function SeminarForm({
 							<TextField
 								select
 								label='Tipo de lista de espera'
-								value={values.waitingListType}
-								name='waitingListType'
+								value={values.waiting_list_type}
+								name='waiting_list_type'
 								onChange={handleChange}
 								fullWidth>
 								<MenuItem value={"auto"}>Apuntar automáticamente</MenuItem>
@@ -295,8 +300,8 @@ export default function SeminarForm({
 							<TextField
 								select
 								label='Sala'
-								value={values.roomId}
-								name='roomId'
+								value={values.room_id}
+								name='room_id'
 								onChange={handleChange}
 								fullWidth>
 								{rooms.map((room, index) => (

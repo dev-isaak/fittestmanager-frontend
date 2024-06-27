@@ -18,8 +18,9 @@ export const getAllSeminars = async (currentCenterId: number) => {
 
 export const createSeminar = async (seminarData: any, centerId: number) => {
   let finalData
+  // debugger
   const supabase = createClient()
-  const formData = { name: seminarData.seminarName, description: seminarData.seminarDescription, fitness_center_id: centerId, booking_limit_per_day: seminarData.bookingLimitPerDay, minimum_persons_per_class: seminarData.minimumPersonsPerClass, limit_time_for_booking: seminarData.limitTimeForBooking, waiting_list_type: seminarData.waitingListType, calendar_order: seminarData.calendarOrder, limit_cancellation_time: seminarData.limitCancellationTime, room_id: seminarData.roomId, date: dayjs(seminarData.date).format('YYYY-MM-DD'), time: dayjs(seminarData.time).format('HH:mm') }
+  const formData = { name: seminarData.name, description: seminarData.description, fitness_center_id: centerId, booking_limit_per_day: seminarData.booking_limit_per_day, minimum_persons_per_class: seminarData.minimum_persons_per_class, limit_time_for_booking: seminarData.limit_time_for_booking, waiting_list_type: seminarData.waiting_list_type, calendar_order: seminarData.calendar_order, limit_cancellation_time: seminarData.limit_cancellation_time, room_id: seminarData.room_id, date: dayjs(seminarData.date).format('YYYY-MM-DD'), time: dayjs(seminarData.time).format('HH:mm') }
   try {
 
     const { data, error } = await supabase
@@ -36,7 +37,7 @@ export const createSeminar = async (seminarData: any, centerId: number) => {
     const color = await createColor(data[0].id, seminarData.color)
 
     if (color) {
-      finalData = await updateSeminar({ ...formData, color: color[0].id, seminarId: data[0].id })
+      finalData = await updateSeminar({ ...formData, color: color[0].id, id: data[0].id, time: `1992-05-11T${dayjs(seminarData.time).format('HH:mm')}` })
     }
 
     return finalData
@@ -48,20 +49,22 @@ export const createSeminar = async (seminarData: any, centerId: number) => {
 
 export const updateSeminar = async (seminarData: any) => {
   const supabase = createClient()
+  // debugger
   let colorId
   if (isNaN(seminarData.color)) {
-    const color = await updateColor(seminarData.seminarId, seminarData.color)
+    const color = await updateColor(seminarData.id, seminarData.color)
     colorId = color[0].id
   } else {
     colorId = seminarData.color
   }
-  const formData = { name: seminarData.name, description: seminarData.description, color: colorId, booking_limit_per_day: seminarData.booking_limit_per_day, minimum_persons_per_class: seminarData.minimum_persons_per_class, limit_time_for_booking: seminarData.limit_time_for_booking, waiting_list_type: seminarData.waiting_list_type, calendar_order: seminarData.calendar_order, limit_cancellation_time: seminarData.limit_cancellation_time, room_id: seminarData.room_id, date: seminarData.date, time: seminarData.time }
+  // al actualizar fallta el tipo de "time"
+  const formData = { name: seminarData.name, description: seminarData.description, color: colorId, booking_limit_per_day: seminarData.booking_limit_per_day, minimum_persons_per_class: seminarData.minimum_persons_per_class, limit_time_for_booking: seminarData.limit_time_for_booking, waiting_list_type: seminarData.waiting_list_type, calendar_order: seminarData.calendar_order, limit_cancellation_time: seminarData.limit_cancellation_time, room_id: seminarData.room_id, date: typeof seminarData.date === 'string' ? seminarData.date : dayjs(seminarData.date).format('YYYY-MM-DD'), time: dayjs(seminarData.time).format('HH:mm') }
 
   try {
     const { data, error } = await supabase
       .from('seminars')
       .update(formData)
-      .eq('id', seminarData.seminarId)
+      .eq('id', seminarData.id)
       .select('*, color(*)')
 
     if (error) {
@@ -142,5 +145,34 @@ export const deleteSeminar = async (classId) => {
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
+  }
+}
+
+export const getAllSeminarsBetweenTwoDates = async (fitnessCenterId: any, startDate, endDate) => {
+  const supabase = createClient()
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+  const start = formatDate(startDate)
+  const end = formatDate(endDate)
+
+  try {
+    let { data: seminars, error } = await supabase
+      .from('seminars')
+      .select('*, color(*)')
+      .eq('fitness_center_id', fitnessCenterId)
+      .gte('date', start)
+      .lte('date', end)
+
+    if (error) {
+      const error: any = new Error('Error updating the class.');
+      error.code = 500;
+      throw error;
+    }
+
+    return seminars
+  } catch (e) {
+    console.error(e)
   }
 }

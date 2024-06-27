@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchSchedulesBetweenTwoDates } from "@/redux/features/classesScheduleSlice";
 import dayjs from "dayjs";
 import DialogForm from "@/app/ui/DialogForm";
+import { fetchSeminarsBetweenTwoDates } from "@/redux/features/seminarsSlice";
 
 export default function DisplayEvents({ currentDate }) {
 	const [openDialog, setOpenDialog] = useState(false);
@@ -17,6 +18,9 @@ export default function DisplayEvents({ currentDate }) {
 	const centerId = currentCenter.id;
 	const schedules = useAppSelector(
 		(data) => data.classesScheduleReducer.weeklySchedules
+	);
+	const seminars = useAppSelector(
+		(data) => data.seminarsReducer.weeklySeminars
 	);
 	const uniqueStartTimes = getUniqueStartTimes(schedules, currentDate);
 
@@ -40,8 +44,29 @@ export default function DisplayEvents({ currentDate }) {
 		);
 	};
 
+	// 	DISPLAY SEMINARS ON THE CALENDAR
+	const getWeeklySeminars = (
+		startDate: Date,
+		getPreviousDates: boolean = false
+	) => {
+		const startWeek = startOfWeek(new Date(startDate));
+		const endWeek = new Date(startWeek);
+		getPreviousDates
+			? endWeek.setDate(startWeek.getDate() - 7)
+			: endWeek.setDate(startWeek.getDate() + 7);
+
+		dispatch(
+			fetchSeminarsBetweenTwoDates({
+				fitnessCenterId: centerId,
+				startDate: startWeek,
+				endDate: new Date(endWeek),
+			})
+		);
+	};
+
 	useEffect(() => {
 		getWeeklyBookings(currentDate);
+		getWeeklySeminars(currentDate);
 	}, [currentCenter, currentDate]);
 
 	const handleOpenDialog = (data: any) => {
