@@ -1,6 +1,7 @@
 import {
 	bookUserToClass,
 	bookUserToWaitingList,
+	userInvited,
 } from "@/redux/features/classesScheduleSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -30,6 +31,9 @@ export default function InviteUserForm({
 }: InviteUserFormType) {
 	const dispatch = useAppDispatch();
 	const [currentSchedule, setCurrentSchedule] = useState(bookingData);
+	const isUserInvited = useAppSelector(
+		(data) => data.classesScheduleReducer.userInvited
+	);
 
 	const weeklySchedules = useAppSelector(
 		(data) => data.classesScheduleReducer.weeklySchedules
@@ -40,6 +44,13 @@ export default function InviteUserForm({
 	const waitingList = useAppSelector(
 		(data) => data.classesScheduleReducer.waitingList
 	);
+
+	useEffect(() => {
+		if (isUserInvited) {
+			dispatch(userInvited(false));
+			onCloseDialog(false);
+		}
+	}, [isUserInvited]);
 
 	useEffect(() => {
 		const schedules = weeklySchedules.filter((schedule) => {

@@ -29,6 +29,7 @@ interface IClassesScheduleSlice {
 	cancellations: any[];
 	updated: boolean;
 	created: boolean;
+	userInvited: boolean;
 	loading: boolean;
 }
 
@@ -40,6 +41,7 @@ const initialState: IClassesScheduleSlice = {
 	cancellations: [],
 	updated: false,
 	created: false,
+	userInvited: false,
 	loading: false,
 };
 
@@ -224,6 +226,9 @@ export const classesScheduleSlice = createSlice({
 		scheduleUpdated: (state, action) => {
 			state.updated = false;
 		},
+		userInvited: (state, action) => {
+			state.userInvited = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchBookingsByScheduleId.pending, (state, action) => {
@@ -356,7 +361,7 @@ export const classesScheduleSlice = createSlice({
 				return scheduleData;
 			});
 
-			state.created = true;
+			state.userInvited = true;
 			state.loading = false;
 			toast.success("Usuario apuntado.");
 		});
@@ -564,7 +569,7 @@ export const classesScheduleSlice = createSlice({
 	},
 });
 
-export const { scheduleCreated, scheduleUpdated } =
+export const { scheduleCreated, scheduleUpdated, userInvited } =
 	classesScheduleSlice.actions;
 
 export default classesScheduleSlice.reducer;
