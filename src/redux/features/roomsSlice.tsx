@@ -11,6 +11,7 @@ interface IRoomsSlice {
 	rooms: any[];
 	updated: boolean;
 	created: boolean;
+	deleted: boolean;
 	loading: boolean;
 }
 
@@ -18,6 +19,7 @@ const initialState: IRoomsSlice = {
 	rooms: [],
 	updated: false,
 	created: false,
+	deleted: false,
 	loading: false,
 };
 
@@ -65,6 +67,9 @@ export const roomsSlice = createSlice({
 		roomsCreated: (state, action) => {
 			state.created = false;
 		},
+		roomsDeleted: (state, action) => {
+			state.deleted = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchRoomsByFitnessCenter.pending, (state, action) => {
@@ -95,11 +100,12 @@ export const roomsSlice = createSlice({
 				state.loading = false;
 			});
 		builder.addCase(createNewRoom.pending, (state, action) => {
-			toast.success("Sala creada.");
 			state.loading = true;
 		});
 		builder.addCase(createNewRoom.fulfilled, (state, action) => {
+			debugger;
 			state.rooms.push(action.payload);
+			toast.success("Sala creada.");
 			state.created = true;
 			state.loading = false;
 		});
@@ -116,17 +122,17 @@ export const roomsSlice = createSlice({
 				return roomData.id !== action.payload[0].id;
 			});
 			toast.success("Sala eliminada con éxito.");
-			state.created = true;
+			state.deleted = true;
 			state.loading = false;
 		});
 		builder.addCase(deleteRoomInfo.rejected, (state, action) => {
 			toast.error(action.error.message);
-			state.created = false;
+			state.deleted = false;
 			state.loading = false;
 		});
 	},
 });
 
-export const { roomsCreated, roomsUpdated } = roomsSlice.actions;
+export const { roomsCreated, roomsUpdated, roomsDeleted } = roomsSlice.actions;
 
 export default roomsSlice.reducer;

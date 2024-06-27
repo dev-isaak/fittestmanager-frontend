@@ -1,8 +1,14 @@
-import { createNewRoom, updateRoomInfo } from "@/redux/features/roomsSlice";
+import {
+	createNewRoom,
+	roomsCreated,
+	updateRoomInfo,
+} from "@/redux/features/roomsSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Formik } from "formik";
 import { roomFormValidation } from "../validation/roomFormValidation";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 type RoomFormType = {
 	roomData?: any;
@@ -20,6 +26,14 @@ export default function RoomsForm({
 		(data) => data.fitnessCentersReducer.currentFitnessCenter
 	);
 	const isLoading = useAppSelector((data) => data.roomsReducer.loading);
+	const isRoomCreated = useAppSelector((data) => data.roomsReducer.created);
+
+	useEffect(() => {
+		if (isRoomCreated) {
+			dispatch(roomsCreated(false));
+			redirect("/dashboard/rooms");
+		}
+	}, [isRoomCreated]);
 
 	const handleCloseButton = () => {
 		onCloseDialog(false);

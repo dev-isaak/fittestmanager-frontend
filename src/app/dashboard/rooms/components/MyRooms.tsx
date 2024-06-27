@@ -20,6 +20,7 @@ import {
 	deleteRoomInfo,
 	fetchRoomsByFitnessCenter,
 	roomsCreated,
+	roomsDeleted,
 	roomsUpdated,
 } from "@/redux/features/roomsSlice";
 import DialogForm from "@/app/ui/DialogForm";
@@ -40,6 +41,7 @@ export default function MyRooms() {
 	const rooms = useAppSelector((data) => data.roomsReducer.rooms);
 	const updated = useAppSelector((data) => data.roomsReducer.updated);
 	const created = useAppSelector((data) => data.roomsReducer.created);
+	const deleted = useAppSelector((data) => data.roomsReducer.deleted);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -56,6 +58,14 @@ export default function MyRooms() {
 	}, [updated, dispatch]);
 
 	useEffect(() => {
+		if (deleted) {
+			dispatch(roomsDeleted(false));
+			setOpenDeleteDialog(false);
+			setRepeatText("");
+		}
+	}, [deleted, dispatch]);
+
+	useEffect(() => {
 		if (currentFitnessCenter.id !== 0) {
 			const centerId = currentFitnessCenter.id;
 			if (!rooms.length) {
@@ -70,7 +80,7 @@ export default function MyRooms() {
 	};
 
 	const handleDeleteRoom = (room: number) => {
-		dispatch(deleteRoomInfo(room.id));
+		dispatch(deleteRoomInfo(room));
 	};
 
 	const handleClickOpenDeleteDialog = (room) => {
@@ -80,6 +90,7 @@ export default function MyRooms() {
 
 	const handleDeleteCloseDialog = () => {
 		setOpenDeleteDialog(false);
+		setRepeatText("");
 	};
 	return (
 		<>

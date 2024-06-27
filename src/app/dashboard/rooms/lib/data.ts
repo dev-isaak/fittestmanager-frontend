@@ -23,16 +23,14 @@ export const createRoom = async (room: any, centerId: number) => {
     const { data, error } = await supabase
       .from('rooms')
       .insert(formData)
-      .select()
+      .select('*')
 
     if (error) {
       const error: any = new Error('Error creating the room.');
       error.code = 500;
       throw error;
     }
-    return data || error
-
-
+    return data
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
@@ -48,7 +46,7 @@ export const updateRoom = async (room: any) => {
       .from('rooms')
       .update(formData)
       .eq('id', room.roomId)
-      .select()
+      .select('*')
 
     if (error) {
       const error: any = new Error('Error updating the room.');
@@ -65,7 +63,6 @@ export const updateRoom = async (room: any) => {
 
 export const deleteRoom = async (roomId: number) => {
   const supabase = createClient()
-
   try {
 
     const { data, error } = await supabase
