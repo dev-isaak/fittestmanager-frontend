@@ -12,50 +12,136 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import { Stack, Switch, styled } from "@mui/material";
+import { useRouter } from "next/navigation";
 
-const tiers = [
+const mensualTiers = [
 	{
-		title: "Free",
-		price: "0",
+		id: "price_1PAY0z01f9W7dg0W7JAkJIcs",
+		title: "Basic",
+		subheader: "Recomendado",
+		price: "50",
 		description: [
-			"10 users included",
-			"2 GB of storage",
-			"Help center access",
-			"Email support",
-		],
-		buttonText: "Sign up for free",
-		buttonVariant: "outlined",
-	},
-	{
-		title: "Professional",
-		subheader: "Recommended",
-		price: "15",
-		description: [
-			"20 users included",
+			"Usuarios ilimitados",
 			"10 GB of storage",
 			"Help center access",
 			"Priority email support",
 			"Dedicated team",
 			"Best deals",
 		],
-		buttonText: "Start now",
+		buttonText: "Empezar ahora",
 		buttonVariant: "contained",
 	},
 	{
-		title: "Enterprise",
-		price: "30",
+		id: "price_1PAY2b01f9W7dg0WWAwSvut4",
+		title: "Plus",
+		price: "75",
 		description: [
-			"50 users included",
+			"Usuarios ilimitados",
 			"30 GB of storage",
 			"Help center access",
 			"Phone & email support",
 		],
 		buttonText: "Contact us",
-		buttonVariant: "outlined",
+		buttonVariant: "contained",
 	},
 ];
 
+const anualTiers = [
+	{
+		id: "price_1PAY0z01f9W7dg0WWPsmSNQe",
+		title: "Basic",
+		subheader: "Recomendado",
+		price: "45",
+		description: [
+			"Usuarios ilimitados",
+			"10 GB of storage",
+			"Help center access",
+			"Priority email support",
+			"Dedicated team",
+			"Best deals",
+		],
+		buttonText: "Empezar ahora",
+		buttonVariant: "contained",
+	},
+	{
+		id: "price_1PAY2u01f9W7dg0W94n1Zdrz",
+		title: "Plus",
+		price: "70",
+		description: [
+			"Usuarios ilimitados",
+			"30 GB of storage",
+			"Help center access",
+			"Phone & email support",
+		],
+		buttonText: "Contact us",
+		buttonVariant: "contained",
+	},
+];
+
+const AntSwitch = styled(Switch)(({}) => ({
+	width: 28,
+	height: 16,
+	padding: 0,
+	display: "flex",
+	"&:active": {
+		"& .MuiSwitch-thumb": {
+			width: 15,
+		},
+		"& .MuiSwitch-switchBase.Mui-checked": {
+			transform: "translateX(9px)",
+		},
+	},
+	"& .MuiSwitch-switchBase": {
+		padding: 2,
+		"&.Mui-checked": {
+			transform: "translateX(12px)",
+			color: "#fff",
+			"& + .MuiSwitch-track": {
+				opacity: 1,
+				backgroundColor: "lightblue",
+			},
+		},
+	},
+	"& .MuiSwitch-thumb": {
+		boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+		width: 12,
+		height: 12,
+		borderRadius: 6,
+		transition: 200,
+	},
+	"& .MuiSwitch-track": {
+		borderRadius: 16 / 2,
+		opacity: 1,
+		backgroundColor: "lightgreen",
+		boxSizing: "border-box",
+	},
+}));
+
 export default function Pricing() {
+	const router = useRouter();
+	const [anualPlan, setAnualPlan] = React.useState(false);
+	const [tiers, setTiers] = React.useState(mensualTiers);
+
+	const handlePlanPeriodChange = () => {
+		setAnualPlan(!anualPlan);
+		setTiers(tiers === mensualTiers ? anualTiers : mensualTiers);
+	};
+
+	const handlePaySubscription = async (priceId: string) => {
+		const res = await fetch("/api/checkout", {
+			method: "POST",
+			body: JSON.stringify({
+				priceId,
+			}),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		const data = await res.json();
+		router.push(data.url);
+	};
+
 	return (
 		<Container
 			id='pricing'
@@ -74,7 +160,7 @@ export default function Pricing() {
 					textAlign: { sm: "left", md: "center" },
 				}}>
 				<Typography component='h2' variant='h4' color='text.primary'>
-					Pricing
+					Precios
 				</Typography>
 				<Typography variant='body1' color='text.secondary'>
 					Quickly build an effective pricing table for your potential customers
@@ -82,6 +168,22 @@ export default function Pricing() {
 					It&apos;s built with default Material UI components with little
 					customization.
 				</Typography>
+				<Stack
+					sx={{
+						flexDirection: "row",
+						alignItems: "center",
+						gap: 1,
+						justifyContent: "center",
+						marginTop: 4,
+					}}>
+					<Typography variant='h6'>Mensual</Typography>
+					<AntSwitch
+						checked={anualPlan}
+						onChange={handlePlanPeriodChange}
+						inputProps={{ "aria-label": "ant design" }}
+					/>
+					<Typography variant='h6'>Anual</Typography>
+				</Stack>
 			</Box>
 			<Grid container spacing={3} alignItems='center' justifyContent='center'>
 				{tiers.map((tier) => (
@@ -97,13 +199,14 @@ export default function Pricing() {
 								display: "flex",
 								flexDirection: "column",
 								gap: 4,
-								border: tier.title === "Professional" ? "1px solid" : undefined,
+								borderRadius: 5,
+								border: tier.title === "Basic" ? "1px solid" : undefined,
 								borderColor:
-									tier.title === "Professional" ? "primary.main" : undefined,
+									tier.title === "Basic" ? "primary.main" : undefined,
 								background:
-									tier.title === "Professional"
-										? "linear-gradient(#033363, #021F3B)"
-										: undefined,
+									tier.title === "Basic"
+										? "linear-gradient(180deg, rgba(17,62,104,1) 0%, rgba(6,29,64,1) 100%)"
+										: "linear-gradient(180deg, rgba(247,245,245,1) 0%, rgba(170,218,222,1) 100%)",
 							}}>
 							<CardContent>
 								<Box
@@ -112,12 +215,12 @@ export default function Pricing() {
 										display: "flex",
 										justifyContent: "space-between",
 										alignItems: "center",
-										color: tier.title === "Professional" ? "grey.100" : "",
+										color: tier.title === "Basic" ? "grey.100" : "",
 									}}>
 									<Typography component='h3' variant='h6'>
 										{tier.title}
 									</Typography>
-									{tier.title === "Professional" && (
+									{tier.title === "Basic" && (
 										<Chip
 											icon={<AutoAwesomeIcon />}
 											label={tier.subheader}
@@ -127,10 +230,10 @@ export default function Pricing() {
 													theme.palette.mode === "light" ? "" : "none",
 												backgroundColor: "primary.contrastText",
 												"& .MuiChip-label": {
-													color: "primary.dark",
+													color: "white",
 												},
 												"& .MuiChip-icon": {
-													color: "primary.dark",
+													color: "yellow",
 												},
 											}}
 										/>
@@ -140,14 +243,13 @@ export default function Pricing() {
 									sx={{
 										display: "flex",
 										alignItems: "baseline",
-										color:
-											tier.title === "Professional" ? "grey.50" : undefined,
+										color: tier.title === "Basic" ? "grey.50" : undefined,
 									}}>
 									<Typography component='h3' variant='h2'>
-										${tier.price}
+										{tier.price}€
 									</Typography>
 									<Typography component='h3' variant='h6'>
-										&nbsp; per month
+										&nbsp; / mes
 									</Typography>
 								</Box>
 								<Divider
@@ -169,19 +271,13 @@ export default function Pricing() {
 										<CheckCircleRoundedIcon
 											sx={{
 												width: 20,
-												color:
-													tier.title === "Professional"
-														? "primary.light"
-														: "primary.main",
+												color: "green",
 											}}
 										/>
 										<Typography
 											variant='subtitle2'
 											sx={{
-												color:
-													tier.title === "Professional"
-														? "grey.200"
-														: undefined,
+												color: tier.title === "Basic" ? "grey.200" : undefined,
 											}}>
 											{line}
 										</Typography>
@@ -193,9 +289,7 @@ export default function Pricing() {
 									color='secondary'
 									fullWidth
 									variant={tier.buttonVariant as "outlined" | "contained"}
-									component='a'
-									href='/material-ui/getting-started/templates/checkout/'
-									target='_blank'>
+									onClick={() => handlePaySubscription(tier.id)}>
 									{tier.buttonText}
 								</Button>
 							</CardActions>

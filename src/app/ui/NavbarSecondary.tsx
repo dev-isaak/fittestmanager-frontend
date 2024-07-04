@@ -44,7 +44,7 @@ export default function NavbarSecondary() {
 		if (isHomePage) {
 			setOpen(false);
 		} else {
-			router.push("/");
+			router.push(`/#${sectionId}`);
 		}
 	};
 

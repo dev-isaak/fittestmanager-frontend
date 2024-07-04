@@ -2,7 +2,7 @@
 import { ThemeProvider } from "@emotion/react";
 import Footer from "../ui/layout/Footer";
 import theme from "../theme";
-import { Container, CssBaseline, Stack } from "@mui/material";
+import { CssBaseline, Stack } from "@mui/material";
 import AuthForm from "../ui/AuthForm";
 
 export default function SignUpPage() {
