@@ -1,12 +1,29 @@
 "use client";
-import { Box, Button, Grid, Stack, TextField } from "@mui/material";
+import {
+	Box,
+	Button,
+	Grid,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from "@mui/material";
 import { Formik } from "formik";
 import { createAccountFormValidation } from "../validation/createAccountFormValidation";
 
 export const CreateAccountForm = ({ setStep, userData, setUserData }) => {
 	return (
-		<Box sx={{ width: "100%" }}>
-			<h2>1. Crea una cuenta</h2>
+		<Paper
+			sx={{
+				display: "flex",
+				flexDirection: "column",
+				gap: 3,
+				background: "#f5f5f5",
+				padding: 4,
+			}}>
+			<Typography component='h2' variant='h4'>
+				Crea una cuenta
+			</Typography>
 			<Formik
 				initialValues={{
 					customerName: userData ? userData.customerName : "",
@@ -31,67 +48,66 @@ export const CreateAccountForm = ({ setStep, userData, setUserData }) => {
 						component='form'
 						onSubmit={handleSubmit}
 						gap={2}
-						minWidth={400}
 						alignItems='center'>
-						<Grid container spacing={2}>
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Nombre'
-									name='customerName'
-									onChange={handleChange}
-									defaultValue={values.customerName}
-								/>
-							</Grid>
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Apellidos'
-									name='customerLastname'
-									onChange={handleChange}
-									defaultValue={values.customerLastname}
-								/>
-							</Grid>
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Correo electrónico'
-									name='customerEmail'
-									onChange={handleChange}
-									defaultValue={values.customerEmail}
-								/>
-							</Grid>
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Repetir correo electrónico'
-									name='repeatCustomerEmail'
-								/>
-							</Grid>
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Contraseña'
-									name='password'
-									onChange={handleChange}
-								/>
-							</Grid>
+						{/* <Grid container spacing={2}>
+							<Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Nombre'
+							name='customerName'
+							onChange={handleChange}
+							defaultValue={values.customerName}
+						/>
+						{/* </Grid> */}
+						{/* <Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Apellidos'
+							name='customerLastname'
+							onChange={handleChange}
+							defaultValue={values.customerLastname}
+						/>
+						{/* </Grid> */}
+						{/* <Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Correo electrónico'
+							name='customerEmail'
+							onChange={handleChange}
+							defaultValue={values.customerEmail}
+						/>
+						{/* </Grid> */}
+						{/* <Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Repetir correo electrónico'
+							name='repeatCustomerEmail'
+						/>
+						{/* </Grid> */}
+						{/* <Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Contraseña'
+							name='password'
+							onChange={handleChange}
+						/>
+						{/* </Grid> */}
 
-							<Grid item xs={12} md={6}>
-								<TextField
-									fullWidth
-									label='Repetir contraseña'
-									name='repeatPassword'
-								/>
-							</Grid>
-						</Grid>
+						{/* <Grid item xs={12} md={6}> */}
+						<TextField
+							fullWidth
+							label='Repetir contraseña'
+							name='repeatPassword'
+						/>
+						{/* </Grid> */}
+						{/* </Grid> */}
 
-						<Button type='submit' variant='contained'>
+						<Button type='submit' variant='contained' fullWidth>
 							Crear usuario
 						</Button>
 					</Stack>
 				)}
 			</Formik>
-		</Box>
+		</Paper>
 	);
 };
