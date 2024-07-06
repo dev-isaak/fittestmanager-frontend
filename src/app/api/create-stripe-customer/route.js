@@ -1,28 +1,31 @@
 import { Stripe } from "stripe";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
-	const { priceId } = await request.json();
-	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+	const { name, phone, address, customerEmail } = await request.json();
+	const { line1, line2, city, country, postal_code, state } = address;
 
-	const customer = await stripe.customers.create({
-		email: "{{CUSTOMER_EMAIL}}",
-		name: "{{CUSTOMER_NAME}}",
-		shipping: {
+	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+	let customer;
+	try {
+		customer = await stripe.customers.create({
+			// payment_method: paymentMethod.id,
+			email: customerEmail,
+			name,
+			phone,
 			address: {
-				city: "Brothers",
-				country: "US",
-				line1: "27 Fredrick Ave",
-				postal_code: "97712",
-				state: "CA",
+				city,
+				country,
+				line1,
+				line2: line2 ? line2 : "",
+				postal_code,
+				state,
 			},
-			name: "{{CUSTOMER_NAME}}",
-		},
-		address: {
-			city: "Brothers",
-			country: "US",
-			line1: "27 Fredrick Ave",
-			postal_code: "97712",
-			state: "CA",
-		},
-	});
+		});
+		// console.log(customer);
+	} catch (error) {
+		console.error(error);
+	}
+
+	return NextResponse.json({ customer_id: customer.id });
 }

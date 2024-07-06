@@ -19,6 +19,7 @@ const mensualTiers = [
 	{
 		id: "price_1PAY0z01f9W7dg0W7JAkJIcs",
 		title: "Basic",
+		type: "monthly",
 		subheader: "Recomendado",
 		price: "50",
 		description: [
@@ -35,6 +36,7 @@ const mensualTiers = [
 	{
 		id: "price_1PAY2b01f9W7dg0WWAwSvut4",
 		title: "Plus",
+		type: "monthly",
 		price: "75",
 		description: [
 			"Usuarios ilimitados",
@@ -51,6 +53,7 @@ const anualTiers = [
 	{
 		id: "price_1PAY0z01f9W7dg0WWPsmSNQe",
 		title: "Basic",
+		type: "anually",
 		subheader: "Recomendado",
 		price: "45",
 		description: [
@@ -67,6 +70,7 @@ const anualTiers = [
 	{
 		id: "price_1PAY2u01f9W7dg0W94n1Zdrz",
 		title: "Plus",
+		type: "anually",
 		price: "70",
 		description: [
 			"Usuarios ilimitados",
@@ -128,18 +132,10 @@ export default function Pricing() {
 		setTiers(tiers === mensualTiers ? anualTiers : mensualTiers);
 	};
 
-	const handlePaySubscription = async (priceId: string) => {
-		const res = await fetch("/api/checkout", {
-			method: "POST",
-			body: JSON.stringify({
-				priceId,
-			}),
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-		const data = await res.json();
-		router.push(data.url);
+	const handlePaySubscription = async (tier: any) => {
+		router.push(
+			`/checkout?price_id=${tier.id}&title=${tier.title}&price=${tier.price}&type=${tier.type}`
+		);
 	};
 
 	return (
@@ -289,7 +285,7 @@ export default function Pricing() {
 									color='secondary'
 									fullWidth
 									variant={tier.buttonVariant as "outlined" | "contained"}
-									onClick={() => handlePaySubscription(tier.id)}>
+									onClick={() => handlePaySubscription(tier)}>
 									{tier.buttonText}
 								</Button>
 							</CardActions>

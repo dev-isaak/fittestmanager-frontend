@@ -21,7 +21,10 @@ export const CreateAccountForm = ({ setStep, userData, setUserData }) => {
 				background: "#f5f5f5",
 				padding: 4,
 			}}>
-			<Typography component='h2' variant='h4'>
+			<Typography
+				component='h2'
+				variant='h4'
+				sx={{ color: "#4f4f4f", fontWeight: 900, textAlign: "center" }}>
 				Crea una cuenta
 			</Typography>
 			<Formik

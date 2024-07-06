@@ -14,14 +14,21 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { CreateAccountForm } from "./forms/CreateAccountForm";
-import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
+import { useSearchParams } from "next/navigation";
+import { CheckoutForm } from "./forms/CheckoutForm";
 
 export default function CheckoutPage() {
+	const searchParams = useSearchParams();
+	const selectedPriceId = searchParams.get("price_id");
+	const selectedPriceType = searchParams.get("type");
+	const selectedPriceTitle = searchParams.get("title");
+	const selectedPriceAmount = searchParams.get("price");
 	const [step, setStep] = useState(0);
 	const [userData, setUserData] = useState({});
 	const [addressData, setAddressData] = useState({});
+	const [customerId, setCustomerId] = useState();
 	const stripePromise = loadStripe(
 		"pk_test_51PA7ft01f9W7dg0WMsCHiZ5lGyWR7Bj5Xj3KXJSTmoFB9AOAXjcXni7SuxZjx9DyE9cItvOPyTcnTtK8gAfRUvvq00NmxowwmO"
 	);
@@ -31,15 +38,29 @@ export default function CheckoutPage() {
 		}
 	};
 
-	const handleAddress = (e) => {
-		console.log(e);
-		setAddressData(e.value);
-	};
+	// const handleSetAddress = async () => {
+	// 	setStep(step + 1);
+	// 	const res = await fetch("/api/create-stripe-customer", {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify({ ...userData, ...addressData }),
+	// 	});
+	// 	const id = await res.json();
+	// 	setCustomerId(id.customer_id);
+	// };
 
-	const handleSetAddress = () => {
-		console.log(addressData);
-		setStep(step + 1);
-	};
+	// const handleSubscription = async (e) => {
+	// 	const res = await fetch("/api/create-subscription", {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify({ customerId, priceId: selectedPriceId }),
+	// 	});
+	// 	// const id = await res.json();
+	// };
 
 	const stepperStyle = {
 		paddingX: 2,
@@ -67,7 +88,7 @@ export default function CheckoutPage() {
 	const options: StripeElementsOptions = {
 		mode: "subscription",
 		amount: 0,
-		currency: "usd",
+		currency: "eur",
 		appearance: {
 			theme: "stripe",
 		},
@@ -96,10 +117,14 @@ export default function CheckoutPage() {
 					</Stack>
 					<Grid container spacing={2} sx={{ maxWidth: 900 }}>
 						<Grid item xs={12} md={6}>
-							<Typography component='h2' variant='h4'>
-								Subscripción
+							<Typography
+								component='h2'
+								variant='h4'
+								sx={{ color: "#333", fontWeight: 900 }}>
+								Subscripción {selectedPriceTitle}
 							</Typography>
-							<Typography variant='h3'>0€</Typography>
+							<Typography>{selectedPriceType}</Typography>
+							<Typography variant='h3'>{selectedPriceAmount}€</Typography>
 						</Grid>
 						<Grid item xs={12} md={6}>
 							{step === 0 && (
@@ -118,40 +143,26 @@ export default function CheckoutPage() {
 										background: "#f5f5f5",
 										padding: 4,
 									}}>
-									<Typography component='h2' variant='h4'>
+									<Typography
+										component='h2'
+										variant='h4'
+										sx={{
+											color: "#4f4f4f",
+											fontWeight: 900,
+											textAlign: "center",
+										}}>
 										Datos de facturación
 									</Typography>
-									<AddressElement
-										onChange={handleAddress}
-										options={{
-											mode: "billing",
-											defaultValues: {
-												name: userData.customerName
-													? `${userData.customerName} ${userData.customerLastname}`
-													: "",
-												address: {
-													line1: addressData?.address
-														? addressData.address.line1
-														: "",
-													country: addressData?.address
-														? addressData.address.country
-														: "",
-												},
-											},
-											fields: {
-												phone: "always",
-											},
-										}}
-									/>
-									<Stack sx={{ marginTop: 2 }}>
+									<CheckoutForm userData={userData} />
+									{/* <Stack sx={{ marginTop: 2 }}>
 										<Button variant='contained' onClick={handleSetAddress}>
 											Siguiente
 										</Button>
-									</Stack>
+									</Stack> */}
 								</Paper>
 							)}
 							{/* https://docs.stripe.com/billing/subscriptions/build-subscriptions?ui=elements */}
-							{step === 2 && (
+							{step === 2 && customerId && (
 								<Paper
 									sx={{
 										display: "flex",
@@ -161,12 +172,18 @@ export default function CheckoutPage() {
 										padding: 4,
 									}}>
 									<Stack sx={{ gap: 3 }}>
-										<Typography component='h2' variant='h4'>
+										<Typography
+											component='h2'
+											variant='h4'
+											sx={{
+												color: "#4f4f4f",
+												fontWeight: 900,
+												textAlign: "center",
+											}}>
 											Pago
 										</Typography>
-										<PaymentElement />
 										<Stack sx={{ marginTop: 2 }}>
-											<Button variant='contained' onClick={handleAddress}>
+											<Button variant='contained' onClick={handleSubscription}>
 												Subscribirse
 											</Button>
 										</Stack>
