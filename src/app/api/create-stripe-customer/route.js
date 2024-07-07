@@ -2,15 +2,14 @@ import { Stripe } from "stripe";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
-	const { name, phone, address, customerEmail } = await request.json();
+	const { name, phone, address, email } = await request.json();
 	const { line1, line2, city, country, postal_code, state } = address;
 
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 	let customer;
 	try {
 		customer = await stripe.customers.create({
-			// payment_method: paymentMethod.id,
-			email: customerEmail,
+			email,
 			name,
 			phone,
 			address: {
@@ -22,7 +21,6 @@ export async function POST(request) {
 				state,
 			},
 		});
-		// console.log(customer);
 	} catch (error) {
 		console.error(error);
 	}

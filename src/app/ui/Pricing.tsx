@@ -19,7 +19,7 @@ const mensualTiers = [
 	{
 		id: "price_1PAY0z01f9W7dg0W7JAkJIcs",
 		title: "Basic",
-		type: "monthly",
+		type: "mensual",
 		subheader: "Recomendado",
 		price: "50",
 		description: [
@@ -36,7 +36,7 @@ const mensualTiers = [
 	{
 		id: "price_1PAY2b01f9W7dg0WWAwSvut4",
 		title: "Plus",
-		type: "monthly",
+		type: "mensual",
 		price: "75",
 		description: [
 			"Usuarios ilimitados",
@@ -51,11 +51,11 @@ const mensualTiers = [
 
 const anualTiers = [
 	{
-		id: "price_1PAY0z01f9W7dg0WWPsmSNQe",
+		id: "price_1PZdY401f9W7dg0WQ6Qd1tUh",
 		title: "Basic",
-		type: "anually",
+		type: "anual",
 		subheader: "Recomendado",
-		price: "45",
+		price: "540",
 		description: [
 			"Usuarios ilimitados",
 			"10 GB of storage",
@@ -70,7 +70,7 @@ const anualTiers = [
 	{
 		id: "price_1PAY2u01f9W7dg0W94n1Zdrz",
 		title: "Plus",
-		type: "anually",
+		type: "anual",
 		price: "70",
 		description: [
 			"Usuarios ilimitados",

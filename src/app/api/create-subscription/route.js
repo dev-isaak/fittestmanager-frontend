@@ -16,6 +16,7 @@ export async function POST(request) {
 		payment_behavior: "default_incomplete",
 		payment_settings: { save_default_payment_method: "on_subscription" },
 		expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
+		trial_period_days: 15,
 	});
 
 	console.log(subscription);
@@ -32,6 +33,7 @@ export async function POST(request) {
 	// 	});
 	// }
 	return NextResponse.json({
-		client_secret: subscription.latest_invoice.payment_intent.client_secret,
+		// client_secret: subscription.latest_invoice.payment_intent.client_secret,
+		client_secret: subscription.pending_setup_intent.client_secret,
 	});
 }

@@ -1,3 +1,5 @@
+import { createClient } from "@/app/utils/supabase/client";
+
 export const createStripeCustomer = async ({ userData, addressData }) => {
   try {
     const res = await fetch("/api/create-stripe-customer", {
@@ -32,4 +34,16 @@ export const createStripeSubscription = async ({ customerId, priceId }) => {
   } catch (e) {
     console.error(e)
   }
+}
+
+export async function signUpNewUser({ email, password }) {
+  const supabase = createClient()
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    // options: {
+    //   emailRedirectTo: 'https://example.com/welcome',
+    // },
+  })
+  return { data, error }
 }
