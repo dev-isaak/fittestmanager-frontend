@@ -14,6 +14,7 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { Stack, Switch, styled } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { getStripePrices, getStripeProducts } from "../lib/pricings";
 
 const mensualTiers = [
 	{
@@ -125,11 +126,30 @@ const AntSwitch = styled(Switch)(({}) => ({
 export default function Pricing() {
 	const router = useRouter();
 	const [anualPlan, setAnualPlan] = React.useState(false);
-	const [tiers, setTiers] = React.useState(mensualTiers);
+	const [tiers, setTiers] = React.useState([]);
+	const [prices, setPrices] = React.useState([]);
+
+	React.useEffect(() => {
+		const getPrices = async () => {
+			const stripePrices = await getStripePrices();
+			setPrices(stripePrices);
+			return stripePrices;
+		};
+		getPrices();
+	}, []);
+
+	React.useEffect(() => {
+		if (anualPlan) {
+			const anualTiers = prices.filter((price) => price.interval === "year");
+			setTiers(anualTiers);
+		} else {
+			const monthlyTiers = prices.filter((price) => price.interval === "month");
+			setTiers(monthlyTiers);
+		}
+	}, [anualPlan, prices]);
 
 	const handlePlanPeriodChange = () => {
 		setAnualPlan(!anualPlan);
-		setTiers(tiers === mensualTiers ? anualTiers : mensualTiers);
 	};
 
 	const handlePaySubscription = async (tier: any) => {
@@ -182,116 +202,138 @@ export default function Pricing() {
 				</Stack>
 			</Box>
 			<Grid container spacing={3} alignItems='center' justifyContent='center'>
-				{tiers.map((tier) => (
-					<Grid
-						item
-						key={tier.title}
-						xs={12}
-						sm={tier.title === "Enterprise" ? 12 : 6}
-						md={4}>
-						<Card
-							sx={{
-								p: 2,
-								display: "flex",
-								flexDirection: "column",
-								gap: 4,
-								borderRadius: 5,
-								border: tier.title === "Basic" ? "1px solid" : undefined,
-								borderColor:
-									tier.title === "Basic" ? "primary.main" : undefined,
-								background:
-									tier.title === "Basic"
-										? "linear-gradient(180deg, rgba(17,62,104,1) 0%, rgba(6,29,64,1) 100%)"
-										: "linear-gradient(180deg, rgba(247,245,245,1) 0%, rgba(170,218,222,1) 100%)",
-							}}>
-							<CardContent>
-								<Box
-									sx={{
-										mb: 1,
-										display: "flex",
-										justifyContent: "space-between",
-										alignItems: "center",
-										color: tier.title === "Basic" ? "grey.100" : "",
-									}}>
-									<Typography component='h3' variant='h6'>
-										{tier.title}
-									</Typography>
-									{tier.title === "Basic" && (
-										<Chip
-											icon={<AutoAwesomeIcon />}
-											label={tier.subheader}
-											size='small'
-											sx={{
-												background: (theme) =>
-													theme.palette.mode === "light" ? "" : "none",
-												backgroundColor: "primary.contrastText",
-												"& .MuiChip-label": {
-													color: "white",
-												},
-												"& .MuiChip-icon": {
-													color: "yellow",
-												},
-											}}
-										/>
-									)}
-								</Box>
-								<Box
-									sx={{
-										display: "flex",
-										alignItems: "baseline",
-										color: tier.title === "Basic" ? "grey.50" : undefined,
-									}}>
-									<Typography component='h3' variant='h2'>
-										{tier.price}€
-									</Typography>
-									<Typography component='h3' variant='h6'>
-										&nbsp; / mes
-									</Typography>
-								</Box>
-								<Divider
-									sx={{
-										my: 2,
-										opacity: 0.2,
-										borderColor: "grey.500",
-									}}
-								/>
-								{tier.description.map((line) => (
-									<Box
-										key={line}
+				{tiers.length &&
+					tiers
+						.sort(
+							(a, b) => parseInt(a.metadata.sort) - parseInt(b.metadata.sort)
+						)
+						.map((tier) => {
+							let pros;
+							if (tier.metadata) {
+								pros = tier.metadata.pros.split([","]);
+							}
+							return (
+								<Grid
+									item
+									key={tier.title}
+									xs={12}
+									sm={tier.title === "Enterprise" ? 12 : 6}
+									md={4}>
+									<Card
 										sx={{
-											py: 1,
+											p: 2,
 											display: "flex",
-											gap: 1.5,
-											alignItems: "center",
+											flexDirection: "column",
+											gap: 4,
+											borderRadius: 5,
+											border:
+												tier.product_id.name === "Básico"
+													? "1px solid"
+													: undefined,
+											borderColor:
+												tier.product_id.name === "Básico"
+													? "primary.main"
+													: undefined,
+											background:
+												tier.product_id.name === "Básico"
+													? "linear-gradient(180deg, rgba(17,62,104,1) 0%, rgba(6,29,64,1) 100%)"
+													: "linear-gradient(180deg, rgba(247,245,245,1) 0%, rgba(170,218,222,1) 100%)",
 										}}>
-										<CheckCircleRoundedIcon
-											sx={{
-												width: 20,
-												color: "green",
-											}}
-										/>
-										<Typography
-											variant='subtitle2'
-											sx={{
-												color: tier.title === "Basic" ? "grey.200" : undefined,
-											}}>
-											{line}
-										</Typography>
-									</Box>
-								))}
-							</CardContent>
-							<CardActions>
-								<Button
-									color='secondary'
-									fullWidth
-									variant={tier.buttonVariant as "outlined" | "contained"}
-									onClick={() => handlePaySubscription(tier)}>
-									{tier.buttonText}
-								</Button>
-							</CardActions>
-						</Card>
-					</Grid>
-				))}
+										<CardContent>
+											<Box
+												sx={{
+													mb: 1,
+													display: "flex",
+													justifyContent: "space-between",
+													alignItems: "center",
+													color:
+														tier.product_id.name === "Básico" ? "grey.100" : "",
+												}}>
+												<Typography component='h3' variant='h6'>
+													{tier.product_id.name}
+												</Typography>
+												{tier.product_id.name === "Básico" && (
+													<Chip
+														icon={<AutoAwesomeIcon />}
+														label='Recomendado'
+														size='small'
+														sx={{
+															background: (theme) =>
+																theme.palette.mode === "light" ? "" : "none",
+															backgroundColor: "primary.contrastText",
+															"& .MuiChip-label": {
+																color: "white",
+															},
+															"& .MuiChip-icon": {
+																color: "yellow",
+															},
+														}}
+													/>
+												)}
+											</Box>
+											<Box
+												sx={{
+													display: "flex",
+													alignItems: "baseline",
+													color:
+														tier.product_id.name === "Básico"
+															? "grey.50"
+															: undefined,
+												}}>
+												<Typography component='h3' variant='h2'>
+													{tier.unit_amount / 100}€
+												</Typography>
+												<Typography component='h3' variant='h6'>
+													&nbsp; / {tier.interval}
+												</Typography>
+											</Box>
+											<Divider
+												sx={{
+													my: 2,
+													opacity: 0.2,
+													borderColor: "grey.500",
+												}}
+											/>
+											{pros?.map((line) => (
+												<Box
+													key={line}
+													sx={{
+														py: 1,
+														display: "flex",
+														gap: 1.5,
+														alignItems: "center",
+													}}>
+													<CheckCircleRoundedIcon
+														sx={{
+															width: 20,
+															color: "green",
+														}}
+													/>
+													<Typography
+														variant='subtitle2'
+														sx={{
+															color:
+																tier.title === "Basic" ? "grey.200" : undefined,
+														}}>
+														{line}
+													</Typography>
+												</Box>
+											))}
+										</CardContent>
+										<CardActions>
+											<Button
+												color='secondary'
+												fullWidth
+												variant='contained'
+												onClick={() => handlePaySubscription(tier)}>
+												{/* {tier.buttonText} */}
+												Subscribirse
+											</Button>
+										</CardActions>
+									</Card>
+								</Grid>
+							);
+						})}
 			</Grid>
 		</Container>
 	);

@@ -70,7 +70,7 @@ export const updateSchedule = async (scheduleData: any) => {
       throw error;
     }
 
-    return data || error
+    return data
   } catch (e: any) {
     console.error(e)
     return { error: e.message, code: e.code }
