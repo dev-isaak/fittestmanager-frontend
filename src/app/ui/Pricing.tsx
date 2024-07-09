@@ -11,78 +11,78 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import { Stack, Switch, styled } from "@mui/material";
+import DoneRoundedIcon from "@mui/icons-material/DoneRounded";
+import { Skeleton, Stack, Switch, styled } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { getStripePrices, getStripeProducts } from "../lib/pricings";
+import { getStripePrices } from "../lib/pricings";
 
-const mensualTiers = [
-	{
-		id: "price_1PAY0z01f9W7dg0W7JAkJIcs",
-		title: "Basic",
-		type: "mensual",
-		subheader: "Recomendado",
-		price: "50",
-		description: [
-			"Usuarios ilimitados",
-			"10 GB of storage",
-			"Help center access",
-			"Priority email support",
-			"Dedicated team",
-			"Best deals",
-		],
-		buttonText: "Empezar ahora",
-		buttonVariant: "contained",
-	},
-	{
-		id: "price_1PAY2b01f9W7dg0WWAwSvut4",
-		title: "Plus",
-		type: "mensual",
-		price: "75",
-		description: [
-			"Usuarios ilimitados",
-			"30 GB of storage",
-			"Help center access",
-			"Phone & email support",
-		],
-		buttonText: "Contact us",
-		buttonVariant: "contained",
-	},
-];
+// const mensualTiers = [
+// 	{
+// 		id: "price_1PAY0z01f9W7dg0W7JAkJIcs",
+// 		title: "Basic",
+// 		type: "mensual",
+// 		subheader: "Recomendado",
+// 		price: "50",
+// 		description: [
+// 			"Usuarios ilimitados",
+// 			"10 GB of storage",
+// 			"Help center access",
+// 			"Priority email support",
+// 			"Dedicated team",
+// 			"Best deals",
+// 		],
+// 		buttonText: "Empezar ahora",
+// 		buttonVariant: "contained",
+// 	},
+// 	{
+// 		id: "price_1PAY2b01f9W7dg0WWAwSvut4",
+// 		title: "Plus",
+// 		type: "mensual",
+// 		price: "75",
+// 		description: [
+// 			"Usuarios ilimitados",
+// 			"30 GB of storage",
+// 			"Help center access",
+// 			"Phone & email support",
+// 		],
+// 		buttonText: "Contact us",
+// 		buttonVariant: "contained",
+// 	},
+// ];
 
-const anualTiers = [
-	{
-		id: "price_1PZdY401f9W7dg0WQ6Qd1tUh",
-		title: "Basic",
-		type: "anual",
-		subheader: "Recomendado",
-		price: "540",
-		description: [
-			"Usuarios ilimitados",
-			"10 GB of storage",
-			"Help center access",
-			"Priority email support",
-			"Dedicated team",
-			"Best deals",
-		],
-		buttonText: "Empezar ahora",
-		buttonVariant: "contained",
-	},
-	{
-		id: "price_1PAY2u01f9W7dg0W94n1Zdrz",
-		title: "Plus",
-		type: "anual",
-		price: "70",
-		description: [
-			"Usuarios ilimitados",
-			"30 GB of storage",
-			"Help center access",
-			"Phone & email support",
-		],
-		buttonText: "Contact us",
-		buttonVariant: "contained",
-	},
-];
+// const anualTiers = [
+// 	{
+// 		id: "price_1PZdY401f9W7dg0WQ6Qd1tUh",
+// 		title: "Basic",
+// 		type: "anual",
+// 		subheader: "Recomendado",
+// 		price: "540",
+// 		description: [
+// 			"Usuarios ilimitados",
+// 			"10 GB of storage",
+// 			"Help center access",
+// 			"Priority email support",
+// 			"Dedicated team",
+// 			"Best deals",
+// 		],
+// 		buttonText: "Empezar ahora",
+// 		buttonVariant: "contained",
+// 	},
+// 	{
+// 		id: "price_1PAY2u01f9W7dg0W94n1Zdrz",
+// 		title: "Plus",
+// 		type: "anual",
+// 		price: "70",
+// 		description: [
+// 			"Usuarios ilimitados",
+// 			"30 GB of storage",
+// 			"Help center access",
+// 			"Phone & email support",
+// 		],
+// 		buttonText: "Contact us",
+// 		buttonVariant: "contained",
+// 	},
+// ];
 
 const AntSwitch = styled(Switch)(({}) => ({
 	width: 28,
@@ -153,8 +153,13 @@ export default function Pricing() {
 	};
 
 	const handlePaySubscription = async (tier: any) => {
+		let interval;
+		if (tier.interval === "month") interval = "mensual";
+		else interval = "anual";
 		router.push(
-			`/checkout?price_id=${tier.id}&title=${tier.title}&price=${tier.price}&type=${tier.type}`
+			`/checkout?price_id=${tier.id}&title=${tier.product_id.name}&price=${
+				tier.unit_amount / 100
+			}&type=${interval}`
 		);
 	};
 
@@ -202,7 +207,7 @@ export default function Pricing() {
 				</Stack>
 			</Box>
 			<Grid container spacing={3} alignItems='center' justifyContent='center'>
-				{tiers.length &&
+				{tiers.length ? (
 					tiers
 						.sort(
 							(a, b) => parseInt(a.metadata.sort) - parseInt(b.metadata.sort)
@@ -227,15 +232,15 @@ export default function Pricing() {
 											gap: 4,
 											borderRadius: 5,
 											border:
-												tier.product_id.name === "Básico"
+												tier.product_id.name === "Basic"
 													? "1px solid"
 													: undefined,
 											borderColor:
-												tier.product_id.name === "Básico"
+												tier.product_id.name === "Basic"
 													? "primary.main"
 													: undefined,
 											background:
-												tier.product_id.name === "Básico"
+												tier.product_id.name === "Basic"
 													? "linear-gradient(180deg, rgba(17,62,104,1) 0%, rgba(6,29,64,1) 100%)"
 													: "linear-gradient(180deg, rgba(247,245,245,1) 0%, rgba(170,218,222,1) 100%)",
 										}}>
@@ -247,12 +252,12 @@ export default function Pricing() {
 													justifyContent: "space-between",
 													alignItems: "center",
 													color:
-														tier.product_id.name === "Básico" ? "grey.100" : "",
+														tier.product_id.name === "Basic" ? "grey.100" : "",
 												}}>
 												<Typography component='h3' variant='h6'>
 													{tier.product_id.name}
 												</Typography>
-												{tier.product_id.name === "Básico" && (
+												{tier.product_id.name === "Basic" && (
 													<Chip
 														icon={<AutoAwesomeIcon />}
 														label='Recomendado'
@@ -276,7 +281,7 @@ export default function Pricing() {
 													display: "flex",
 													alignItems: "baseline",
 													color:
-														tier.product_id.name === "Básico"
+														tier.product_id.name === "Basic"
 															? "grey.50"
 															: undefined,
 												}}>
@@ -284,9 +289,20 @@ export default function Pricing() {
 													{tier.unit_amount / 100}€
 												</Typography>
 												<Typography component='h3' variant='h6'>
-													&nbsp; / {tier.interval}
+													&nbsp; / {tier.interval === "month" ? "mes" : "año"}
 												</Typography>
 											</Box>
+											{tier.interval === "year" && (
+												<Typography
+													variant='body2'
+													sx={{
+														marginTop: -2,
+														color:
+															tier.product_id.name === "Basic" && "#f5f5f5",
+													}}>
+													{tier.unit_amount / 100 / 12}€ / mes
+												</Typography>
+											)}
 											<Divider
 												sx={{
 													my: 2,
@@ -303,17 +319,20 @@ export default function Pricing() {
 														gap: 1.5,
 														alignItems: "center",
 													}}>
-													<CheckCircleRoundedIcon
+													<DoneRoundedIcon
 														sx={{
-															width: 20,
+															width: 30,
 															color: "green",
+															marginRight: -1,
 														}}
 													/>
 													<Typography
 														variant='subtitle2'
 														sx={{
 															color:
-																tier.title === "Basic" ? "grey.200" : undefined,
+																tier.product_id.name === "Basic"
+																	? "#f5f5f5"
+																	: "#333",
 														}}>
 														{line}
 													</Typography>
@@ -322,7 +341,11 @@ export default function Pricing() {
 										</CardContent>
 										<CardActions>
 											<Button
-												color='secondary'
+												color={
+													tier.product_id.name === "Basic"
+														? "secondary"
+														: "primary"
+												}
 												fullWidth
 												variant='contained'
 												onClick={() => handlePaySubscription(tier)}>
@@ -333,7 +356,13 @@ export default function Pricing() {
 									</Card>
 								</Grid>
 							);
-						})}
+						})
+				) : (
+					<Box sx={{ display: "flex", gap: 2, m: 0, p: 0 }}>
+						<Skeleton variant='rounded' width={375} height={550} />
+						<Skeleton variant='rounded' width={375} height={550} />
+					</Box>
+				)}
 			</Grid>
 		</Container>
 	);
