@@ -111,27 +111,27 @@ const theme: ThemeOptions = createTheme({
 				},
 			},
 		},
-		MuiTabs: {
-			styleOverrides: {
-				indicator: {
-					backgroundColor: "#f5f5f5",
-				},
-			},
-		},
-		MuiTab: {
-			styleOverrides: {
-				root: {
-					"&.Mui-selected": {
-						background: "rgb(241, 245, 249)",
-						borderRadius: "10px 10px 0px 0px",
-						boxShadow: "4px 4px 10px lightgray",
-					},
-					"&.MuiTabs-indicator": {
-						backgroundColor: "red",
-					},
-				},
-			},
-		},
+		// MuiTabs: {
+		// 	styleOverrides: {
+		// 		indicator: {
+		// 			backgroundColor: "#f5f5f5",
+		// 		},
+		// 	},
+		// },
+		// MuiTab: {
+		// 	styleOverrides: {
+		// 		root: {
+		// 			"&.Mui-selected": {
+		// 				background: "rgb(241, 245, 249)",
+		// 				borderRadius: "10px 10px 0px 0px",
+		// 				boxShadow: "4px 4px 10px lightgray",
+		// 			},
+		// 			"&.MuiTabs-indicator": {
+		// 				backgroundColor: "red",
+		// 			},
+		// 		},
+		// 	},
+		// },
 		MuiAvatar: {
 			styleOverrides: {
 				root: {

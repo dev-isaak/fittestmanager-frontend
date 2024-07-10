@@ -15,14 +15,17 @@ import { toast } from "react-toastify";
 import AlertMessage from "../ui/AlertMessage";
 import { useRouter } from "next/navigation";
 import { createClient } from "../utils/supabase/client";
-import { Stack } from "@mui/material";
+import { CircularProgress, Stack } from "@mui/material";
+import { useState } from "react";
 
 export default function SignIn() {
 	const router = useRouter();
 	const supabase = createClient();
+	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setLoading(true);
 		const data = new FormData(event.currentTarget);
 		const userCredentials = {
 			email: data.get("email") as string,
@@ -31,9 +34,11 @@ export default function SignIn() {
 		const { error } = await supabase.auth.signInWithPassword(userCredentials);
 		if (error) {
 			toast.error(error.message);
+			setLoading(false);
 			throw new Error(error.message);
 		}
 		router.push("/dashboard");
+		setLoading(false);
 	};
 
 	return (
@@ -73,14 +78,18 @@ export default function SignIn() {
 						control={<Checkbox value='remember' color='primary' />}
 						label='Remember me'
 					/>
-					<Button
-						color='primary'
-						type='submit'
-						fullWidth
-						variant='contained'
-						sx={{ mt: 3, mb: 2 }}>
-						Sign In
-					</Button>
+					{loading ? (
+						<CircularProgress />
+					) : (
+						<Button
+							color='primary'
+							type='submit'
+							fullWidth
+							variant='contained'
+							sx={{ mt: 3, mb: 2 }}>
+							Entrar
+						</Button>
+					)}
 					<Grid container>
 						<Grid item xs>
 							<Link href='#' variant='body2'>

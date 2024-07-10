@@ -21,7 +21,7 @@ export const UserZoneListItems = () => {
 		{
 			text: "Configuración",
 			icon: <SettingsIcon sx={{ color: iconColor }} />,
-			path: "/dashboard/settings",
+			path: "/dashboard/configuration",
 		},
 		{
 			text: "Logout",
@@ -32,17 +32,35 @@ export const UserZoneListItems = () => {
 
 	return (
 		<>
-			{menuItems.map((item, index) => (
-				<ListItemButton
-					key={index}
-					sx={{
-						background: pathName === item.path ? "rgba(65,76,99,1)" : "inherit",
-					}}
-					onClick={removeSession}>
-					<ListItemIcon>{item.icon}</ListItemIcon>
-					<ListItemText primary={item.text} />
-				</ListItemButton>
-			))}
+			{menuItems.map((item, index) => {
+				if (item.text === "Logout") {
+					return (
+						<ListItemButton
+							key={index}
+							sx={{
+								background:
+									pathName === item.path ? "rgba(65,76,99,1)" : "inherit",
+							}}
+							onClick={removeSession}>
+							<ListItemIcon>{item.icon}</ListItemIcon>
+							<ListItemText primary={item.text} />
+						</ListItemButton>
+					);
+				} else {
+					return (
+						<ListItemButton
+							key={index}
+							sx={{
+								background:
+									pathName === item.path ? "rgba(65,76,99,1)" : "inherit",
+							}}
+							href={item.path}>
+							<ListItemIcon>{item.icon}</ListItemIcon>
+							<ListItemText primary={item.text} />
+						</ListItemButton>
+					);
+				}
+			})}
 		</>
 	);
 };

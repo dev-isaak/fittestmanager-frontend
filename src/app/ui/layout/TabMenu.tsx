@@ -33,7 +33,7 @@ function TabMenu({ component, titleTab }: any) {
 	return (
 		<Box>
 			<Tabs
-				sx={{ background: "#e1e1e1" }}
+				// sx={{ background: "#e1e1e1" }}
 				value={tabContent}
 				onChange={handleTabChange}>
 				{titleTab?.map((item: string, index: number) => (
